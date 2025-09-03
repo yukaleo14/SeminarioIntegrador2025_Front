@@ -1,12 +1,17 @@
-import { Component, signal } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { Saludo } from './components/saludo/saludo';
+import { Header } from './components/header/header';
+import { Buscador } from './components/buscador/buscador';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, Saludo, Header,Buscador],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrl: './app.scss'
 })
-export class App {
-  protected readonly title = signal('front');
+export class App implements OnInit {
+
+  ngOnInit(){}
+
 }

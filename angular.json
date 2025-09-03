@@ -25,7 +25,8 @@
               }
             ],
             "styles": [
-              "src/styles.css"
+              "src/custom-theme.scss",
+              "src/styles.scss"
             ]
           },
           "configurations": {
@@ -82,11 +83,19 @@
               }
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.scss"
             ]
           }
         }
       }
     }
+  },
+  "schematics": {
+    "@schematics/angular:component": {
+      "style": "scss"
+    }
+  },
+  "cli": {
+    "analytics": false
   }
 }

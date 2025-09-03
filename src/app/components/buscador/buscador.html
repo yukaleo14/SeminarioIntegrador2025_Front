@@ -1,0 +1,6 @@
+<form [formGroup]="grupo" (ngSubmit)="onSubmit()">
+    <mat-form-field appearance="outline" [subscriptSizing]="'dynamic'">
+        <mat-icon matPrefix>search</mat-icon>
+        <input matInput placeholder="Buscá locales, comidas..." [formControlName]="'formBuscador'">
+    </mat-form-field>
+</form>
