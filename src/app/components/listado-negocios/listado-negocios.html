@@ -1,1 +1,5 @@
-<p>listado-negocios works!</p>
+<div class="cards-grid">
+@for (item of empresas; track $index) {
+    <app-card-empresa [empresa]="item"></app-card-empresa>
+}
+</div>

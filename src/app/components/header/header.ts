@@ -15,6 +15,7 @@ export class Header {
   ubicacionActual = signal('Direccion 46');
   cantPedidos = signal(5);
   items = signal(['hola', 'abc', 'direccion 244']);
+  isLoggedIn = signal(false);
 
   onCambiarSeleccion(item: any){
     this.ubicacionActual.set(item);

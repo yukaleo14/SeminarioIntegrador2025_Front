@@ -1,0 +1,30 @@
+.component-container {
+  width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  padding-inline: 0;
+}
+
+.carrusel-categorias {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-inline: 0;
+  scroll-padding-inline: 10px;
+  padding-bottom: 16px;
+}
+
+
+.carrusel-categorias::-webkit-scrollbar {
+  display: none; /* hide scrollbar Chrome/Safari */
+}
+.carrusel-categorias {
+  scrollbar-width: none; /* hide scrollbar Firefox */
+}
+
+.categoria-item-container {
+  flex: 0 0 auto;           /* each item keeps its width */
+  scroll-snap-align: start; /* optional with snap */
+}

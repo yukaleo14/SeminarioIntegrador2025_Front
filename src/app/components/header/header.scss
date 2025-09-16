@@ -1,7 +1,31 @@
+.ubicacion-container {
+  display: flex;
+  align-items: center;
+  gap: 4px; // spacing between "Enviar a" and the button
+}
+
 .example-spacer {
   flex: 1 1 auto;
 }
 
-.direcciones-menu .mat-menu-content{
-  padding: 30px;
+.label {
+  font-size: 0.85rem; // make "Enviar a" slightly smaller
+  opacity: 0.8;       // lighter so it looks secondary
+}
+
+.ubicacion-btn {
+  color: rgb(255, 166, 0); // or any accent color you want
+  font-weight: 500;
+  text-transform: none; // keeps normal case instead of uppercase
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.ubicacion-text{
+  color: rgb(255, 145, 0); // or any accent color you want
+  font-weight: 500;
+}
+
+.ubicacion-btn .arrow {
+  font-size: 18px;
 }

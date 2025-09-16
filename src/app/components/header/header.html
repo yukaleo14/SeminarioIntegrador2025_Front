@@ -1,24 +1,34 @@
 <mat-toolbar class="theme-primary">
-  <button matIconButton aria-label="Ver mis datos">
+  <button mat-icon-button aria-label="Ver mis datos">
     <mat-icon>menu</mat-icon>
   </button>
-  <div>
-    <span>Enviar a</span>
-    <button matButton [matMenuTriggerFor]="menu">{{ubicacionActual()}}</button>
+
+  <div class="ubicacion-container">
+    <span class="label">Enviar a</span>
+    <button mat-button [matMenuTriggerFor]="menu" class="ubicacion-btn">
+      <span class="ubicacion-text">{{ ubicacionActual() }}</span>
+      <mat-icon iconPositionEnd class="arrow">expand_more</mat-icon>
+    </button>
   </div>
 
   <span class="example-spacer"></span>
-  <button matIconButton aria-label="Carrito de compras">
-    <mat-icon class="material-symbols-outlined" [matBadge]="cantPedidos()">shopping_cart</mat-icon>
+
+  @if (isLoggedIn()) {
+  <button mat-icon-button aria-label="Carrito de compras">
+    <mat-icon class="material-symbols-outlined" [matBadgeHidden]="cantPedidos() ===0" [matBadge]="cantPedidos()">
+      shopping_cart
+    </mat-icon>
   </button>
+  }
+
 </mat-toolbar>
 
 <mat-menu #menu="matMenu" class="direcciones-menu">
   <ng-template matMenuContent>
     @for(item of items(); track $index){
-      <button mat-menu-item (click)="onCambiarSeleccion(item)">{{item}}</button>
+    <button mat-menu-item (click)="onCambiarSeleccion(item)">{{item}}</button>
     }@empty {
-      <span>No hay ubicaciones</span>
+    <span>No hay ubicaciones</span>
     }
   </ng-template>
 </mat-menu>

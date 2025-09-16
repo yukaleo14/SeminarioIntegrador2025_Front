@@ -1,0 +1,46 @@
+.empresa-card {
+  display: block;
+  width: 100%;
+  max-width: 320px;           /* adjust to fit grid */
+  border-radius: 16px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.empresa-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+}
+
+.empresa-portada {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  display: block;
+  aspect-ratio: 16/9;
+}
+
+.empresa-title {
+  padding: 12px 14px;
+}
+
+.empresa-nombre {
+  display: block;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #222;
+}
+
+.empresa-categorias {
+  display: block;
+  font-size: 14px;
+  color: #777;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;   /* avoid multi-line overflow */
+}
