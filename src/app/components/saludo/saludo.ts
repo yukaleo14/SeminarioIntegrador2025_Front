@@ -17,7 +17,7 @@ export class Saludo {
       tap(() => this.currentTime.set(new Date()))
     )
     .subscribe();
-
+  // TODO: Obtener nombre del usuario mediante service
   usuario = signal<string>('Martín');
   saludo = computed(() => {
     const hour = this.currentTime().getHours();

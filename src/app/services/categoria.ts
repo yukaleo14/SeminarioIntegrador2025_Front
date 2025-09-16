@@ -11,6 +11,8 @@ export class Categoria {
   private readonly baseUrl = '/backend';
   private LOCAL_DATA = LOCAL_DATA;
 
+  // TODO: Actualizar ruta de la peticion
+  // TODO: Mejor manejo de errores, reutilizar
   getLista(): Observable<CategoriaItem[]> {
     return of(this.LOCAL_DATA).pipe(
       catchError(this.handleError)

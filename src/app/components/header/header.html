@@ -13,12 +13,19 @@
 
   <span class="example-spacer"></span>
 
-  @if (isLoggedIn()) {
+  @if (mostrarCarrito()) {
   <button mat-icon-button aria-label="Carrito de compras">
-    <mat-icon class="material-symbols-outlined" [matBadgeHidden]="cantPedidos() ===0" [matBadge]="cantPedidos()">
+    <mat-icon class="material-symbols-outlined">
       shopping_cart
     </mat-icon>
   </button>
+  }
+  @if(mostrarLogin()) {
+  <a matIconButton [routerLink]="'/login'" aria-label="Iniciar sesión / registrarse">
+    <mat-icon class="material-symbols-outlined">
+      account_circle
+    </mat-icon>
+  </a>
   }
 
 </mat-toolbar>

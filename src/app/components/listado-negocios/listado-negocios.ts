@@ -9,6 +9,7 @@ import { CardEmpresa } from '../card-empresa/card-empresa';
   styleUrl: './listado-negocios.scss'
 })
 export class ListadoNegocios {
+  // TODO: Obtener negocios/empresas por service
   empresas = MOCK_EMPRESAS;
 }
 
