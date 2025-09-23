@@ -1,5 +1,9 @@
 <div class="cards-grid">
-@for (item of empresas; track $index) {
-    <app-card-empresa [empresa]="item"></app-card-empresa>
-}
+  @for (item of empresas(); track $index) {
+  <app-card-empresa [empresa]="item"></app-card-empresa>
+  }@empty {
+    @for (skeleton of [1,2,3,4,5,6]; track $index) {
+    <app-skeleton [width]="'285px'" [height]="'160px'" [radius]="'16px'"></app-skeleton>
+    }
+  }
 </div>

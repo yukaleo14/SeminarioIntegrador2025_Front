@@ -1,19 +1,32 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, signal, WritableSignal } from '@angular/core';
+import { delay, Observable, of } from 'rxjs';
 import { Empresa } from '../../models/Empresa';
 import { CardEmpresa } from '../card-empresa/card-empresa';
+import { Skeleton } from '../skeleton/skeleton';
 
 @Component({
   selector: 'app-listado-negocios',
-  imports: [CardEmpresa],
+  imports: [CardEmpresa, Skeleton],
   templateUrl: './listado-negocios.html',
   styleUrl: './listado-negocios.scss'
 })
-export class ListadoNegocios {
+export class ListadoNegocios implements OnInit{
   // TODO: Obtener negocios/empresas por service
-  empresas = MOCK_EMPRESAS;
+  empresas: WritableSignal<Empresa[]> = signal([]);
+
+  ngOnInit(): void {
+    MOCK_EMPRESAS.subscribe({
+      next: (data) =>{
+        this.empresas.set(data)
+      },
+      error:(err)=>{
+        this.empresas.set([]);
+      }
+    })
+  }
 }
 
-const MOCK_EMPRESAS: Empresa[] = [
+const MOCK_EMPRESAS: Observable<Empresa[]> = of([
   {
     id: 1,
     nombre: "Rose Garden Restaurant",
@@ -38,4 +51,4 @@ const MOCK_EMPRESAS: Empresa[] = [
     portada: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800",
     categorias: "Vegan - Salads - Healthy"
   }
-];
+]).pipe(delay(1000));
