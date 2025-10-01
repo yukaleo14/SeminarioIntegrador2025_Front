@@ -1,8 +1,9 @@
-<div style="display: flex; justify-content: center;">
+
+<div>
 
     <mat-card>
         <mat-card-header>
-            <h1>Ingreso</h1>
+            <h1>Registro</h1>
         </mat-card-header>
         <form>
         <mat-card-content>
@@ -13,7 +14,7 @@
                 <mat-icon matSuffix>mail</mat-icon>
             </mat-form-field>
 
-
+            <p></p>
 
             <mat-form-field appearance="outline">
                 <mat-label>Contraseña</mat-label>
@@ -23,7 +24,12 @@
                         'visibility'}}</mat-icon></button>
             </mat-form-field>
 
-            <mat-checkbox>Recuerdame</mat-checkbox>
+            <mat-form-field appearance="outline">
+                <mat-label>Confirma contraseña</mat-label>
+                <input [type]="hide() ? 'password' : 'text'" matInput placeholder="Confirmar contraseña">
+            </mat-form-field>
+            <p></p>
+            <mat-checkbox>Acepto los terminos y condiciones</mat-checkbox>
 
             </div>
            
@@ -34,14 +40,16 @@
         <mat-card-actions>
 
 
-            <button mat-stroked-button type="button" (click)="onRegistrarse()" aria-label="Registrarse">
+            <button mat-flat-button type="button" (click)="onRegistrarse()" aria-label="Registrarse">
                 Registrarse
             </button>
-            <button mat-flat-button type="submit" aria-label="Registrarse">
-                Iniciar sesion
-            </button>
+            
         </mat-card-actions>
         </form>
+        
+
+
+
     </mat-card>
 
 </div>
