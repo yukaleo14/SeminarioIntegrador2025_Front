@@ -15,6 +15,8 @@ import { MatInputModule } from '@angular/material/input';
 })
 export class Registro {
   hide = signal<boolean>(true);
+  hide2 = signal<boolean>(true);
+
   accept_terms_conditions: boolean = true;
  // la logica y variables de datos que se usan en el template
   onRegistrarse(){
@@ -23,5 +25,8 @@ export class Registro {
 
   toggleHide(){
     this.hide.update(valorActual => !valorActual);
+  }
+  toggleHide2(){
+    this.hide2.update(valorActual => !valorActual);
   }
 }

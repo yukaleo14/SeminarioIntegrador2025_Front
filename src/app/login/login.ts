@@ -1,4 +1,4 @@
-import { Component, model, signal } from '@angular/core';
+import { Component, inject, model, signal } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -6,6 +6,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { Router } from '@angular/router';
 
 
 
@@ -18,11 +19,13 @@ import { MatInputModule } from '@angular/material/input';
   styleUrl: './login.scss'
 })
 export class Login {
+  private _router = inject(Router);
   hide = signal<boolean>(true);
   remember_me: boolean = true;
  // la logica y variables de datos que se usan en el template
   onRegistrarse(){
     //Navegar al componente de registro
+    this._router.navigate(['/registro']);
   }
 
   toggleHide(){
