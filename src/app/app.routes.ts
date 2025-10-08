@@ -4,13 +4,14 @@ import { ItemCategoria } from './components/item-categoria/item-categoria';
 import { CardEmpresa } from './components/card-empresa/card-empresa';
 import { Login } from './login/login';
 import { Registro } from './registro/registro';
+import { EmpresaConsulta } from './empresa-consulta/empresa-consulta';
 
 export const routes: Routes = [
     {path:'home' ,component: Home},
     {path:'login' ,component: Login},
     {path:'categoria/:id' ,component: ItemCategoria},
-    {path:'empresa/:id' ,component: CardEmpresa},
     {path:'registro' ,component: Registro},
+    {path:'empresa/:id' ,component: EmpresaConsulta},
 
     {path:'**' ,redirectTo:'home'}
 ];

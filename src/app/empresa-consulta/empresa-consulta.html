@@ -1,0 +1,12 @@
+<div class="head-empresa">
+    <button mat-icon-button><mat-icon>chevron_left</mat-icon></button>
+    Local
+</div>
+@if (error()) {
+  <p>{{error()}}</p>
+}
+@if (empresa()) {
+  <img class="empresa-portada" [src]="empresa()!.portada" [alt]="empresa()!.nombre">
+}@else {
+    <app-skeleton [width]="'80%'" [height]="'80%'"></app-skeleton>
+}
