@@ -2,12 +2,53 @@
 <div style="display: flex; justify-content: center;">
 
     <mat-card>
-        <mat-card-header>
+        <mat-card-header class = "card-header">
             <h1>Registro</h1>
         </mat-card-header>
         <form>
         <mat-card-content>
+
             <div class = "card-content">
+                <div class = "form-row">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Nombre</mat-label>
+                        <input matInput type="text" placeholder="Nombre">
+                        <mat-icon matSuffix>person</mat-icon>
+                    </mat-form-field>
+
+
+            
+                    <mat-form-field appearance="outline">
+                        <mat-label>Apellido</mat-label>
+                        <input matInput type="text" placeholder="Nombre">
+                        <mat-icon matSuffix>person</mat-icon>
+                    </mat-form-field>
+                </div>
+            
+
+            
+                 <mat-form-field appearance="outline">
+                <mat-label>Telefono</mat-label>
+                <input matInput type="number" placeholder="Telefono">
+                <mat-icon matSuffix>phone</mat-icon>
+            </mat-form-field>
+
+            
+                 <mat-form-field appearance="outline">
+                <mat-label>DNI</mat-label>
+                <input matInput type="number" placeholder="DNI">
+                <mat-icon matSuffix>badge</mat-icon>
+            </mat-form-field>
+
+            
+                 <mat-form-field appearance="outline">
+                <mat-label>Cuit/Cuil</mat-label>
+                <input matInput type="number" placeholder="Cuit/Cuil">
+                <mat-icon matSuffix>account_box</mat-icon>
+            </mat-form-field>
+
+
+            
                  <mat-form-field appearance="outline">
                 <mat-label>Mail</mat-label>
                 <input matInput type="email" placeholder="Mail">
