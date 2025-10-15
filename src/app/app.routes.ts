@@ -5,6 +5,7 @@ import { CardEmpresa } from './components/card-empresa/card-empresa';
 import { Login } from './login/login';
 import { Registro } from './registro/registro';
 import { EmpresaConsulta } from './empresa-consulta/empresa-consulta';
+import { SeguimientoPedido } from './components/seguimiento-pedido/seguimiento-pedido';
 
 export const routes: Routes = [
     {path:'home' ,component: Home},
@@ -12,6 +13,7 @@ export const routes: Routes = [
     {path:'categoria/:id' ,component: ItemCategoria},
     {path:'registro' ,component: Registro},
     {path:'empresa/:id' ,component: EmpresaConsulta},
+    {path:'seguimiento' ,component: SeguimientoPedido},
 
     {path:'**' ,redirectTo:'home'}
 ];
