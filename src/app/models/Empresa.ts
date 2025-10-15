@@ -1,6 +1,9 @@
+import { Sucursal } from "./Sucursal";
+
 export interface Empresa {
   id: number
   nombre: string;
   portada: string;
-  categorias: string;
+  descripcion: string;
+  sucursal: Sucursal;
 }

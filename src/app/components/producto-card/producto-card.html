@@ -1,0 +1,11 @@
+<mat-card class="producto-card">
+    <img [ngSrc]="producto().imagen" width="150" height="150" alt="{{ producto().nombre }}" />
+    <div class="card-content">
+        <h4>{{ producto().nombre }}</h4>
+        <p>{{ producto().empresa.nombre }}</p>
+        <div class="precio">${{ producto().precio }}</div>
+    </div>
+    <button mat-fab color="primary" class="add-button" (click)="onAgregar()">
+        <mat-icon>add</mat-icon>
+    </button>
+</mat-card>

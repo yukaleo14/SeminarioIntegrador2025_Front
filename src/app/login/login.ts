@@ -1,4 +1,4 @@
-import { Component, inject, model, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -24,7 +24,7 @@ export class Login implements OnInit {
   private _fb = inject(FormBuilder);
   private _authService = inject(AuthService)
   hide = signal<boolean>(true);
-  remember_me: boolean = true;
+  remember_me = signal<boolean>(false);
   formularioLogin: FormGroup = new FormGroup({});
 
   ngOnInit(): void {
@@ -37,9 +37,15 @@ export class Login implements OnInit {
 
   onSubmit() {
     const rq: LoginDto = this.formularioLogin.getRawValue() as LoginDto;
-    console.log(rq);
+    this.formularioLogin.disable();
     this._authService.login(rq).subscribe({
-      next: (data) => { console.log(data) }
+      next: (data) => {
+        this._router.navigate(['/']);
+
+      },error: (err) =>{
+        //TODO: Manejo de errores
+        this.formularioLogin.enable();
+      },
     })
   }
 

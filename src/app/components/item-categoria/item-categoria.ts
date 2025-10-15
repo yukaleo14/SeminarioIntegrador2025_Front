@@ -1,6 +1,6 @@
 import { Component, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { CategoriaItem } from '../../models/CategoriaItem';
+import { CategoriaItem } from '../../models/Categoria';
 
 @Component({
   selector: 'app-item-categoria',

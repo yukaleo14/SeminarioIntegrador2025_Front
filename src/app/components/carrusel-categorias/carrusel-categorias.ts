@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, signal, computed, resource } from '@angular/core';
-import { CategoriaItem } from '../../models/CategoriaItem';
+import { CategoriaItem } from '../../models/Categoria';
 import { Categoria } from '../../services/categoria';
 import { ItemCategoria } from '../item-categoria/item-categoria';
 import { HttpErrorResponse } from '@angular/common/http';

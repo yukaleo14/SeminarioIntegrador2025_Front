@@ -1,12 +1,10 @@
-<div style="display: flex; justify-content: center;">
-
+<div class="card-container">
     <mat-card>
         <mat-card-header class="card-header">
             <h1>Ingreso</h1>
         </mat-card-header>
         <form [formGroup]="formularioLogin" (ngSubmit)="onSubmit()">
-            <mat-card-content>
-                <div class="card-content">
+            <mat-card-content class="card-content">
                     <mat-form-field appearance="outline">
                         <mat-label>Mail</mat-label>
                         <input matInput type="email" placeholder="Mail" formControlName="mail">
@@ -23,17 +21,10 @@
                         </button>
                     </mat-form-field>
 
-                    <mat-checkbox>Recuerdame</mat-checkbox>
-
-                </div>
-
-
-
+                    <mat-checkbox [checked]="remember_me">Recuerdame</mat-checkbox>
             </mat-card-content>
 
             <mat-card-actions>
-
-
                 <button mat-stroked-button type="button" (click)="onRegistrarse()" aria-label="Registrarse">
                     Registrarse
                 </button>

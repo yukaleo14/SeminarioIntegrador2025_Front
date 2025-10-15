@@ -1,12 +1,35 @@
-<div class="head-empresa">
-    <button mat-icon-button><mat-icon>chevron_left</mat-icon></button>
-    Local
+<div class="empresa-container">
+  <div class="header">
+    <button mat-icon-button>
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <span class="title">Local</span>
+  </div>
+
+  <img [ngSrc]="empresa()!.sucursal.imagenSucursal" width="512" height="256" class="header-image" />
+
+  <div class="info">
+    <h2 class="empresa-nombre">{{empresa()!.nombre}}</h2>
+    <p class="descripcion">
+      {{empresa()!.sucursal.descripcion}}
+    </p>
+
+
+    <div class="categorias">
+      @for (categoria of categorias(); track categoria) {
+      <button mat-stroked-button [color]="categoria === categoriaSeleccionada() ? 'primary' : undefined"
+        (click)="onCategoriaSelect(categoria)">
+        {{ categoria }}
+      </button>
+      }
+    </div>
+
+    <h3 class="subtitulo">{{ categoriaSeleccionada() }} ({{ productosFiltrados().length }})</h3>
+
+    <div class="productos">
+      @for (producto of productosFiltrados(); track producto.id) {
+      <app-producto-card (agregar)="agregarAlCarrito($event)" [producto]="producto"></app-producto-card>
+      }
+    </div>
+  </div>
 </div>
-@if (error()) {
-  <p>{{error()}}</p>
-}
-@if (empresa()) {
-  <img class="empresa-portada" [src]="empresa()!.portada" [alt]="empresa()!.nombre">
-}@else {
-    <app-skeleton [width]="'80%'" [height]="'80%'"></app-skeleton>
-}
