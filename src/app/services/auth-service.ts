@@ -10,12 +10,20 @@ export interface LoginDto {
 }
 
 export interface RegisterDto {
-  mail: string;
-  contraseña: string;
-  nombre?: string;
-  // Agrega otros campos según tu CreateUserDto
+  nombre: string,
+  apellido: string,
+  mail: string,
+  dni: string,
+  contraseña: string,
+  telefono: string,
+  cuit: string,
+  rol: Rol,
 }
-
+export enum Rol {
+    CLIENTE = 'CLIENTE',
+    DELIVERY = 'DELIVERY',
+    BUSINESS = 'BUSINESS',
+}
 export interface User {
   id: number;
   mail: string;

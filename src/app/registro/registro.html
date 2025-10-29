@@ -5,20 +5,20 @@
         <mat-card-header class = "card-header">
             <h1>Registro</h1>
         </mat-card-header>
-        <form>
+        <form [formGroup]="formularioRegistro" (ngSubmit)="onSubmit()">
         <mat-card-content>
 
             <div class = "card-content">
                 <div class = "form-row">
                     <mat-form-field appearance="outline" class = "field">
                         <mat-label>Nombre</mat-label>
-                        <input matInput type="text" placeholder="Nombre">
+                        <input matInput formControlName="nombre" type="text" placeholder="Nombre">
                         <mat-icon matSuffix>person</mat-icon>
                     </mat-form-field>
             
                     <mat-form-field appearance="outline" class = "field">
                         <mat-label>Apellido</mat-label>
-                        <input matInput type="text" placeholder="Nombre">
+                        <input matInput formControlName="apellido" type="text" placeholder="Nombre">
                         <mat-icon matSuffix>person</mat-icon>
                     </mat-form-field>
                 </div>
@@ -27,13 +27,13 @@
 
                 <mat-form-field appearance="outline" class = "field">
                     <mat-label>DNI</mat-label>
-                    <input matInput type="number" placeholder="DNI">
+                    <input matInput formControlName="dni" type="number" placeholder="DNI">
                     <mat-icon matSuffix>badge</mat-icon>
                 </mat-form-field>
             
                 <mat-form-field appearance="outline" class = "field">
                     <mat-label>Cuit/Cuil</mat-label>
-                    <input matInput type="number" placeholder="Cuit/Cuil">
+                    <input matInput formControlName="cuitCuil" type="number" placeholder="Cuit/Cuil">
                     <mat-icon matSuffix>account_box</mat-icon>
                 </mat-form-field>
 
@@ -43,13 +43,13 @@
 
                 <mat-form-field appearance="outline" class = "field">
                     <mat-label>Telefono</mat-label>
-                    <input matInput type="number" placeholder="Telefono">
+                    <input matInput formControlName="telefono" type="number" placeholder="Telefono">
                     <mat-icon matSuffix>phone</mat-icon>
                 </mat-form-field>
 
                 <mat-form-field appearance="outline" class = "field">
                     <mat-label>Mail</mat-label>
-                    <input matInput type="email" placeholder="Mail">
+                    <input matInput formControlName="mail" type="email" placeholder="Mail">
                     <mat-icon matSuffix>mail</mat-icon>
                 </mat-form-field>
 
@@ -60,7 +60,7 @@
 
                 <mat-form-field appearance="outline" class = "field">
                     <mat-label>Contraseña</mat-label>
-                    <input [type]="hide() ? 'password' : 'text'" matInput placeholder="Contraseña">
+                    <input formControlName="contraseña" [type]="hide() ? 'password' : 'text'" matInput placeholder="Contraseña">
                     <button mat-icon-button matSuffix (click)="toggleHide()" [attr.aria-label]="'Hide Password'"
                         [attr.aria-pressed]="hide()" type="button"><mat-icon>{{hide() ? 'visibility_off' :
                             'visibility'}}</mat-icon></button>
@@ -68,7 +68,7 @@
 
                 <mat-form-field appearance="outline" class = "field">
                     <mat-label>Confirmar Contraseña</mat-label>
-                    <input [type]="hide2() ? 'password' : 'text'" matInput placeholder="Contraseña">
+                    <input formControlName="confContraseña" [type]="hide2() ? 'password' : 'text'" matInput placeholder="Contraseña">
                     <button mat-icon-button matSuffix (click)="toggleHide2()" [attr.aria-label]="'Hide Password'"
                         [attr.aria-pressed]="hide()" type="button"><mat-icon>{{hide() ? 'visibility_off' :
                             'visibility'}}</mat-icon></button>
@@ -77,7 +77,7 @@
             </div>
             
 
-            <mat-checkbox>Acepto los terminos y condiciones</mat-checkbox>
+            <mat-checkbox formControlName="termCondiciones">Acepto los terminos y condiciones</mat-checkbox>
 
             </div>
            
@@ -88,7 +88,7 @@
         <mat-card-actions>
 
 
-            <button mat-flat-button type="button" (click)="onRegistrarse()" aria-label="Registrarse">
+            <button mat-flat-button type="submit" [disabled]="!formularioRegistro.valid" aria-label="Registrarse">
                 Registrarse
             </button>
             
