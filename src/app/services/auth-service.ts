@@ -38,8 +38,6 @@ export class AuthService {
   login(loginDto: LoginDto): Observable<{token: string}> {
     return this.http.post<{token: string}>(`${this.apiUrl}/login`, loginDto).pipe(
       tap(token => {
-        console.log({token});
-        
         this.setToken(token.token);
         this.currentUserSubject.next(this.getUserFromToken());
       })

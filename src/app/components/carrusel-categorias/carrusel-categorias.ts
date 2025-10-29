@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, signal, computed, resource } from '@angular/core';
-import { CategoriaItem } from '../../models/Categoria';
-import { Categoria } from '../../services/categoria';
+import { Categoria } from '../../models/Categoria';
+import { CategoriaService } from '../../services/categoria-service';
 import { ItemCategoria } from '../item-categoria/item-categoria';
 import { HttpErrorResponse } from '@angular/common/http';
 
@@ -11,10 +11,10 @@ import { HttpErrorResponse } from '@angular/common/http';
   styleUrl: './carrusel-categorias.scss'
 })
 export class CarruselCategorias implements OnInit {
-  private readonly _dataService = inject(Categoria);
+  private readonly _dataService = inject(CategoriaService);
 
   // State signals
-  categorias = signal<CategoriaItem[]>([]);
+  categorias = signal<Categoria[]>([]);
   loading = signal(false);
   error = signal<string | null>(null);
 

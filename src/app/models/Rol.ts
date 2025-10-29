@@ -1,3 +1,5 @@
-export interface Rol {
-    nombre: string;
+export enum Rol {
+    REPARTIDOR = 'REPARTIDOR',
+    EMPRESA = 'EMPRESA',
+    CLIENTE = 'CLIENTE'
 }

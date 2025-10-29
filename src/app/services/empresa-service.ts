@@ -9,7 +9,23 @@ import { Producto } from '../models/Producto';
   providedIn: 'root'
 })
 export class EmpresaService {
-  readonly local_example: Empresa = {id: 123, nombre: 'Hola', portada: 'hola', categorias:''}
+  readonly local_example: Empresa = {
+    id: 123, nombre: 'Hola', portada: 'hola', descripcion: '',
+    sucursal: {
+      altura: 12,
+      calle: '',
+      coordenadaX: 123,
+      coordenadaY: 123,
+      imagenSucursal: '',
+      nombreUbicacion: 'nombre',
+      descripcion: 'hola',
+      horario: [{
+        desde: 16,
+        hasta: 21,
+        dia: { nombre: '' }
+      }]
+    }
+  }
   private apiUrl = `${environment.apiUrl}/empresa`;
 
   constructor(private http: HttpClient) {}

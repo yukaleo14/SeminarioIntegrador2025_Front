@@ -1,3 +1,4 @@
+import { Categoria } from "./Categoria";
 import { Sucursal } from "./Sucursal";
 
 export interface Empresa {
@@ -6,4 +7,5 @@ export interface Empresa {
   portada: string;
   descripcion: string;
   sucursal: Sucursal;
+  categorias?: Categoria[]
 }
