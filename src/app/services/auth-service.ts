@@ -20,7 +20,6 @@ export interface RegisterDto {
   cuit: string,
   rol: Rol
 }
-
 export interface User {
   id: number;
   mail: string;
