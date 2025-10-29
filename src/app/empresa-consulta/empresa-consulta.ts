@@ -14,9 +14,9 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { Producto } from '../models/Producto';
 import { EmpresaService } from '../services/empresa-service';
-import { Empresa } from '../models/Empresa';
 import { ProductoCard } from '../components/producto-card/producto-card';
 import { CarroService } from '../services/carro-service';
+import { Sucursal } from '../models/Sucursal';
 
 
 @Component({
@@ -40,7 +40,7 @@ export class EmpresaConsultaComponent {
   private readonly _carro = inject(CarroService);
   idEmpresa = input.required<number>();
   productos = signal<Producto[]>([]);
-  empresa = signal<Empresa | null>(null);
+  empresa = signal<Sucursal | null>(null);
   isLoading = computed( ()=> {this.empresa() === null});
   categorias = computed(() => {
     const set = new Set(this.productos().map(p => p.categoria.nombre));
@@ -53,10 +53,6 @@ export class EmpresaConsultaComponent {
       p => p.categoria.nombre === this.categoriaSeleccionada()
     )
   );
-
-  getEmpresa(){
-
-  }
 
   ngOnInit() {
       // Simulación de carga
@@ -74,7 +70,7 @@ export class EmpresaConsultaComponent {
   }
 
   agregarAlCarrito(producto: Producto){
-
+    this._carro.addProduct(producto, 1);
   }
 
 }

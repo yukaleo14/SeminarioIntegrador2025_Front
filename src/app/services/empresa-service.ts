@@ -1,38 +1,20 @@
-import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { Empresa } from '../models/Empresa';
-import { environment } from '../environments/environment';
 import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { environment } from '../environments/environment';
 import { Producto } from '../models/Producto';
+import { Sucursal } from '../models/Sucursal';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EmpresaService {
-  readonly local_example: Empresa = {
-    id: 123, nombre: 'Hola', portada: 'hola', descripcion: '',
-    sucursal: {
-      altura: 12,
-      calle: '',
-      coordenadaX: 123,
-      coordenadaY: 123,
-      imagenSucursal: '',
-      nombreUbicacion: 'nombre',
-      descripcion: 'hola',
-      horario: [{
-        desde: 16,
-        hasta: 21,
-        dia: { nombre: '' }
-      }]
-    }
-  }
   private apiUrl = `${environment.apiUrl}/empresa`;
 
   constructor(private http: HttpClient) {}
 
-  getById(id: number): Observable<Empresa>{
-    return this.http.get<Empresa>(`${this.apiUrl}/${id}`);
-    return of(this.local_example)
+  getById(id: number): Observable<Sucursal>{
+    return this.http.get<Sucursal>(`${this.apiUrl}/${id}`);
   }
 
   getProductos(): Observable<Producto[]>{

@@ -1,9 +1,9 @@
 import { Component, inject, OnInit, signal, WritableSignal } from '@angular/core';
 import { delay, Observable, of } from 'rxjs';
-import { Empresa } from '../../models/Empresa';
 import { CardEmpresa } from '../card-empresa/card-empresa';
 import { Skeleton } from '../skeleton/skeleton';
 import { EmpresaService } from '../../services/empresa-service';
+import { Sucursal } from '../../models/Sucursal';
 
 @Component({
   selector: 'app-listado-negocios',
@@ -13,7 +13,7 @@ import { EmpresaService } from '../../services/empresa-service';
 })
 export class ListadoNegocios implements OnInit{
   // TODO: Obtener negocios/empresas por service
-  empresas: WritableSignal<Empresa[]> = signal([]);
+  empresas: WritableSignal<Sucursal[]> = signal([]);
 
   private readonly _dataService = inject(EmpresaService);
   ngOnInit(): void {

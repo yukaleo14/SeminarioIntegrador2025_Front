@@ -12,7 +12,7 @@ export class CategoriaService {
   private apiUrl = `${environment.apiUrl}/categoria`;
 
   getLista(): Observable<Categoria[]> {
-    return this.http.get<Categoria[]>(`/${this.apiUrl}/`);
+    return this.http.get<Categoria[]>(`${this.apiUrl}/`);
   }
 }
 /* const LOCAL_DATA: CategoriaItem[] = [
