@@ -36,6 +36,11 @@ export class Login implements OnInit {
   }
 
   onSubmit() {
+    if (!this.formularioLogin.valid){
+      return 
+    }
+
+
     const rq: LoginDto = this.formularioLogin.getRawValue() as LoginDto;
     this.formularioLogin.disable();
     this._authService.login(rq).subscribe({

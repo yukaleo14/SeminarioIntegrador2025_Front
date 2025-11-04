@@ -28,7 +28,7 @@
                 <button mat-stroked-button type="button" (click)="onRegistrarse()" aria-label="Registrarse">
                     Registrarse
                 </button>
-                <button mat-flat-button type="submit" aria-label="Registrarse">
+                <button mat-flat-button type="submit" aria-label="Iniciar sesion" [disabled]="!formularioLogin.valid">
                     Iniciar sesion
                 </button>
             </mat-card-actions>
