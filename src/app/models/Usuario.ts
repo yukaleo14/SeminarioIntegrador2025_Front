@@ -1,4 +1,6 @@
 import { Rol } from "./Rol";
+import { Sucursal } from "./Sucursal";
+import { Ubicacion } from "./Ubicacion";
 
 export interface Usuario {
     nombre: string;
@@ -8,4 +10,6 @@ export interface Usuario {
     mail: string;
     cuit: string;
     rol: Rol;
+    sucursal?: Sucursal;
+    ubicacion?: Ubicacion[];
 }

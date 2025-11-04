@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { environment } from '../environments/environment';
+import { Rol } from '../models/Rol';
 
 export interface LoginDto {
   mail: string;
@@ -10,12 +11,15 @@ export interface LoginDto {
 }
 
 export interface RegisterDto {
-  mail: string;
-  contraseña: string;
-  nombre?: string;
-  // Agrega otros campos según tu CreateUserDto
+  nombre: string,
+  apellido: string,
+  mail: string,
+  dni: string,
+  contraseña: string,
+  telefono: string,
+  cuit: string,
+  rol: Rol
 }
-
 export interface User {
   id: number;
   mail: string;
