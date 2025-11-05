@@ -1,0 +1,13 @@
+.producto-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+
+    .add-button {
+        position: absolute;
+        bottom: 1rem;
+        right: 1rem;
+    }
+}

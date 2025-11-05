@@ -1,67 +1,62 @@
-import { Component,forwardRef,inject, OnInit, signal} from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, NG_VALUE_ACCESSOR, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatError, MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { Router } from '@angular/router';
 import { AuthService, RegisterDto } from '../services/auth-service';
-import { Rol } from '../models/Rol';
 
 @Component({
   selector: 'app-registro',
-  imports: [MatCardModule,MatCheckboxModule, MatInputModule, ReactiveFormsModule, MatFormFieldModule, MatIconModule, MatButtonModule],
+  imports: [MatCardModule, MatCheckboxModule, MatInputModule, ReactiveFormsModule, MatFormFieldModule, MatIconModule, MatButtonModule, MatSelectModule, MatError],
   templateUrl: './registro.html',
   styleUrl: './registro.scss',
-  providers: [{
-    provide: NG_VALUE_ACCESSOR,
-    useExisting: forwardRef(() => 'mail'),
-    multi: true,
-  }]
-  
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class Registro implements OnInit{
-
-
+export class Registro {
   hide = signal<boolean>(true);
   hide2 = signal<boolean>(true);
-  
-  private formBuilder = inject(FormBuilder);
-  private _router = inject(Router);
   private _fb = inject(FormBuilder);
   private _authService = inject(AuthService);
   formularioRegistro: FormGroup = new FormGroup({});
-  registerButtonControl = new FormControl(''); 
-  constructor(){
-        this.formularioRegistro = this._fb.group({
-    nombre: ['',Validators.required],
-    apellido: ['',Validators.required],
-    dni: ['',Validators.required],
-    cuitCuil: ['',Validators.required],
-    telefono: ['',Validators.required],
-    mail: ['',[Validators.required, Validators.email]],
-    contraseña: ['',Validators.required],
-    confContraseña: ['',Validators.required],
-    termCondiciones: [false,Validators.requiredTrue]
-    
-  });
+  constructor() {
+    this.formularioRegistro = this._fb.group({
+        nombre: ['', Validators.required],
+        apellido: ['', Validators.required],
+        dni: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(8)]],
+        cuitCuil: ['', [Validators.required, Validators.minLength(11), Validators.maxLength(11)]],
+        telefono: ['', Validators.required],
+        mail: ['', [Validators.required, Validators.email]],
+        tipoUsuario: ['', Validators.required],
+        contraseña: ['', Validators.required],
+        confContraseña: ['', Validators.required],
+        termCondiciones: [false, Validators.requiredTrue]
+      }, { validators: confirmPasswordValidator }
+    );
+
   }
 
-  ngOnInit(): void {
-
-    
-
-
-}
-
-  onSubmit(){
+  private readonly router = inject(Router);
+  onSubmit() {
     if (!this.formularioRegistro.valid) return
     const rq = this.getObject();
-    this._authService.register(rq);
+    this._authService.register(rq).subscribe({
+      next: (token) => {
+        console.log('Usuario registrado correctamente');
+        this.router.navigate(['/dashboard']); // o donde corresponda
+      },
+      error: (err) => {
+        console.error('Error al registrar:', err);
+        alert('Error al registrar el usuario. Por favor, intente nuevamente.');
+      }
+    });
   }
-  getObject(): RegisterDto{
+
+  getObject(): RegisterDto {
     return {
       nombre: this.formularioRegistro.controls['nombre'].value,
       apellido: this.formularioRegistro.controls['apellido'].value,
@@ -70,21 +65,38 @@ export class Registro implements OnInit{
       dni: this.formularioRegistro.controls['dni'].value,
       mail: this.formularioRegistro.controls['mail'].value,
       telefono: this.formularioRegistro.controls['telefono'].value,
-      rol: Rol.CLIENTE
+      rol: this.formularioRegistro.controls['tipoUsuario'].value
+    }
   }
-}
 
-  accept_terms_conditions: boolean = true;
- // la logica y variables de datos que se usan en el template
-
-  toggleHide(){
+  toggleHide() {
     this.hide.update(valorActual => !valorActual);
   };
-  toggleHide2(){
+  toggleHide2() {
     this.hide2.update(valorActual => !valorActual);
   };
 
+}
 
-  
+export const confirmPasswordValidator: ValidatorFn = (group: AbstractControl): ValidationErrors | null => {
+  const passwordControl = group.get('contraseña');
+  const confirmControl = group.get('confContraseña');
+
+  if (!passwordControl || !confirmControl) return null;
+  const password = passwordControl.value;
+  const confirm = confirmControl.value;
+  // Si aún no se completaron ambos campos, limpiamos error previo
+  if (!password || !confirm) {
+    confirmControl.setErrors(null);
+    return null;
   }
-
+  if (password !== confirm) {
+    confirmControl.setErrors({ passwordNoMatch: true });
+    return { passwordNoMatch: true };
+  }
+  // Si coinciden, aseguramos limpiar errores anteriores
+  if (confirmControl.hasError('passwordNoMatch')) {
+    confirmControl.setErrors(null);
+  }
+  return null;
+};

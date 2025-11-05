@@ -18,8 +18,8 @@
     <div class="categorias">
       @for (categoria of categorias(); track categoria) {
       <button mat-stroked-button [color]="categoria === categoriaSeleccionada() ? 'primary' : undefined"
-        (click)="onCategoriaSelect(categoria)">
-        {{ categoria }}
+        (click)="onCategoriaSelect(categoria.id)">
+        {{ categoria.nombre }}
       </button>
       }
     </div>

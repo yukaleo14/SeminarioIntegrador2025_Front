@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { environment } from '../environments/environment';
 import { Rol } from '../models/Rol';
-
+import { Usuario } from '../models/Usuario';
 export interface LoginDto {
   mail: string;
   contraseña: string;
@@ -60,7 +60,7 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem('token');
     this.currentUserSubject.next(null);
-    this.router.navigate(['/login']);
+    //this.router.navigate(['/login']);
   }
 
   getToken(): string | null {
@@ -122,4 +122,12 @@ export class AuthService {
     const user = this.getCurrentUser();
     return user?.id || null;
   }
+
+    /**
+     * Obtiene el perfil del usuario actual
+     * Usa el endpoint /auth/profile que ya existe en el backend
+     */
+    getCurrentUserProfile(): Observable<Usuario> {
+      return this.http.get<Usuario>(`${this.apiUrl}/profile`);
+    }
 }

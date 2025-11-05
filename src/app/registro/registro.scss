@@ -1,13 +1,21 @@
-.card-header{display:flex;
-justify-content: center;
-align-items: center;
-
-}
-.form-row{
+.registro-container {
     display: flex;
-    gap: 16px;
+    justify-content: center;
+    margin-top: 2rem;
 }
 
-.field{
-    width: 230px;
+.card-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
+.form-row {
+    display: flex;
+    gap: 2rem;
+}
+
+.field {
+    width: 100%;
 }

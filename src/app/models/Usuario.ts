@@ -9,7 +9,7 @@ export interface Usuario {
     dni: string;
     mail: string;
     cuit: string;
-    rol: Rol;
-    sucursal?: Sucursal;
-    ubicacion?: Ubicacion[];
+    rol: Rol; // CLIENTE, BUSINESS, DELIVERY
+    sucursal?: Sucursal; // Tiene si rol = 'BUSINESS'
+    ubicacion?: Ubicacion[];// Tiene si rol ='CLIENTE'
 }

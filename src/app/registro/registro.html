@@ -1,103 +1,86 @@
-
-<div style="display: flex; justify-content: center;">
-
+<div class="registro-container">
     <mat-card>
-        <mat-card-header class = "card-header">
+        <mat-card-header class="card-header">
             <h1>Registro</h1>
         </mat-card-header>
         <form [formGroup]="formularioRegistro" (ngSubmit)="onSubmit()">
-        <mat-card-content>
-
-            <div class = "card-content">
-                <div class = "form-row">
-                    <mat-form-field appearance="outline" class = "field">
-                        <mat-label>Nombre</mat-label>
-                        <input matInput formControlName="nombre" type="text" placeholder="Nombre">
-                        <mat-icon matSuffix>person</mat-icon>
+            <mat-card-content>
+                <div class="card-content">
+                    <div class="form-row">
+                        <mat-form-field appearance="outline" class="field">
+                            <mat-label>Nombre</mat-label>
+                            <input matInput formControlName="nombre" type="text" placeholder="Nombre">
+                            <mat-icon matSuffix>person</mat-icon>
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" class="field">
+                            <mat-label>Apellido</mat-label>
+                            <input matInput formControlName="apellido" type="text" placeholder="Apellido">
+                        </mat-form-field>
+                    </div>
+                    <div class="form-row">
+                        <mat-form-field appearance="outline" class="field">
+                            <mat-label>DNI</mat-label>
+                            <input matInput formControlName="dni" placeholder="DNI">
+                            <mat-icon matSuffix>badge</mat-icon>
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" class="field">
+                            <mat-label>Cuit/Cuil</mat-label>
+                            <input matInput formControlName="cuitCuil" placeholder="Cuit/Cuil">
+                            <mat-icon matSuffix>account_box</mat-icon>
+                        </mat-form-field>
+                    </div>
+                    <div class="form-row">
+                        <mat-form-field appearance="outline" class="field">
+                            <mat-label>Telefono</mat-label>
+                            <input matInput formControlName="telefono" placeholder="Telefono">
+                            <mat-icon matSuffix>phone</mat-icon>
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" class="field">
+                            <mat-label>Mail</mat-label>
+                            <input matInput formControlName="mail" type="email" placeholder="Mail">
+                            <mat-icon matSuffix>mail</mat-icon>
+                        </mat-form-field>
+                    </div>
+                    <div class="form-row">
+                        <mat-form-field appearance="outline" class="field">
+                            <mat-label>Contraseña</mat-label>
+                            <input formControlName="contraseña" [type]="hide() ? 'password' : 'text'" matInput
+                                placeholder="Contraseña">
+                            <button mat-icon-button matSuffix (click)="toggleHide()"
+                                [attr.aria-pressed]="hide()" type="button"><mat-icon>{{hide() ?  'visibility': 'visibility_off'}}</mat-icon></button>
+                        </mat-form-field>
+                        <mat-form-field appearance="outline" class="field">
+                            <mat-label>Confirmar Contraseña</mat-label>
+                            <input formControlName="confContraseña" [type]="hide2() ? 'password' : 'text'" matInput
+                                placeholder="Confirmar contraseña">
+                            <button mat-icon-button matSuffix (click)="toggleHide2()"
+                             [attr.aria-pressed]="hide2()"
+                                type="button"><mat-icon>{{hide2() ? 'visibility': 'visibility_off'}}</mat-icon></button>
+                                @if(formularioRegistro.get('confContraseña')?.hasError('passwordNoMatch') && formularioRegistro.get('confContraseña')?.touched) {
+                                    <mat-error>Las contraseñas no coinciden.</mat-error>
+                                }
+                            </mat-form-field>
+                        </div>
+                    <mat-form-field appearance="outline" class="field">
+                        <mat-label>Tipo de Usuario</mat-label>
+                        <mat-select formControlName="tipoUsuario" placeholder="Tipo de Usuario">
+                            <mat-option value="CLIENTE">Cliente</mat-option>
+                            <mat-option value="BUSINESS">Empresa</mat-option>
+                            <mat-option value="DELIVERY">Repartidor</mat-option>
+                        </mat-select>
                     </mat-form-field>
-            
-                    <mat-form-field appearance="outline" class = "field">
-                        <mat-label>Apellido</mat-label>
-                        <input matInput formControlName="apellido" type="text" placeholder="Nombre">
-                        <mat-icon matSuffix>person</mat-icon>
-                    </mat-form-field>
+                    <p>
+                        <mat-checkbox formControlName="termCondiciones">Acepto los terminos y condiciones</mat-checkbox>
+                    </p>
                 </div>
+            </mat-card-content>
+            <mat-card-actions>
+                <button mat-flat-button type="submit" [disabled]="!formularioRegistro.valid" aria-label="Registrarse">
+                    Registrarse
+                </button>
 
-            <div class = "form-row">
-
-                <mat-form-field appearance="outline" class = "field">
-                    <mat-label>DNI</mat-label>
-                    <input matInput formControlName="dni" type="number" placeholder="DNI">
-                    <mat-icon matSuffix>badge</mat-icon>
-                </mat-form-field>
-            
-                <mat-form-field appearance="outline" class = "field">
-                    <mat-label>Cuit/Cuil</mat-label>
-                    <input matInput formControlName="cuitCuil" type="number" placeholder="Cuit/Cuil">
-                    <mat-icon matSuffix>account_box</mat-icon>
-                </mat-form-field>
-
-            </div>
-            
-            <div class = "form-row">
-
-                <mat-form-field appearance="outline" class = "field">
-                    <mat-label>Telefono</mat-label>
-                    <input matInput formControlName="telefono" type="number" placeholder="Telefono">
-                    <mat-icon matSuffix>phone</mat-icon>
-                </mat-form-field>
-
-                <mat-form-field appearance="outline" class = "field">
-                    <mat-label>Mail</mat-label>
-                    <input matInput formControlName="mail" type="email" placeholder="Mail">
-                    <mat-icon matSuffix>mail</mat-icon>
-                </mat-form-field>
-
-            </div>
-
-            
-            <div class = "form-row">
-
-                <mat-form-field appearance="outline" class = "field">
-                    <mat-label>Contraseña</mat-label>
-                    <input formControlName="contraseña" [type]="hide() ? 'password' : 'text'" matInput placeholder="Contraseña">
-                    <button mat-icon-button matSuffix (click)="toggleHide()" [attr.aria-label]="'Hide Password'"
-                        [attr.aria-pressed]="hide()" type="button"><mat-icon>{{hide() ? 'visibility_off' :
-                            'visibility'}}</mat-icon></button>
-                </mat-form-field>
-
-                <mat-form-field appearance="outline" class = "field">
-                    <mat-label>Confirmar Contraseña</mat-label>
-                    <input formControlName="confContraseña" [type]="hide2() ? 'password' : 'text'" matInput placeholder="Contraseña">
-                    <button mat-icon-button matSuffix (click)="toggleHide2()" [attr.aria-label]="'Hide Password'"
-                        [attr.aria-pressed]="hide()" type="button"><mat-icon>{{hide() ? 'visibility_off' :
-                            'visibility'}}</mat-icon></button>
-                </mat-form-field>
-
-            </div>
-            
-
-            <mat-checkbox formControlName="termCondiciones">Acepto los terminos y condiciones</mat-checkbox>
-
-            </div>
-           
-
-
-        </mat-card-content>
-
-        <mat-card-actions>
-
-
-            <button mat-flat-button type="submit" [disabled]="!formularioRegistro.valid" aria-label="Registrarse">
-                Registrarse
-            </button>
-            
-            
-        </mat-card-actions>
+            </mat-card-actions>
         </form>
-        
-
-
 
     </mat-card>
 
