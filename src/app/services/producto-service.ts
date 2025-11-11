@@ -17,7 +17,7 @@ export class ProductoService {
     return this.http.get<Producto>(`${this.apiUrl}/${id}`);
   }
 
-  getProductosBySucursal(sucursalId?:number, categoriaId?: number): Observable<Producto[]>{
+  getProductosBySucursalAndCategoria(sucursalId?:number, categoriaId?: number): Observable<Producto[]>{
     let params = new HttpParams();
     if (sucursalId) {
       params = params.set('sucursalId', sucursalId);

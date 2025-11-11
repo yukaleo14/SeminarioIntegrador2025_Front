@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../environments/environment';
@@ -12,28 +12,10 @@ export class CategoriaService {
   private apiUrl = `${environment.apiUrl}/categoria`;
 
   getLista(): Observable<Categoria[]> {
-    return this.http.get<Categoria[]>(`${this.apiUrl}/`);
+    return this.http.get<Categoria[]>(`${this.apiUrl}`);
+  }
+  getListaBySucursal(sucursalId: number): Observable<Categoria[]> {
+    const params = new HttpParams().set('sucursalId', sucursalId.toString());
+    return this.http.get<Categoria[]>(`${this.apiUrl}`, { params });
   }
 }
-/* const LOCAL_DATA: CategoriaItem[] = [
-  {
-    id: 1,
-    nombre: 'Hamburguesas',
-    imagen: '/img/categoria-hamburguesas.png'
-  },
-  {
-    id: 2,
-    nombre: 'Pizzas',
-    imagen: '/img/categoria-pizzas.png'
-  },
-  {
-    id: 3,
-    nombre: 'Panadería',
-    imagen: '/img/categoria-panaderias.png'
-  },
-  {
-    id: 4,
-    nombre: 'Ensaladas',
-    imagen: '/img/categoria-ensaladas.png'
-  }
-]; */

@@ -4,7 +4,9 @@ import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { environment } from '../environments/environment';
 import { Rol } from '../models/Rol';
-import { Usuario } from '../models/Usuario';
+import { Empresa } from '../models/Empresa';
+import { Comprador } from '../models/Comprador';
+import { Repartidor } from '../models/Repartidor';
 export interface LoginDto {
   mail: string;
   contraseña: string;
@@ -17,13 +19,40 @@ export interface RegisterDto {
   dni: string,
   contraseña: string,
   telefono: string,
-  cuit: string,
-  rol: Rol
+  cuitCuil: string,
+  rol: Rol,
+  imagenPerfil: string,
+  altura: string,
+  calle: string,
+  nombreUbicacion: string,
+  coordenadaX: number,
+  coordenadaY: number
 }
-export interface User {
+
+export class User {
   id: number;
   mail: string;
-  rol: string;
+  rol: Rol;
+  empresa?: Empresa;
+  comprador?: Comprador;
+  repartidor?: Repartidor;
+  constructor(id: number, mail: string, rol: Rol) {
+    this.id = id;
+    this.mail = mail;
+    this.rol = rol;
+  }
+  getDataByRole(): Empresa | Comprador | Repartidor | undefined {
+    switch (this.rol) {
+      case Rol.EMPRESA:
+        return this.empresa;
+      case Rol.COMPRADOR:
+        return this.comprador;
+      case Rol.REPARTIDOR:
+        return this.repartidor;
+      default:
+        return undefined;
+    }
+  }
 }
 
 @Injectable({
@@ -90,11 +119,7 @@ export class AuthService {
 
     try {
       const payload = this.decodeToken(token);
-      return {
-        id: payload.id,
-        mail: payload.mail,
-        rol: payload.rol
-      };
+      return new User( payload.id, payload.mail, payload.rol);
     } catch {
       return null;
     }
@@ -110,7 +135,7 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
-  hasRole(role: string): boolean {
+  hasRole(role: Rol): boolean {
     const user = this.getCurrentUser();
     return user?.rol === role;
   }
@@ -127,7 +152,7 @@ export class AuthService {
      * Obtiene el perfil del usuario actual
      * Usa el endpoint /auth/profile que ya existe en el backend
      */
-    getCurrentUserProfile(): Observable<Usuario> {
-      return this.http.get<Usuario>(`${this.apiUrl}/profile`);
+    getCurrentUserProfile(): Observable<User> {
+      return this.http.get<User>(`${this.apiUrl}/profile`);
     }
 }

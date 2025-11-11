@@ -1,3 +1,9 @@
-export interface Dia {
-    nombre: string;
+export enum Dia {
+    LUNES,
+    MARTES,
+    MIERCOLES,
+    JUEVES,
+    VIERNES,
+    SABADO,
+    DOMINGO
 }

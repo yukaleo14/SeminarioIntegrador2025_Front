@@ -2,9 +2,9 @@
   <span class="example-spacer"></span>
 
   @if (this.isLoggedIn()) {
-  <button mat-icon-button aria-label="Carrito de compras">
+  <button mat-icon-button aria-label="Menú de usuario" [matMenuTriggerFor]="userMenu">
     <mat-icon class="material-symbols-outlined">
-      shopping_cart
+      account_circle
     </mat-icon>
   </button>
   }@else {
@@ -16,3 +16,11 @@
   }
 
 </mat-toolbar>
+
+<mat-menu #userMenu="matMenu">
+  <button mat-menu-item (click)="logout()">
+    <mat-icon class="material-symbols-outlined">logout</mat-icon>
+    <span>Cerrar sesión</span>
+  </button>
+
+</mat-menu>

@@ -1,7 +1,5 @@
-<div class="component-container">
-    <div class="carrusel-categorias scroll-container">
-        @for (item of categorias(); track $index) {
-        <app-item-categoria [data]="item"></app-item-categoria>
-        }
-    </div>
+<div class="carrusel-categorias scroll-container">
+    @for (item of categorias(); track item.id) {
+    <app-item-categoria [data]="item" (click)="onCategoriaClick(item)"></app-item-categoria>
+    }
 </div>

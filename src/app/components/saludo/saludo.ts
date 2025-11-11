@@ -1,8 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Usuario } from '../../models/Usuario';
-import { AuthService } from '../../services/auth-service';
+import { AuthService, User } from '../../services/auth-service';
 
 @Component({
   selector: 'app-saludo',
@@ -23,10 +22,8 @@ export class Saludo {
       takeUntilDestroyed()
     )
       .subscribe({
-        next: (user: Usuario) => {
-          this.usuario.set(user.nombre);
-
-          
+        next: (user: User) => {
+          this.usuario.set(user.getDataByRole()?.nombre || '');
         },
         error: (err: HttpErrorResponse) => {
           console.error('Error al obtener el perfil del usuario:', err);

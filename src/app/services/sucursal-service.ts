@@ -1,14 +1,13 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../environments/environment';
-import { Producto } from '../models/Producto';
 import { Sucursal } from '../models/Sucursal';
 
 @Injectable({
   providedIn: 'root'
 })
-export class EmpresaService {
+export class SucursalService {
   private apiUrl = `${environment.apiUrl}/sucursal`;
 
   constructor(private http: HttpClient) {}
@@ -17,11 +16,7 @@ export class EmpresaService {
     return this.http.get<Sucursal>(`${this.apiUrl}/${id}`);
   }
 
-  getProductosBySucursal(id:number): Observable<Producto[]>{
-    let params = new HttpParams;
-    if (id) {
-      params = params.set('sucursalId', id);
-    }
-    return this.http.get<Producto[]>(`${this.apiUrl}/productos/`, {params});
+  findAll(): Observable<Sucursal[]>{
+    return this.http.get<Sucursal[]>(`${this.apiUrl}`);
   }
 }

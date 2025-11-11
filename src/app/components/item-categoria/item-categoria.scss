@@ -1,32 +1,25 @@
 .categoria-item-container {
   display: flex;
-  align-items: center;   // vertical centering
-  gap: 12px;             // space between img + text
-  padding: 10px 16px;
-  border-radius: 40px;   // big radius for container
-  background: #fff;
-  text-decoration: none;
-  color: inherit;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  }
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 .categoria-item-img {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;   // makes it a circle
-  object-fit: cover;    // avoid distortion
-  pointer-events: none;
+  width: 100%;
+  max-width: 120px;
+  aspect-ratio: 1 / 1;
+  border-radius: 1rem;
+  object-fit: cover;
+  transition: transform 0.2s ease;
 }
 
-.categoria-item-nombre {
-  font-size: 16px;
-  font-weight: 500;
-  flex: 1;              // name expands if needed
+.categoria-item-container:hover .categoria-item-img {
+  transform: scale(1.05);
+}
+
+@media (max-width: 600px) {
+  .categoria-item-img {
+    max-width: 90px;
+  }
 }
