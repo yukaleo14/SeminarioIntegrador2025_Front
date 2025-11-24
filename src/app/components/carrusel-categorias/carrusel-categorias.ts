@@ -1,8 +1,9 @@
-import { Component, inject, OnInit, signal, computed, resource } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, computed, inject, OnInit, output, signal } from '@angular/core';
 import { Categoria } from '../../models/Categoria';
 import { CategoriaService } from '../../services/categoria-service';
 import { ItemCategoria } from '../item-categoria/item-categoria';
-import { HttpErrorResponse } from '@angular/common/http';
+import { FileService } from '../../services/file-service';
 
 @Component({
   selector: 'app-carrusel-categorias',
@@ -25,6 +26,13 @@ export class CarruselCategorias implements OnInit {
   ngOnInit(): void {
     this.loadCategorias();
   }
+
+  categoriaSeleccionada = output<Categoria>();
+
+  onCategoriaClick(categoria: Categoria) {
+    this.categoriaSeleccionada.emit(categoria);
+  }
+
 
   loadCategorias(): void {
     this.loading.set(true);

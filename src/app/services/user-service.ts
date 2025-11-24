@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../environments/environment';
-import { Usuario } from '../models/Usuario';
+import { User } from './auth-service';
 
 export interface CreateUserDto {
   mail: string;
@@ -37,15 +37,15 @@ export class UsersService {
   /**
    * Obtiene todos los usuarios
    */
-  findAll(): Observable<Usuario[]> {
-    return this.http.get<Usuario[]>(this.apiUrl);
+  findAll(): Observable<User[]> {
+    return this.http.get<User[]>(this.apiUrl);
   }
 
   /**
    * Obtiene un usuario por ID
    */
-  findOne(id: number): Observable<Usuario> {
-    return this.http.get<Usuario>(`${this.apiUrl}/${id}`);
+  findOne(id: number): Observable<User> {
+    return this.http.get<User>(`${this.apiUrl}/${id}`);
   }
 
   /**

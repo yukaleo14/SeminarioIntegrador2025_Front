@@ -1,4 +1,5 @@
-<a class="categoria-item-container" [routerLink]="'/categoria/'+data().id">
-    <img class="categoria-item-img" [src]="data().imagen" [alt]="data().nombre">
-    <span class="categoria-item-nombre">{{data().nombre}}</span>
+<a class="categoria-item-container">
+  <img class="categoria-item-img" [ngSrc]="getImagenUrl(data().imagen)"
+    [alt]="data().nombre" width="150" height="150"/>
+  <span class="categoria-item-nombre">{{ data().nombre }}</span>
 </a>

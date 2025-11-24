@@ -1,6 +1,6 @@
 import { Categoria } from "./Categoria";
 import { Estado } from "./Estado";
-import { Usuario } from "./Usuario";
+import { Sucursal } from "./Sucursal";
 
 export interface Producto {
     id: number;
@@ -10,5 +10,5 @@ export interface Producto {
     categoriaId: number;
     categoria: Categoria;
     estado: Estado;
-    empresa: Usuario;
+    sucursal: Sucursal;
 }

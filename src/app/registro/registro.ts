@@ -61,12 +61,18 @@ export class Registro {
       nombre: this.formularioRegistro.controls['nombre'].value,
       apellido: this.formularioRegistro.controls['apellido'].value,
       contraseña: this.formularioRegistro.controls['contraseña'].value,
-      cuit: this.formularioRegistro.controls['cuitCuil'].value,
+      cuitCuil: this.formularioRegistro.controls['cuitCuil'].value,
       dni: this.formularioRegistro.controls['dni'].value,
       mail: this.formularioRegistro.controls['mail'].value,
       telefono: this.formularioRegistro.controls['telefono'].value,
-      rol: this.formularioRegistro.controls['tipoUsuario'].value
-    }
+      rol: this.formularioRegistro.controls['tipoUsuario'].value,
+      imagenPerfil: '',
+      altura: '',
+      calle: '',
+      coordenadaX: 0,
+      coordenadaY: 0,
+      nombreUbicacion: ''
+    };
   }
 
   toggleHide() {

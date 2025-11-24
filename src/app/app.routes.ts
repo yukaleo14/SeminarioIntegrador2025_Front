@@ -4,7 +4,7 @@ import { ItemCategoria } from './components/item-categoria/item-categoria';
 import { CardEmpresa } from './components/card-empresa/card-empresa';
 import { Login } from './login/login';
 import { Registro } from './registro/registro';
-import { EmpresaConsultaComponent } from './empresa-consulta/empresa-consulta';
+import { SucursalConsultaComponent } from './sucursal-consulta/sucursal-consulta';
 import { SeguimientoPedido } from './components/seguimiento-pedido/seguimiento-pedido';
 import { SeleccionUbicaciones } from './components/seleccion-ubicaciones/seleccion-ubicaciones';
 
@@ -13,7 +13,7 @@ export const routes: Routes = [
     {path:'login' ,component: Login},
     {path:'categoria/:id' ,component: ItemCategoria},
     {path:'registro' ,component: Registro},
-    {path:'empresa/:id' ,component: EmpresaConsultaComponent},
+    {path:'sucursal/:idEmpresa' ,component: SucursalConsultaComponent},
     {path:'seguimiento' ,component: SeguimientoPedido},
     {path:'seleccion-ubicacion' , component: SeleccionUbicaciones},
 

@@ -1,0 +1,35 @@
+<div class="sucursal-container">
+  <header class="sucursal-header">
+    <button mat-icon-button class="back-button">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <span class="title">Local</span>
+  </header>
+
+  <img [ngSrc]="sucursal()?.imagen ?? 'assets/img/sucursal-placeholder.jpg'" width="512" height="256"
+    class="sucursal-banner" />
+
+  <section class="sucursal-info">
+    <h2 class="sucursal-nombre">{{ sucursal()?.nombre }}</h2>
+    <p class="sucursal-descripcion">{{ sucursal()?.descripcion }}</p>
+
+    <!-- Carrusel de categorías reutilizado -->
+    <app-carrusel-categorias class="categorias-section"
+      (categoriaSeleccionada)="onCategoriaSelect($event)"></app-carrusel-categorias>
+
+    <div class="productos-header">
+      <h3 class="productos-titulo">
+        {{ categoriaSeleccionada().nombre }} ({{ productos().length }})
+      </h3>
+    </div>
+
+    <div class="productos-grid">
+      @for (producto of productos(); track producto.id) {
+      <app-producto-card class="producto-card" (agregar)="agregarAlCarrito($event)"
+        [producto]="producto"></app-producto-card>
+      }@empty {
+      <h4>No se encontraron productos</h4>
+      }
+    </div>
+  </section>
+</div>
