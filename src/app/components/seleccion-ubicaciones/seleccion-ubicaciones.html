@@ -1,0 +1,15 @@
+<div class="buscador">
+  <div class="input-group">
+    <input type="text"
+           [(ngModel)]="textoBusqueda"
+           placeholder="Ingresá una dirección" />
+
+    <button (click)="buscarPorTexto()">Buscar</button>
+  </div>
+</div>
+
+<div id="map"></div>
+
+<div class="info" *ngIf="direccionEncontrada">
+  <p>📍 {{ direccionEncontrada }}</p>
+</div>

@@ -6,6 +6,7 @@ import { Login } from './login/login';
 import { Registro } from './registro/registro';
 import { EmpresaConsultaComponent } from './empresa-consulta/empresa-consulta';
 import { SeguimientoPedido } from './components/seguimiento-pedido/seguimiento-pedido';
+import { SeleccionUbicaciones } from './components/seleccion-ubicaciones/seleccion-ubicaciones';
 
 export const routes: Routes = [
     {path:'home' ,component: Home},
@@ -14,6 +15,7 @@ export const routes: Routes = [
     {path:'registro' ,component: Registro},
     {path:'empresa/:id' ,component: EmpresaConsultaComponent},
     {path:'seguimiento' ,component: SeguimientoPedido},
+    {path:'seleccion-ubicacion' , component: SeleccionUbicaciones},
 
     {path:'**' ,redirectTo:'home'}
 ];
