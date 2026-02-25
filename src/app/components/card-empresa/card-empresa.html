@@ -1,5 +1,5 @@
 <a [routerLink]="['/sucursal/', empresa()!.id]" class="empresa-card">
-    <img class="empresa-portada" [width]="320" [height]="150"  [ngSrc]="getImagenUrl(empresa().imagen ?? 'sucursal-logo-placeholder.png')" [alt]="empresa().nombre">
+    <img class="empresa-portada" [width]="320" [height]="150"  [ngSrc]="getImagenUrl()" [alt]="empresa().nombre">
     <div class="empresa-title">
         <span class="empresa-nombre">{{empresa().nombre}}</span>
         <span class="empresa-categorias">{{empresa().categorias}}</span>

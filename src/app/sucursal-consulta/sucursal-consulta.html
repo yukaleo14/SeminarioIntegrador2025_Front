@@ -1,12 +1,12 @@
 <div class="sucursal-container">
   <header class="sucursal-header">
-    <button mat-icon-button class="back-button">
+    <button mat-icon-button class="back-button" (click)="volverAtras()">
       <mat-icon>arrow_back</mat-icon>
     </button>
     <span class="title">Local</span>
   </header>
 
-  <img [ngSrc]="sucursal()?.imagen ?? 'assets/img/sucursal-placeholder.jpg'" width="512" height="256"
+  <img [ngSrc]="getImagenUrl()" width="512" height="256"
     class="sucursal-banner" />
 
   <section class="sucursal-info">
@@ -14,7 +14,7 @@
     <p class="sucursal-descripcion">{{ sucursal()?.descripcion }}</p>
 
     <!-- Carrusel de categorías reutilizado -->
-    <app-carrusel-categorias class="categorias-section"
+    <app-carrusel-categorias class="categorias-section" [filtroSucursal]="idEmpresa()"
       (categoriaSeleccionada)="onCategoriaSelect($event)"></app-carrusel-categorias>
 
     <div class="productos-header">

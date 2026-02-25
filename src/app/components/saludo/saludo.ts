@@ -23,7 +23,7 @@ export class Saludo {
     )
       .subscribe({
         next: (user: User) => {
-          this.usuario.set(user.getDataByRole()?.nombre || '');
+          this.usuario.set(User.getDataByRole(user)?.nombre || '');
         },
         error: (err: HttpErrorResponse) => {
           console.error('Error al obtener el perfil del usuario:', err);

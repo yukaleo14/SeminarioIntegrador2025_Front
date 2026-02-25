@@ -14,6 +14,6 @@ export class ItemCategoria {
   private readonly _fileService = inject(FileService);
   
   getImagenUrl(nombreArchivo: string): string {
-    return this._fileService.getImagenUrl(nombreArchivo);
+    return this._fileService.getImagenUrl(`categoria/${nombreArchivo}`);
   }
 }

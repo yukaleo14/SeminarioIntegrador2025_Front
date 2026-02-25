@@ -41,14 +41,14 @@ export class User {
     this.mail = mail;
     this.rol = rol;
   }
-  getDataByRole(): Empresa | Comprador | Repartidor | undefined {
-    switch (this.rol) {
+  static getDataByRole(user: User): Empresa | Comprador | Repartidor | undefined {
+    switch (user.rol) {
       case Rol.EMPRESA:
-        return this.empresa;
+        return user.empresa;
       case Rol.COMPRADOR:
-        return this.comprador;
+        return user.comprador;
       case Rol.REPARTIDOR:
-        return this.repartidor;
+        return user.repartidor;
       default:
         return undefined;
     }

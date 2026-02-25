@@ -1,4 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -20,10 +21,10 @@ import { Categoria } from '../models/Categoria';
 import { Producto } from '../models/Producto';
 import { Sucursal } from '../models/Sucursal';
 import { CarroService } from '../services/carro-service';
+import { CategoriaService } from '../services/categoria-service';
+import { FileService } from '../services/file-service';
 import { ProductoService } from '../services/producto-service';
 import { SucursalService } from '../services/sucursal-service';
-import { CategoriaService } from '../services/categoria-service';
-import { HttpErrorResponse } from '@angular/common/http';
 
 
 @Component({
@@ -48,6 +49,8 @@ export class SucursalConsultaComponent {
   private readonly _productoService = inject(ProductoService);
   private readonly _categoriaService = inject(CategoriaService);
   private readonly _carro = inject(CarroService);
+  private readonly _fileService = inject(FileService);
+
   private readonly destroyRef = inject(DestroyRef);
   idEmpresa = input.required<number>();
   productos = signal<Producto[]>([]);
@@ -55,21 +58,16 @@ export class SucursalConsultaComponent {
   isLoading = computed<boolean>(() => this.sucursal() === null && this.productos().length === 0);
   categorias = signal<Categoria[]>([]);
   categoriaSeleccionada = signal<Categoria>({ id: 0, nombre: 'Todos', imagen: '' });
+  getImagenUrl(): string {
+    const nombreArchivo: string = this.sucursal()?.imagen ? 'sucursal/' + this.sucursal()!.id + '/' + this.sucursal()!.imagen : 'logo-placeholder.png'
+    return this._fileService.getImagenUrl(nombreArchivo);
+  }
 
   ngOnInit() {
     this._empresaService.getById(this.idEmpresa()).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: data => this.sucursal.set(data),
       error: console.error
     });
-
-    this._categoriaService.getListaBySucursal(this.idEmpresa())
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (data: Categoria[]) => {
-          this.categorias.set([{ id: 0, nombre: 'Todos', imagen: '(ruta a public/categoria-todas' } as Categoria, ...data]);
-        },
-        error: (err: HttpErrorResponse) => console.error(err)
-      });
 
     this._productoService.getProductosBySucursalAndCategoria(this.idEmpresa())
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -80,17 +78,22 @@ export class SucursalConsultaComponent {
   }
 
   onCategoriaSelect(categoria: Categoria) {
-    this.categoriaSeleccionada.set(this.categorias().find(c => c.id === categoria.id)!);
-    this._productoService.getProductosBySucursalAndCategoria(this.idEmpresa(), this.categoriaSeleccionada().id === 0 ? undefined : this.categoriaSeleccionada().id)
+    this.categoriaSeleccionada.set(categoria);
+    const filtro = categoria.id === 0 ? undefined : categoria.id;
+    this._productoService
+      .getProductosBySucursalAndCategoria(this.idEmpresa(), filtro)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: data => this.productos.set(data),
-        error: (err) => console.error(err)
+        next: (data) => this.productos.set(data),
+        error: console.error
       });
-
+  }
+  volverAtras() {
+    window.history.back();
   }
 
-  agregarAlCarrito(obj: {producto: Producto, cantidad: number}) {
+
+  agregarAlCarrito(obj: { producto: Producto, cantidad: number }) {
     this._carro.addProduct(obj.producto, obj.cantidad);
   }
 }

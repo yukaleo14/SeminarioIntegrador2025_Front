@@ -1,9 +1,8 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, computed, inject, OnInit, output, signal } from '@angular/core';
+import { Component, computed, inject, input, OnInit, output, signal } from '@angular/core';
 import { Categoria } from '../../models/Categoria';
 import { CategoriaService } from '../../services/categoria-service';
 import { ItemCategoria } from '../item-categoria/item-categoria';
-import { FileService } from '../../services/file-service';
 
 @Component({
   selector: 'app-carrusel-categorias',
@@ -12,6 +11,7 @@ import { FileService } from '../../services/file-service';
   styleUrl: './carrusel-categorias.scss'
 })
 export class CarruselCategorias implements OnInit {
+  filtroSucursal = input<number>();
   private readonly _dataService = inject(CategoriaService);
 
   // State signals
@@ -24,6 +24,14 @@ export class CarruselCategorias implements OnInit {
   isEmpty = computed(() => !this.loading() && this.categorias().length === 0);
 
   ngOnInit(): void {
+    if(this.filtroSucursal()){
+      // Load categorias filtrando
+      this._dataService.getListaBySucursal(this.filtroSucursal()!).pipe().subscribe({
+        next: (data: Categoria[]) => {
+          this.categorias.set(data);
+        }});
+        return;
+    }
     this.loadCategorias();
   }
 

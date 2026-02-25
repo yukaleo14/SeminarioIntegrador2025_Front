@@ -20,10 +20,10 @@ export class ProductoService {
   getProductosBySucursalAndCategoria(sucursalId?:number, categoriaId?: number): Observable<Producto[]>{
     let params = new HttpParams();
     if (sucursalId) {
-      params = params.set('sucursalId', sucursalId);
+      params = params.set('sucursalId', sucursalId.toString());
     }
     if (categoriaId) {
-      params = params.set('categoriaId', categoriaId);
+      params = params.set('categoriaId', categoriaId.toString());
     }
     return this.http.get<Producto[]>(`${this.apiUrl}/sucursal`, {params});
   }

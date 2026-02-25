@@ -12,7 +12,8 @@ import { FileService } from '../../services/file-service';
 export class CardEmpresa {
   private readonly _fileService = inject(FileService);
   empresa = input.required<Sucursal>();
-  getImagenUrl(nombreArchivo: string): string {
+  getImagenUrl(): string {
+    const nombreArchivo: string = this.empresa()?.imagen ? 'sucursal/' + this.empresa()!.id + '/' + this.empresa()!.imagen : 'logo-placeholder.png'
     return this._fileService.getImagenUrl(nombreArchivo);
   }
 }
