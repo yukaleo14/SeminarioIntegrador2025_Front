@@ -1,0 +1,44 @@
+#map {
+  height: 400px;
+  width: 100%;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+
+.buscador {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  .input-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    input {
+      flex: 1;
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      padding: 8px 12px;
+      border: none;
+      background-color: #6c5ce7;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+
+      &:hover {
+        background-color: #5a4ae3;
+      }
+    }
+  }
+}
+
+.info {
+  margin-top: 10px;
+  text-align: center;
+  font-size: 16px;
+}
