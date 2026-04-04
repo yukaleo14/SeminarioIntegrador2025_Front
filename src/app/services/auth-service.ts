@@ -155,4 +155,36 @@ export class AuthService {
     getCurrentUserProfile(): Observable<User> {
       return this.http.get<User>(`${this.apiUrl}/profile`);
     }
+
+    getEmpresaId(): number | null {
+    const token = this.getToken();
+    if (!token) return null;
+
+    try {
+      const payload = this.decodeToken(token);
+      
+      // Prioridad 1: empresaId directo en el token
+      if (payload.empresaId) return payload.empresaId;
+      
+      // Prioridad 2: empresa?.id (si guardaste el objeto empresa en el JWT)
+      if (payload.empresa?.id) return payload.empresa.id;
+
+      // Prioridad 3: Si solo tenés userId y el rol es EMPRESA, podemos usarlo como fallback
+      if (payload.rol === Rol.EMPRESA) {
+        return payload.id;   // Muchos sistemas usan el mismo ID para usuario y empresa
+      }
+
+      return null;
+    } catch (e) {
+      console.error('Error al obtener empresaId del token', e);
+      return null;
+    }
+  }
+
+  /**
+   * Verifica si el usuario actual es una Empresa
+   */
+  isEmpresa(): boolean {
+    return this.hasRole(Rol.EMPRESA);
+  }
 }
