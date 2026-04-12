@@ -69,7 +69,15 @@ export class SucursalConsultaComponent {
       error: console.error
     });
 
-    this._productoService.getProductosBySucursalAndCategoria(this.idEmpresa())
+    // Chequeo para idEmpresa undefined
+    const idEmpresa = this.idEmpresa();
+    if (idEmpresa === undefined) {
+      console.error('ID de empresa no disponible');
+      return;
+    }
+
+    // Get all products for the sucursal (no category filter on init)
+    this._productoService.getProductosBySucursalAndCategoria(idEmpresa, 0)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: data => this.productos.set(data),
@@ -80,8 +88,18 @@ export class SucursalConsultaComponent {
   onCategoriaSelect(categoria: Categoria) {
     this.categoriaSeleccionada.set(categoria);
     const filtro = categoria.id === 0 ? undefined : categoria.id;
+
+    // Chequeo para idEmpresa undefined
+    const idEmpresa = this.idEmpresa();
+    if (idEmpresa === undefined) {
+      console.error('ID de empresa no disponible');
+      return;
+    }
+
+    // Ajusta si filtro es undefined: Usa un default o maneja
+    const categoriaId = filtro ?? 0; // Ejemplo: Default a 0 si undefined
     this._productoService
-      .getProductosBySucursalAndCategoria(this.idEmpresa(), filtro)
+      .getProductosBySucursalAndCategoria(idEmpresa, categoriaId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data) => this.productos.set(data),

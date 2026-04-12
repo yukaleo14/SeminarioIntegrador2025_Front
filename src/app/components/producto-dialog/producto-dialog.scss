@@ -1,0 +1,17 @@
+mat-dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+img {
+  border: 1px solid #ccc;
+  padding: 8px;
+  margin-top: 8px;
+}

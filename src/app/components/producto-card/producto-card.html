@@ -1,9 +1,9 @@
 <mat-card class="producto-card">
-    <img [ngSrc]="producto().imagen" width="150" height="150" [alt]="producto().nombre" />
+    <img [ngSrc]="producto()?.imagen ?? 'assets/placeholder.jpg'" width="150" height="150" [alt]="producto().nombre" />
 
     <div class="card-content">
         <h4>{{ producto().nombre }}</h4>
-        <p>{{ producto().sucursal.nombre }}</p>
+        <p>{{ producto()?.sucursal?.nombre ?? 'Sin sucursal' }}</p>
         <div class="precio">${{ producto().precio }}</div>
     </div>
 

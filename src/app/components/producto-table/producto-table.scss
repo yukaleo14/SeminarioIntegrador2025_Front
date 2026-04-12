@@ -1,0 +1,14 @@
+table {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.mat-header-cell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mat-cell, .mat-header-cell {
+  padding: 8px;
+}

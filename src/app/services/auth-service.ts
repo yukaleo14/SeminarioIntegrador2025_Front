@@ -51,7 +51,7 @@ export class User {
         return user.repartidor;
       default:
         return undefined;
-    }
+    }    
   }
 }
 

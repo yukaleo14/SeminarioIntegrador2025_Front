@@ -7,6 +7,7 @@ import { Registro } from './registro/registro';
 import { SucursalConsultaComponent } from './sucursal-consulta/sucursal-consulta';
 import { SeguimientoPedido } from './components/seguimiento-pedido/seguimiento-pedido';
 import { SeleccionUbicaciones } from './components/seleccion-ubicaciones/seleccion-ubicaciones';
+import { ProductoTableComponent } from './components/producto-table/producto-table';
 
 export const routes: Routes = [
     {path:'home' ,component: Home},
@@ -16,6 +17,7 @@ export const routes: Routes = [
     {path:'sucursal/:idEmpresa' ,component: SucursalConsultaComponent},
     {path:'seguimiento' ,component: SeguimientoPedido},
     {path:'seleccion-ubicacion' , component: SeleccionUbicaciones},
+    {path:'producto',component: ProductoTableComponent},
 
     {path:'**' ,redirectTo:'home'}
 ];
