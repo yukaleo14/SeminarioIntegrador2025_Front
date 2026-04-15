@@ -8,6 +8,9 @@ import { SucursalConsultaComponent } from './sucursal-consulta/sucursal-consulta
 import { SeguimientoPedido } from './components/seguimiento-pedido/seguimiento-pedido';
 import { SeleccionUbicaciones } from './components/seleccion-ubicaciones/seleccion-ubicaciones';
 import { TablaPedidos } from './components/tabla-pedidos/tabla-pedidos';
+import { HacerPedido } from './hacer-pedido/hacer-pedido';
+import { ProductosPorCategoria } from './productos-por-categoria/productos-por-categoria';
+import { CarritoComponent } from './carrito-component/carrito-component';
 
 export const routes: Routes = [
     {path:'home' ,component: Home},
@@ -18,6 +21,10 @@ export const routes: Routes = [
     {path:'seguimiento' ,component: SeguimientoPedido},
     {path:'seleccion-ubicacion' , component: SeleccionUbicaciones},
     {path: 'tabla-pedidos', component: TablaPedidos},
+    {path: 'hacer-pedido/:idEmpresa', component: HacerPedido},
+    {path: 'categoria/:idCategoria/productos', component: ProductosPorCategoria},
+    {path: 'carrito', component: CarritoComponent},
+
 
     {path:'**' ,redirectTo:'home'}
 ];
