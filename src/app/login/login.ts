@@ -30,7 +30,7 @@ export class Login implements OnInit {
   ngOnInit(): void {
     this.formularioLogin = this._fb.group({
       mail: ['', [Validators.required, Validators.email]],
-      contraseña: ['', [Validators.required]],
+      contrasena: ['', [Validators.required]],
     });
 
   }
