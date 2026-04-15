@@ -1,6 +1,8 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Producto } from '../models/Producto';
+import { AuthService } from './auth-service';
+
 
 export interface CartItem {
   producto: Producto;
@@ -11,12 +13,21 @@ export interface CartItem {
   providedIn: 'root'
 })
 export class CarroService {
+
+  private authService = inject(AuthService);
+
   private storageKey = 'carro_items_v1';
   private items: CartItem[] = [];
   private items$ = new BehaviorSubject<CartItem[]>([]);
 
   constructor() {
     this.loadFromStorage();
+    
+    this.authService.currentUser$.subscribe(user => {
+    if (!user) {
+      this.clear();
+    }
+  });
   }
 
   // Observable to watch cart changes
@@ -78,9 +89,7 @@ export class CarroService {
   private saveToStorage(): void {
     try {
       localStorage.setItem(this.storageKey, JSON.stringify(this.items));
-    } catch (e) {
-      // ignore storage errors
-    }
+    } catch (e) {}
     this.items$.next(this.items.slice());
   }
 
