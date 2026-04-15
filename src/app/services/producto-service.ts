@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { environment } from '../environments/environment';
 import { Producto } from '../models/Producto';
 import { Sucursal } from '../models/Sucursal';
@@ -26,5 +26,13 @@ export class ProductoService {
       params = params.set('categoriaId', categoriaId.toString());
     }
     return this.http.get<Producto[]>(`${this.apiUrl}/sucursal`, {params});
+  }
+
+  getByCategoria(categoriaId: number): Observable<Producto[]> {
+    if (!categoriaId) {
+      return throwError(() => new Error('ID de categoría inválido'));
+    }
+    const params = new HttpParams().set('categoriaId', categoriaId.toString());
+    return this.http.get<Producto[]>(`${this.apiUrl}/categoria/${categoriaId}`);
   }
 }

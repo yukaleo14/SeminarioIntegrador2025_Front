@@ -18,4 +18,10 @@ export class CategoriaService {
     const params = new HttpParams().set('sucursalId', sucursalId.toString());
     return this.http.get<Categoria[]>(`${this.apiUrl}`, { params });
   }
+
+  getById(id: number): Observable<Categoria> {
+    return this.http.get<Categoria>(`${this.apiUrl}/${id}`);
+  }
+
+  
 }

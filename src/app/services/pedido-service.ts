@@ -49,6 +49,11 @@ export class PedidoService {
     this.setupSocketListeners();
   }
 
+  crearPedido(pedido: any): Observable<Pedido> {
+    return this.http.post<Pedido>(`${this.apiUrl}`, pedido);
+  }
+  
+
   // ==================== HTTP ====================
 
   getPedidosDeMiEmpresa(): Observable<Pedido[]> {
@@ -56,6 +61,10 @@ export class PedidoService {
   }
 
   // ==================== WebSocket ====================
+
+  actualizarEstado(pedidoId: number, estado: string) {
+    return this.http.patch<any>(`${this.apiUrl}/pedidos/${pedidoId}/estado`, { estado });
+  }
 
   connectAndJoinRoom(): void {
     if (!this.authService.isAuthenticated() || !this.authService.isEmpresa()) {
