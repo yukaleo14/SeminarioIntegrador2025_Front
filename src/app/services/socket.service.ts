@@ -6,18 +6,28 @@ import { Pedido } from './pedido-service';
 
 @Injectable({ providedIn: 'root' })
 export class SocketService {
-  private socket: Socket;
-  private ordersSubject = new BehaviorSubject<any[]>([]);
+  private socket!: Socket;
+  private pedidosSubject = new BehaviorSubject<Pedido[]>([]);
 
   constructor() {
-    this.socket = io(environment.apiUrl + '/orders', {
-      transports: ['websocket'],
+    this.initSocket();
+  }
+
+  private initSocket() {
+    const url = `${environment.apiUrl}/pedidos`; // Asegúrate de que apiUrl esté definido en tu environment
+    this.socket = io(url, {
+      transports: ['websocket', 'polling'], // Forzar uso de WebSocket
+      autoConnect: false, // No conectar automáticamente
+      reconnection: true, // Habilitar reconexión automática
+      reconnectionAttempts: 10, // Intentar reconectar indefinidamente
+      reconnectionDelay: 1500, // Esperar 1 segundo antes de intentar reconectar
     });
   }
   
   connect() {
     if (!this.socket.connected) {
-      this.socket = io('http://localhost:3000');
+      console.log('Conectando al servidor de WebSocket...');
+      this.socket.connect();
     }
   }
   
@@ -35,45 +45,76 @@ export class SocketService {
 
   // Conectar y unirse a la sala de la empresa
   joinCompanyRoom(sucursalId: string | number) {
-    console.log('Uniéndose a la sala de la empresa con ID:', sucursalId);
-    this.socket.emit('joinCompanyRoom', sucursalId);
-  }                     
-
-  // Escuchar nuevos pedidos
-  onNewPedido(): Observable<any> {
-    return new Observable((observer) => {
-      this.socket.on('Nuevo pedido', (order: any) => {
-        console.log('Nuevo pedido recibido:', order);
-        observer.next(order);
-      });
+    if (this.socket.connected) {
+      console.log('Uniéndose a la sala de la empresa con ID:', sucursalId);
+      this.socket.emit('joinCompanyRoom', sucursalId);
+    } else {
+      console.error('No se pudo conectar al servidor de WebSocket');
+    }
+  }        
+  
+  onPedidosList(callback: (pedidos: Pedido[]) => void) {
+    this.socket.on('pedidosList', (pedidos) => {
+      console.log('Lista inicial de pedidos recibida:', pedidos.length);
+      this.pedidosSubject.next(pedidos);
+      callback(pedidos);
     });
   }
 
-  // Obtener la lista reactiva para la tabla
-  getPedidos$(): Observable<any[]> {
-    return this.ordersSubject.asObservable();
-  }
-
-  updatePedidos(pedidos: Pedido[]) {
-    this.ordersSubject.next(pedidos);
-  }
-
-  onPedidoCreado(): Observable<any> {
+  // Escuchar nuevos pedidos
+  onNuevoPedido(): Observable<Pedido> {
     return new Observable((observer) => {
-      this.socket.on('pedidoCreado', (pedido) => {
+      this.socket.on('Nuevo pedido', (pedido: Pedido) => {
+        console.log('Nuevo pedido recibido:', pedido);
+        this.addPedido(pedido); 
+        observer.next(pedido);
+      });
+      return () => {
+        this.socket.off('Nuevo pedido');
+      };
+    });
+  }
+
+  onPedidoActualizado(): Observable<Pedido> {
+    return new Observable((observer) => {
+      this.socket.on('Pedido actualizado', (pedido: Pedido) => {
+        this.updatePedidos(pedido);
+        observer.next(pedido);
+      });
+      return () => {
+        this.socket.off('Pedido actualizado');
+      };
+    });
+  }
+
+
+  // Obtener la lista reactiva para la tabla
+  getPedidos$(): Observable<Pedido[]> {
+    return this.pedidosSubject.asObservable();
+  }
+
+  onPedidoCreado(): Observable<Pedido> {
+    return new Observable((observer) => {
+      this.socket.on('pedidoCreado', (pedido: Pedido) => {
         observer.next(pedido);
       });
     });
   }
 
-
-  // Agregar pedido a la lista local (para que se actualice la tabla)
-  addPedido(order: any) {
-    const current = this.ordersSubject.value;
-    this.ordersSubject.next([...current, order]);
+  private addPedido(pedido: Pedido) {
+    const currentPedidos = this.pedidosSubject.value;
+    this.pedidosSubject.next([pedido, ...currentPedidos]);
+  }
+  
+  updatePedidos(pedidosActualizado: Pedido) {
+    const actuales = this.pedidosSubject.value.map(p =>
+      p.id === pedidosActualizado.id ? pedidosActualizado : p
+    )
+    this.pedidosSubject.next(actuales);
   }
 
   disconnect() {
+    this.socket.removeAllListeners();
     this.socket.disconnect();
   }
 }
