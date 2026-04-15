@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, ChangeDetectorRef } from '@angular/core';
+import { Component, AfterViewInit, ChangeDetectorRef, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
 import * as L from 'leaflet';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
@@ -11,13 +11,24 @@ import { CommonModule } from '@angular/common';
   templateUrl: './seleccion-ubicaciones.html',
   styleUrl: './seleccion-ubicaciones.scss'
 })
-export class SeleccionUbicaciones implements AfterViewInit {
+export class SeleccionUbicaciones implements AfterViewInit, OnDestroy {
+
+  @Input() sucursalLatLng?: [number, number]; // [lat, lng]
+  @Input() sucursalNombre?: string = 'sucursal';
+
+  @Output() ubicacionSeleccionada = new EventEmitter
+  <{ lat: number, lng: number, direccion: string }>();
 
   map!: L.Map;
-  marker!: L.Marker;
+  usermarker!: L.Marker;
+  sucursalMarker!: L.Marker;
+
   textoBusqueda: string = '';
   direccionEncontrada: string = '';
-  ultimaPosicionMarcador: L.LatLng | null = null;
+
+  // ultimaPosicionMarcador: L.LatLng | null = null;
+
+  private destroy$ = false;
 
   constructor(
     private http: HttpClient,
@@ -28,59 +39,91 @@ export class SeleccionUbicaciones implements AfterViewInit {
     this.inicializarMapa();
   }
 
-  inicializarMapa() {
-    this.map = L.map('map').setView([-34.6037, -58.3816], 13);
+  ngOnDestroy(): void {
+    this.destroy$ = true;
+    if (this.map) {
+      this.map.remove();
+    }
+  }
+
+  private inicializarMapa() {
+    this.map = L.map('map').setView([-31.42, -64.18], 13);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19
+      maxZoom: 19,
+      attribution: '© OpenStreetMap'
     }).addTo(this.map);
 
-    this.marker = L.marker([-34.6037, -58.3816], { draggable: true }).addTo(this.map);
+    this.usermarker = L.marker([-31.42, -64.18], { draggable: true }).addTo(this.map);
 
-    this.marker.on('dragend', () => {
-      const pos = this.marker.getLatLng();
-      this.ultimaPosicionMarcador = pos;
+    this.usermarker.on('dragend', () => {
+      const pos = this.usermarker.getLatLng();
       this.obtenerDireccion(pos.lat, pos.lng, true);
     });
+
+    if (this.sucursalLatLng) {
+      this.sucursalMarker = L.marker(this.sucursalLatLng, { icon: L.icon({
+        iconUrl: 'assets/sucursal-icon.png',
+        iconSize: [32, 32],
+        iconAnchor: [16, 32]
+      }) }).addTo(this.map).bindPopup(this.sucursalNombre || 'Sucursal').openPopup();
+    }
   }
 
   buscarPorTexto() {
     if (!this.textoBusqueda.trim()) return;
 
-    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${this.textoBusqueda}`;
+    // const url = `https://nominatim.openstreetmap.org/search?format=json&q=${this.textoBusqueda}`;
 
-    this.http.get<any[]>(url).subscribe(result => {
-      if (result.length > 0) {
-        const { lat, lon } = result[0];
+    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(this.textoBusqueda)}&limit=1`;
 
-        this.actualizarMapaPorBusqueda(Number(lat), Number(lon));
+    // this.http.get<any[]>(url).subscribe(result => {
+    //   if (result.length > 0) {
+    //     const { lat, lon } = result[0];
 
-        // Reverse geocoding para mostrar la dirección real
-        this.obtenerDireccion(Number(lat), Number(lon), false);
+    //     this.actualizarMapaPorBusqueda(Number(lat), Number(lon));
+
+    //     // Reverse geocoding para mostrar la dirección real
+    //     this.obtenerDireccion(Number(lat), Number(lon), false);
+    //   }
+    // });
+
+    this.http.get<any[]>(url).subscribe({
+      next: result => {
+        if (result.length > 0) {
+          const lat = Number(result[0].lat);
+          const lon = Number(result[0].lon);
+          this.actualizarMapaPorBusqueda(lat, lon);
+          this.obtenerDireccion(lat, lon, false);
+        }
+      },
+      error: err => {
+        console.error('Error al buscar ubicación:', err);
       }
     });
   }
 
   actualizarMapaPorBusqueda(lat: number, lng: number) {
     this.map.setView([lat, lng], 16);
-    this.marker.setLatLng([lat, lng]);
-    this.ultimaPosicionMarcador = new L.LatLng(lat, lng);
+    this.usermarker.setLatLng([lat, lng]);
+    // this.ultimaPosicionMarcador = new L.LatLng(lat, lng);
   }
 
-  obtenerDireccion(lat: number, lng: number, actualizarInput: boolean) {
-    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`;
+  obtenerDireccion(lat: number, lng: number, actualizarInput: boolean = false) {
+    // const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`;
+    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`;
 
-    this.http.get<any>(url).subscribe(data => {
-      if (data && data.display_name) {
+    this.http.get<any>(url).subscribe({
+      next: data => {
+         if (data?.display_name) {
         this.direccionEncontrada = data.display_name;
-
         if (actualizarInput) {
           this.textoBusqueda = data.display_name;
         }
-
+        this.ubicacionSeleccionada.emit({ lat, lng, direccion: this.direccionEncontrada });
         // FORZAR A ANGULAR A ACTUALIZAR HTML
-        this.cdr.detectChanges();
-      }
+        this.cdr.detectChanges(); 
+    }}
     });
   }
 }
