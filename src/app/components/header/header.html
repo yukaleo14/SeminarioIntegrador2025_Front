@@ -1,18 +1,41 @@
 <mat-toolbar class="theme-primary">
+  
+  <!-- Espacio a la izquierda (opcional, si quieres logo o título) -->
+  <!-- <span class="brand">Mi App</span> -->
+
   <span class="example-spacer"></span>
 
+  <!-- CARRITO (nuevo) -->
+  @if (isLoggedIn()) {
+    <button mat-icon-button 
+            aria-label="Ver carrito"
+            (click)="irAlCarrito()"
+            class="cart-button">
+      <mat-icon class="material-symbols-outlined">shopping_cart</mat-icon>
+      <!-- Contador de items (opcional pero muy recomendado) -->
+      @if (totalItems() > 0) {
+        <span class="cart-count">{{ totalItems() }}</span>
+      }
+    </button>
+  }
+
+  <!-- Ícono de Usuario -->
   @if (this.isLoggedIn()) {
-  <button mat-icon-button aria-label="Menú de usuario" [matMenuTriggerFor]="userMenu">
-    <mat-icon class="material-symbols-outlined">
-      account_circle
-    </mat-icon>
-  </button>
-  }@else {
-  <a matIconButton [routerLink]="'/login'" aria-label="Iniciar sesión / registrarse">
-    <mat-icon class="material-symbols-outlined">
-      account_circle
-    </mat-icon>
-  </a>
+    <button mat-icon-button 
+            aria-label="Menú de usuario" 
+            [matMenuTriggerFor]="userMenu">
+      <mat-icon class="material-symbols-outlined">
+        account_circle
+      </mat-icon>
+    </button>
+  } @else {
+    <a mat-icon-button 
+       [routerLink]="'/login'" 
+       aria-label="Iniciar sesión / registrarse">
+      <mat-icon class="material-symbols-outlined">
+        account_circle
+      </mat-icon>
+    </a>
   }
 
 </mat-toolbar>
@@ -22,5 +45,4 @@
     <mat-icon class="material-symbols-outlined">logout</mat-icon>
     <span>Cerrar sesión</span>
   </button>
-
 </mat-menu>
