@@ -4,6 +4,7 @@ import { Sucursal } from '../../models/Sucursal';
 import { SucursalService } from '../../services/sucursal-service';
 import { CardEmpresa } from '../card-empresa/card-empresa';
 import { Skeleton } from '../skeleton/skeleton';
+import { FileService } from '../../services/file-service';
 
 @Component({
   selector: 'app-listado-sucursales',
@@ -15,6 +16,7 @@ export class ListadoSucursales implements OnInit{
   empresas: WritableSignal<Sucursal[]> = signal([]);
 
   private readonly _dataService = inject(SucursalService);
+  private readonly _fileService = inject(FileService);
   ngOnInit(): void {
     this.cargarEmpresas();
   }
