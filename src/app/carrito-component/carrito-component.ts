@@ -23,9 +23,7 @@ private carroService = inject(CarroService);
   items = signal<CartItem[]>([]);
   totalItems = signal(0);
   totalPrice = signal(0);
-
   isLoading = signal(false);
-
   ubicacionEntrega = signal<{ lat: number, lng: number, direccion: string } | null>(null);
   sucursalActual: any = null; 
 
@@ -33,19 +31,53 @@ private carroService = inject(CarroService);
 
   ngOnInit() {
     this.subscription.add(
-      this.carroService.watchItems().subscribe(items => {
-        this.items.set(items);
+      this.carroService.watchItems().subscribe(cartItems => {
+        console.log('🛒 Carrito actualizado - items con sus IDs:', 
+    cartItems.map(i => ({
+      id: i.producto.id,
+      nombre: i.producto.nombre,
+      cantidad: i.cantidad
+    })));
+        const newItems = cartItems.map(item => ({
+        ...item,
+        producto: { ...item.producto }   // copia profunda del producto
+      }));
+
+      this.items.set(newItems);
+      console.log('Items en carrito (desde subscribe):', this.items());
+      console.log('Cantidad de items:', this.items().length);
         this.totalItems.set(this.carroService.getTotalItems());
         this.totalPrice.set(this.carroService.getTotalPrice());
+
+        if (cartItems.length > 0) {
+          this.sucursalActual = cartItems[0].producto.sucursal;
+        }
       })
     );
 
-    this.loadCart();
+    this.refreshCart();
+  }
 
-    const items = this.carroService.getItems();
-    if (items.length > 0) {
-      this.sucursalActual = items[0].producto.sucursal;
-    }
+  
+
+  private refreshCart() {
+    const currentItems = this.carroService.getItems();
+    const newItems = currentItems.map(item => ({
+        ...item,
+        producto: { ...item.producto }   // copia profunda del producto
+      }));
+
+      this.items.set(newItems);
+    this.totalItems.set(this.carroService.getTotalItems());
+    this.totalPrice.set(this.carroService.getTotalPrice());
+  }
+
+  trackByProducto(index: number, item: CartItem): number {
+    return item.producto.id;   // o item.producto.id + '-' + item.cantidad si quieres
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
   }
 
   onUbicacionSeleccionada(event: any ) {
@@ -58,31 +90,31 @@ private carroService = inject(CarroService);
     this.router.navigate(['/home']);
   }
 
-  private loadCart() {
-    this.items.set(this.carroService.getItems());
-    this.totalItems.set(this.carroService.getTotalItems());
-    this.totalPrice.set(this.carroService.getTotalPrice());
+  cambiarCantidad(item: CartItem, event: Event) {
+    const input = event?.target as HTMLInputElement;
+    let nuevaCantidad = parseInt(input.value, 10);
+    if (isNaN(nuevaCantidad) || nuevaCantidad < 1) {
+      nuevaCantidad = 1;
+      input.value = '1';
+    }
+    this.carroService.updateQuantity(item.producto.id, nuevaCantidad);
   }
 
   aumentarCantidad(item: CartItem) {
     this.carroService.addProduct(item.producto, 1);
-    this.loadCart();
   }
 
   disminuirCantidad(item: CartItem) {
     this.carroService.addProduct(item.producto, -1);
-    this.loadCart();
   }
 
   eliminarProducto(item: CartItem) {
     this.carroService.removeProduct(item.producto.id);
-    this.loadCart();
   }
   
   vaciarCarrito() {
     if (confirm('¿Estás seguro de que quieres vaciar el carrito?')) {
       this.carroService.clear();
-      this.loadCart();
     }
   }
 
@@ -135,15 +167,16 @@ private carroService = inject(CarroService);
       next: (pedidoCreado) => {
         alert('Pedido confirmado con éxito!');
         this.carroService.clear();
-        this.loadCart();
         this.router.navigate(['/seguimiento', pedidoCreado.id]);
       },
       error: (err) => {
+        console.error('Error al confirmar el pedido:', err);
         alert('Error al confirmar el pedido. Por favor, intenta nuevamente.');
         this.isLoading.set(false);
       }
     });
   }
+
 
 
 }

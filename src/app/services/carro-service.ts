@@ -32,12 +32,14 @@ export class CarroService {
 
   // Observable to watch cart changes
   watchItems(): Observable<CartItem[]> {
+    console.log(this.items);
+    
     return this.items$.asObservable();
   }
 
   // Return a shallow copy of items
   getItems(): CartItem[] {
-    return this.items.slice();
+    return [...this.items];
   }
 
   getItem(productoId: number): CartItem | undefined {
@@ -45,30 +47,45 @@ export class CarroService {
   }
 
   addProduct(producto: Producto, cantidad = 1): void {
-    const idx = this.items.findIndex(i => i.producto.id === producto.id);
+    if (cantidad === 0) return;
+
+    const currentItems = [...this.items];
+    const idx = currentItems.findIndex(i => i.producto.id === producto.id);
+
     if (idx >= 0) {
-      this.items[idx].cantidad += cantidad;
-    } else {
-      this.items.push({ producto, cantidad });
+      const nuevaCantidad = currentItems[idx].cantidad + cantidad;
+      if (nuevaCantidad <= 0) {
+        currentItems.splice(idx, 1);
+      } else {
+        currentItems[idx] = {
+          ...currentItems[idx],
+          cantidad: nuevaCantidad
+        };
+      }
+    } else if (cantidad > 0) {
+      currentItems.push({ producto: { ...producto }, cantidad });
     }
+    this.items = currentItems;
     this.saveToStorage();
   }
 
   updateQuantity(productoId: number, cantidad: number): void {
-    const idx = this.items.findIndex(i => i.producto.id === productoId);
+    const currentItems = [...this.items];
+    const idx = currentItems.findIndex(i => i.producto.id === productoId);
     if (idx === -1) return;
     if (cantidad <= 0) {
-      this.items.splice(idx, 1);
+      currentItems.splice(idx, 1);
     } else {
-      this.items[idx].cantidad = cantidad;
+      currentItems[idx].cantidad = cantidad;
     }
+    this.items = currentItems;
     this.saveToStorage();
   }
 
   removeProduct(productoId: number): void {
     const idx = this.items.findIndex(i => i.producto.id === productoId);
-    if (idx === -1) return;
-    this.items.splice(idx, 1);
+    const currentItems = this.items.filter(i => i.producto.id !== productoId);
+    this.items = currentItems;
     this.saveToStorage();
   }
 
@@ -90,7 +107,7 @@ export class CarroService {
     try {
       localStorage.setItem(this.storageKey, JSON.stringify(this.items));
     } catch (e) {}
-    this.items$.next(this.items.slice());
+    this.items$.next([...this.items]);
   }
 
   private loadFromStorage(): void {
@@ -104,6 +121,6 @@ export class CarroService {
     } catch (e) {
       this.items = [];
     }
-    this.items$.next(this.items.slice());
+    this.items$.next([...this.items]);
   }
 }

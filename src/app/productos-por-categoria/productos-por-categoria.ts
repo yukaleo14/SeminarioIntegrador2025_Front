@@ -58,6 +58,7 @@ export class ProductosPorCategoria implements OnInit {
 
       this.productoService.getByCategoria(categoriaId).subscribe({
         next: (data) => {
+          console.log('📦 Productos recibidos del backend:', JSON.stringify(data, null, 2));
           this.productos.set(data);
           this.loading.set(false);
         },
@@ -74,12 +75,21 @@ export class ProductosPorCategoria implements OnInit {
   }
 
   agregarAlCarrito(producto: Producto) {
+    console.log('→ Agregando producto:', {
+    id: producto.id,
+    nombre: producto.nombre,
+    precio: producto.precio,
+    sucursal: producto.sucursal
+  });
     if (!this.authService.isAuthenticated()) {
       alert('Debes iniciar sesión para agregar productos al carrito');
       this.router.navigate(['/login']);
       return;
     }
-    this.carroService.addProduct(producto, 1);
+
+    const productoCopia = JSON.parse(JSON.stringify(producto)) as Producto;
+
+    this.carroService.addProduct(productoCopia, 1);
     alert(`Producto "${producto.nombre}" agregado al carrito!`);
   }
 }
