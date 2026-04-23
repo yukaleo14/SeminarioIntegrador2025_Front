@@ -138,6 +138,12 @@ private carroService = inject(CarroService);
       return;
     }
 
+    const sucursal = this.sucursalActual;
+    if (!sucursal?.ubicacion?.posicion) {
+      alert('No se pudo determinar la ubicación de la sucursal. Por favor, intenta nuevamente.');
+      return;
+    }
+
     this.isLoading.set(true);
 
     const pedidoData = {
@@ -153,14 +159,20 @@ private carroService = inject(CarroService);
       pagoId: 1,   //mejorar
       estadoId: 1, // CREADO
 
-      ubicacionEntregaLat: this.ubicacionEntrega()!.lat,
-      ubicacionEntregaLng: this.ubicacionEntrega()!.lng,
-      direccionEntrega: this.ubicacionEntrega()!.direccion,
-      // detallePedidos: itemsActuales.map(i => ({
-      //   productoId: i.producto.id,
-      //   cantidad: i.cantidad,
-      //   precioUnitario: i.producto.precio
-      // }))
+      origenLat: sucursal.ubicacion.posicion.lat,
+      origenLng: sucursal.ubicacion.posicion.lng,
+      nombreSucursal: sucursal.nombre,
+
+      destinoLat: this.ubicacionEntrega()!.lat,
+      destinoLng: this.ubicacionEntrega()!.lng,
+      calleComprador: this.ubicacionEntrega()!.direccion,
+      
+
+      detallePedidos: itemsActuales.map(i => ({
+        productoId: i.producto.id,
+        cantidad: i.cantidad,
+        precioUnitario: i.producto.precio
+      }))
     };
 
     this.pedidoService.crearPedido(pedidoData).subscribe({

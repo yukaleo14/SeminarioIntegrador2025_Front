@@ -25,6 +25,17 @@ export interface Pedido {
   empresa?: { id: number; nombre: string };
   repartidor?: { id: number; nombre: string };
   estado?: { id: number; nombre: string };
+
+  rutaOsrm?: {
+    distanciaKm: number;
+    duracionMin: number;
+    geometria: string;
+    pasos: {
+      instruccion: string;
+      distanciaM: number;
+      duracionSeg: number;
+    }[];
+  };
 }
 
 @Injectable({
