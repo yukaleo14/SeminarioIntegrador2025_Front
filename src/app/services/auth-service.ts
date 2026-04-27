@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, catchError, Observable, tap, throwError } from 'rxjs';
 import { environment } from '../environments/environment';
 import { Rol } from '../models/Rol';
 import { Empresa } from '../models/Empresa';
@@ -9,7 +9,7 @@ import { Comprador } from '../models/Comprador';
 import { Repartidor } from '../models/Repartidor';
 export interface LoginDto {
   mail: string;
-  contraseña: string;
+  contrasena: string;
 }
 
 export interface RegisterDto {
@@ -17,7 +17,7 @@ export interface RegisterDto {
   apellido: string,
   mail: string,
   dni: string,
-  contraseña: string,
+  contrasena: string,
   telefono: string,
   cuitCuil: string,
   rol: Rol,
@@ -78,12 +78,20 @@ export class AuthService {
   }
 
   register(registerDto: RegisterDto): Observable<string> {
-    return this.http.post<string>(`${this.apiUrl}/register`, registerDto).pipe(
-      tap(token => {
-        this.setToken(token);
-        this.currentUserSubject.next(this.getUserFromToken());
-      })
-    );
+   return this.http.post(`${this.apiUrl}/register`, registerDto, {
+    responseType: 'text' as const   // ← Esta es la clave
+  }).pipe(
+    tap((token: string) => {
+      console.log('✅ Token recibido del backend:', token);
+      this.setToken(token);
+      this.currentUserSubject.next(this.getUserFromToken());
+    }),
+    catchError((error) => {
+      console.error('Error en register:', error);
+      throw error;
+    })
+  );
+    
   }
 
   logout(): void {
@@ -155,4 +163,36 @@ export class AuthService {
     getCurrentUserProfile(): Observable<User> {
       return this.http.get<User>(`${this.apiUrl}/profile`);
     }
+
+    getEmpresaId(): number | null {
+    const token = this.getToken();
+    if (!token) return null;
+
+    try {
+      const payload = this.decodeToken(token);
+      
+      // Prioridad 1: empresaId directo en el token
+      if (payload.empresaId) return payload.empresaId;
+      
+      // Prioridad 2: empresa?.id (si guardaste el objeto empresa en el JWT)
+      if (payload.empresa?.id) return payload.empresa.id;
+
+      // Prioridad 3: Si solo tenés userId y el rol es EMPRESA, podemos usarlo como fallback
+      if (payload.rol === Rol.EMPRESA) {
+        return payload.id;   // Muchos sistemas usan el mismo ID para usuario y empresa
+      }
+
+      return null;
+    } catch (e) {
+      console.error('Error al obtener empresaId del token', e);
+      return null;
+    }
+  }
+
+  /**
+   * Verifica si el usuario actual es una Empresa
+   */
+  isEmpresa(): boolean {
+    return this.hasRole(Rol.EMPRESA);
+  }
 }

@@ -44,7 +44,7 @@
                     <div class="form-row">
                         <mat-form-field appearance="outline" class="field">
                             <mat-label>Contraseña</mat-label>
-                            <input formControlName="contraseña" [type]="hide() ? 'password' : 'text'" matInput
+                            <input formControlName="contrasena" [type]="hide() ? 'password' : 'text'" matInput
                                 placeholder="Contraseña">
                             <button mat-icon-button matSuffix (click)="toggleHide()"
                                 [attr.aria-pressed]="hide()" type="button"><mat-icon>{{hide() ?  'visibility': 'visibility_off'}}</mat-icon></button>
@@ -64,7 +64,7 @@
                     <mat-form-field appearance="outline" class="field">
                         <mat-label>Tipo de Usuario</mat-label>
                         <mat-select formControlName="tipoUsuario" placeholder="Tipo de Usuario">
-                            <mat-option value="CLIENTE">Cliente</mat-option>
+                            <mat-option value="COMPRADOR">Comprador</mat-option>
                             <mat-option value="EMPRESA">Empresa</mat-option>
                             <mat-option value="REPARTIDOR">Repartidor</mat-option>
                         </mat-select>

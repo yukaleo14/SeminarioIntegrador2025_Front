@@ -1,7 +1,8 @@
-<a [routerLink]="['/sucursal/', empresa()!.id]" class="empresa-card">
-    <img class="empresa-portada" [width]="320" [height]="150"  [ngSrc]="getImagenUrl()" [alt]="empresa().nombre">
+<a [routerLink]="['/sucursal/', sucursal()!.id]" class="empresa-card">
+    <img class="empresa-portada" [width]="320" [height]="150"  [ngSrc]="getImagenUrl()" [alt]="sucursal().nombre">
     <div class="empresa-title">
-        <span class="empresa-nombre">{{empresa().nombre}}</span>
-        <span class="empresa-categorias">{{empresa().categorias}}</span>
+        <span class="empresa-nombre">{{sucursal().nombre}}</span>
+        <span class="empresa-descripcion">{{ sucursal().descripcion || 'Sucursal' }}</span>
+        <span class="empresa-categorias">{{sucursal().categorias}}</span>
     </div>
 </a>

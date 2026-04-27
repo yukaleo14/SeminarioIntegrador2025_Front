@@ -32,7 +32,7 @@ export class Registro {
         telefono: ['', Validators.required],
         mail: ['', [Validators.required, Validators.email]],
         tipoUsuario: ['', Validators.required],
-        contraseña: ['', Validators.required],
+        contrasena: ['', Validators.required],
         confContraseña: ['', Validators.required],
         termCondiciones: [false, Validators.requiredTrue]
       }, { validators: confirmPasswordValidator }
@@ -43,15 +43,30 @@ export class Registro {
   private readonly router = inject(Router);
   onSubmit() {
     if (!this.formularioRegistro.valid) return
+
     const rq = this.getObject();
+
     this._authService.register(rq).subscribe({
-      next: (token) => {
-        console.log('Usuario registrado correctamente');
-        this.router.navigate(['/dashboard']); // o donde corresponda
+      next: (token: string) => {
+
+        console.log('Usuario registrado correctamente, token:', token);
+        
+        this.router.navigate(['/dashboard']); 
+
       },
       error: (err) => {
         console.error('Error al registrar:', err);
-        alert('Error al registrar el usuario. Por favor, intente nuevamente.');
+        let mensajeError = 'Error al registrar, por favor intente nuevamente.';
+
+        if (err.error?.message) {
+        mensajeError = err.error.message;
+      } else if (err.status === 409) {
+        mensajeError = 'Ya existe un usuario con ese correo electrónico.';
+      } else if (err.status === 400) {
+        mensajeError = 'Datos inválidos. Verifique la información ingresada.';
+      }
+
+      alert(mensajeError);
       }
     });
   }
@@ -60,7 +75,7 @@ export class Registro {
     return {
       nombre: this.formularioRegistro.controls['nombre'].value,
       apellido: this.formularioRegistro.controls['apellido'].value,
-      contraseña: this.formularioRegistro.controls['contraseña'].value,
+      contrasena: this.formularioRegistro.controls['contrasena'].value,
       cuitCuil: this.formularioRegistro.controls['cuitCuil'].value,
       dni: this.formularioRegistro.controls['dni'].value,
       mail: this.formularioRegistro.controls['mail'].value,
@@ -85,7 +100,7 @@ export class Registro {
 }
 
 export const confirmPasswordValidator: ValidatorFn = (group: AbstractControl): ValidationErrors | null => {
-  const passwordControl = group.get('contraseña');
+  const passwordControl = group.get('contrasena');
   const confirmControl = group.get('confContraseña');
 
   if (!passwordControl || !confirmControl) return null;

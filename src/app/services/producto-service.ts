@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, Observable, throwError } from 'rxjs';
+import { catchError, Observable, throwError, throwError } from 'rxjs';
 import { environment } from '../environments/environment';
 import { Producto } from '../models/Producto';
 import { AuthService } from './auth-service';

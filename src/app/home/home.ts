@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Buscador } from "../components/buscador/buscador";
 import { CarruselCategorias } from "../components/carrusel-categorias/carrusel-categorias";
 import { Header } from "../components/header/header";

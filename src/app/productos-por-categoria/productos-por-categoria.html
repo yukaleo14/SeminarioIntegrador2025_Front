@@ -1,0 +1,45 @@
+<app-header> </app-header>
+<div class="productos-container">
+  <div class="header">
+    <button class="btn-volver" (click)="volver()">
+      ← Volver
+    </button>
+    <h2 *ngIf="categoriaActual()">
+      {{ categoriaActual()!.nombre }}
+    </h2>
+    <h2 *ngIf="!categoriaActual()">Productos</h2>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading()" class="loading">
+    Cargando productos...
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error()" class="error">
+    {{ error() }}
+  </div>
+
+  <!-- Lista de productos -->
+  <div class="productos-grid" *ngIf="!loading() && !error()">
+    <div *ngFor="let producto of productos()" class="producto-card">
+      <img [src]="producto.imagen || 'assets/no-image.png'" 
+           [alt]="producto.nombre"
+           class="producto-imagen">
+      
+      <div class="producto-info">
+        <h3>{{ producto.nombre }}</h3>
+        
+        <p class="precio">${{ producto.precio }}</p>
+      </div>
+
+      <button class="btn-agregar" (click)="agregarAlCarrito(producto)">
+        Agregar al carrito
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="!loading() && !error() && productos().length === 0" class="no-resultados">
+    No se encontraron productos en esta categoría.
+  </div>
+</div>

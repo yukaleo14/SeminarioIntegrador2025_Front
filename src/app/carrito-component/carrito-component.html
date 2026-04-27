@@ -1,0 +1,75 @@
+<div class="carrito-container">
+
+  <h2>Mi Carrito ({{ totalItems() }} productos)</h2>
+
+  <!-- Lista de productos -->
+  <div *ngIf="items().length > 0; else carritoVacio" class="items-list">
+    
+    <div *ngFor="let item of items(); trackBy: trackByProducto" class="cart-item">
+      
+      <img [src]="item.producto.imagen || 'assets/no-image.png'" 
+           [alt]="item.producto.nombre" 
+           class="item-img">
+
+      <div class="item-info">
+        <h4>{{ item.producto.nombre }}</h4>
+        <p class="precio-unitario">
+          Precio unitario: <strong>${{ item.producto.precio }}</strong>
+        </p>
+      </div>
+
+      <!-- Control de cantidad -->
+      <div class="quantity-control">
+        <button (click)="disminuirCantidad(item)" [disabled]="item.cantidad <= 1">−</button>
+        <span class="cantidad">{{ item.cantidad }}</span>
+        <button (click)="aumentarCantidad(item)">+</button>
+      </div>
+
+      <!-- Subtotal -->
+      <div class="subtotal">
+        <strong>Subtotal:</strong><br>
+        ${{ item.producto.precio * item.cantidad }}
+      </div>
+
+      <!-- Eliminar -->
+      <button class="btn-eliminar" (click)="eliminarProducto(item)">✕</button>
+    </div>
+  </div>
+
+  <!-- Resumen del pedido -->
+  <div *ngIf="items().length > 0" class="resumen">
+    <h3>Total a pagar: <strong>${{ totalPrice() }}</strong></h3>
+    
+    <div class="acciones">
+      <button class="btn-secondary" (click)="vaciarCarrito()">Vaciar Carrito</button>
+      <button 
+        class="btn-confirmar" 
+        (click)="confirmarPedido()"
+        [disabled]="isLoading() || !ubicacionEntrega()">
+        {{ isLoading() ? 'Procesando...' : 'Confirmar Pedido' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Carrito vacío -->
+  <ng-template #carritoVacio>
+    <div class="carrito-vacio">
+      <p>Tu carrito está vacío</p>
+      <button (click)="volverALaTienda()" class="btn-primary">Ver productos</button>
+    </div>
+  </ng-template>
+
+  <!-- Botón siempre visible -->
+  <div class="volver-tienda">
+    <button (click)="volverALaTienda()" class="btn-primary">Seguir comprando</button>
+  </div>
+
+</div>
+
+<!-- Ubicación -->
+<h3>¿Dónde retiras o te entregamos el pedido?</h3>
+<app-seleccion-ubicaciones 
+  [sucursalLatLng]="[sucursalActual?.latitud || 0, sucursalActual?.longitud || 0]" 
+  [sucursalNombre]="sucursalActual?.nombre || 'Sucursal Principal'"
+  (ubicacionSeleccionada)="onUbicacionSeleccionada($event)">
+</app-seleccion-ubicaciones>

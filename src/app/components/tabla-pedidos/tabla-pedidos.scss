@@ -1,0 +1,116 @@
+.pedidos-container {
+  padding: 25px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+h2 {
+  margin: 0;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.btn-home {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.pedidos-table {
+  background-color: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.pedidos-table th {
+  background-color: #f8f9fa;
+  color: #495057;
+  font-weight: 600;
+  padding: 16px 12px;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+}
+
+.pedidos-table td {
+  padding: 16px 12px;
+  vertical-align: middle;
+}
+
+.pedido-row:hover {
+  background-color: #f8fbff;
+  transition: background-color 0.2s ease;
+}
+
+.pedido-numero {
+  color: #3498db;
+  font-size: 1.05rem;
+}
+
+.cliente-nombre {
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.hora-estimada {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #e67e22;
+  font-weight: 600;
+}
+
+.monto {
+  color: #27ae60;
+  font-size: 1.05rem;
+}
+
+.tiempo-prep {
+  background-color: #ecf0f1;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: #7f8c8d;
+}
+
+.badge {
+  padding: 8px 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-radius: 30px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.btn-detalle {
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.no-pedidos {
+  color: #95a5a6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

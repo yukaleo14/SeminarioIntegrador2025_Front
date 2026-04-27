@@ -3,6 +3,7 @@ import { Component, computed, inject, input, OnInit, output, signal } from '@ang
 import { Categoria } from '../../models/Categoria';
 import { CategoriaService } from '../../services/categoria-service';
 import { ItemCategoria } from '../item-categoria/item-categoria';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-carrusel-categorias',
@@ -13,6 +14,7 @@ import { ItemCategoria } from '../item-categoria/item-categoria';
 export class CarruselCategorias implements OnInit {
   filtroSucursal = input<number>();
   private readonly _dataService = inject(CategoriaService);
+  private router = inject(Router);
 
   // State signals
   categorias = signal<Categoria[]>([]);
@@ -39,8 +41,8 @@ export class CarruselCategorias implements OnInit {
 
   onCategoriaClick(categoria: Categoria) {
     this.categoriaSeleccionada.emit(categoria);
+    this.router.navigate(['/categoria', categoria.id, 'productos']);
   }
-
 
   loadCategorias(): void {
     this.loading.set(true);
