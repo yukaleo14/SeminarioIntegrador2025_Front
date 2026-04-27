@@ -1,6 +1,6 @@
-import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, Observable, throwError, throwError } from 'rxjs';
+import { catchError, Observable, throwError } from 'rxjs';
 import { environment } from '../environments/environment';
 import { Producto } from '../models/Producto';
 import { AuthService } from './auth-service';
@@ -37,6 +37,14 @@ export class ProductoService {
     return this.http.get<Producto[]>(`${this.apiUrl}/sucursal/?sucursalId=${sucursalId}&categoriaId=${categoriaId}`).pipe(
       catchError(this.handleError)
     );
+  }
+
+  getByCategoria(categoriaId: number): Observable<Producto[]> {
+    if (!categoriaId) {
+      return throwError(() => new Error('ID de categoría inválido'));
+    }
+    const params = new HttpParams().set('categoriaId', categoriaId.toString());
+    return this.http.get<Producto[]>(`${this.apiUrl}/categoria/${categoriaId}`, { params });
   }
 
   createProducto(producto: Producto): Observable<void> {
