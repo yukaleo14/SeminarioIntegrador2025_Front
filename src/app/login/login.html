@@ -14,7 +14,7 @@
                     <mat-form-field appearance="outline">
                         <mat-label>Contraseña</mat-label>
                         <input matInput [type]="hide() ? 'password' : 'text'" placeholder="Contraseña"
-                            formControlName="contraseña">
+                            formControlName="contrasena">
                         <button mat-icon-button matSuffix (click)="toggleHide()" [attr.aria-label]="'Hide Password'"
                             [attr.aria-pressed]="hide()" type="button">
                             <mat-icon>{{ hide() ? 'visibility_off' : 'visibility' }}</mat-icon>

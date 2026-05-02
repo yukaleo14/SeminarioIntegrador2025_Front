@@ -32,7 +32,7 @@ export class Registro {
         telefono: ['', Validators.required],
         mail: ['', [Validators.required, Validators.email]],
         tipoUsuario: ['', Validators.required],
-        contraseña: ['', Validators.required],
+        contrasena: ['', Validators.required],
         confContraseña: ['', Validators.required],
         termCondiciones: [false, Validators.requiredTrue]
       }, { validators: confirmPasswordValidator }
@@ -60,7 +60,7 @@ export class Registro {
     return {
       nombre: this.formularioRegistro.controls['nombre'].value,
       apellido: this.formularioRegistro.controls['apellido'].value,
-      contraseña: this.formularioRegistro.controls['contraseña'].value,
+      contrasena: this.formularioRegistro.controls['contrasena'].value,
       cuitCuil: this.formularioRegistro.controls['cuitCuil'].value,
       dni: this.formularioRegistro.controls['dni'].value,
       mail: this.formularioRegistro.controls['mail'].value,
@@ -85,7 +85,7 @@ export class Registro {
 }
 
 export const confirmPasswordValidator: ValidatorFn = (group: AbstractControl): ValidationErrors | null => {
-  const passwordControl = group.get('contraseña');
+  const passwordControl = group.get('contrasena');
   const confirmControl = group.get('confContraseña');
 
   if (!passwordControl || !confirmControl) return null;

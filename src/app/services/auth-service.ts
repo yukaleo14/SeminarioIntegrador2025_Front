@@ -1,15 +1,16 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
-import { environment } from '../environments/environment';
-import { Rol } from '../models/Rol';
-import { Empresa } from '../models/Empresa';
-import { Comprador } from '../models/Comprador';
-import { Repartidor } from '../models/Repartidor';
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {Router} from '@angular/router';
+import {BehaviorSubject, Observable, tap} from 'rxjs';
+import {environment} from '../environments/environment';
+import {Rol} from '../models/Rol';
+import {Empresa} from '../models/Empresa';
+import {Comprador} from '../models/Comprador';
+import {Repartidor} from '../models/Repartidor';
+
 export interface LoginDto {
   mail: string;
-  contraseña: string;
+  contrasena: string;
 }
 
 export interface RegisterDto {
@@ -17,7 +18,7 @@ export interface RegisterDto {
   apellido: string,
   mail: string,
   dni: string,
-  contraseña: string,
+  contrasena: string,
   telefono: string,
   cuitCuil: string,
   rol: Rol,
@@ -29,6 +30,13 @@ export interface RegisterDto {
   coordenadaY: number
 }
 
+export interface Payload {
+  id: number;
+  mail: string;
+  rol: Rol;
+  iat: number;
+  exp: number;
+}
 export class User {
   id: number;
   mail: string;
@@ -36,6 +44,7 @@ export class User {
   empresa?: Empresa;
   comprador?: Comprador;
   repartidor?: Repartidor;
+
   constructor(id: number, mail: string, rol: Rol) {
     this.id = id;
     this.mail = mail;
@@ -51,7 +60,7 @@ export class User {
         return user.repartidor;
       default:
         return undefined;
-    }    
+    }
   }
 }
 
@@ -66,10 +75,11 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private router: Router
-  ) {}
+  ) {
+  }
 
-  login(loginDto: LoginDto): Observable<{token: string}> {
-    return this.http.post<{token: string}>(`${this.apiUrl}/login`, loginDto).pipe(
+  login(loginDto: LoginDto): Observable<{ token: string }> {
+    return this.http.post<{ token: string }>(`${this.apiUrl}/login`, loginDto).pipe(
       tap(token => {
         this.setToken(token.token);
         this.currentUserSubject.next(this.getUserFromToken());
@@ -96,6 +106,10 @@ export class AuthService {
     return localStorage.getItem('token');
   }
 
+  getObjetoUser(): User {
+    return new User(0, '', Rol.COMPRADOR);
+  }
+
   private setToken(token: string): void {
     localStorage.removeItem('token');
     localStorage.setItem('token', token);
@@ -104,7 +118,7 @@ export class AuthService {
   isAuthenticated(): boolean {
     const token = this.getToken();
     if (!token) return false;
-    
+
     try {
       const payload = this.decodeToken(token);
       return payload.exp * 1000 > Date.now();
@@ -119,7 +133,7 @@ export class AuthService {
 
     try {
       const payload = this.decodeToken(token);
-      return new User( payload.id, payload.mail, payload.rol);
+      return new User(payload.id, payload.mail, payload.rol);
     } catch {
       return null;
     }
@@ -148,11 +162,11 @@ export class AuthService {
     return user?.id || null;
   }
 
-    /**
-     * Obtiene el perfil del usuario actual
-     * Usa el endpoint /auth/profile que ya existe en el backend
-     */
-    getCurrentUserProfile(): Observable<User> {
-      return this.http.get<User>(`${this.apiUrl}/profile`);
-    }
+  /**
+   * Obtiene el perfil del usuario actual
+   * Usa el endpoint /auth/profile que ya existe en el backend
+   */
+  getCurrentUserProfile(): Observable<User> {
+    return this.http.get<User>(`${this.apiUrl}/profile`);
+  }
 }
