@@ -1,6 +1,6 @@
-import {Injectable} from '@angular/core';
-import {io, Socket} from 'socket.io-client';
-import {Observable} from 'rxjs';
+import { Injectable } from '@angular/core';
+import { io, Socket } from 'socket.io-client';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -16,16 +16,28 @@ export class ChatService {
     });
   }
 
+  disconnect() {
+    this.socket.disconnect();
+  }
+
   joinRoom(pedidoId: number) {
-    this.socket.emit('joinRoom', {pedidoId});
+    this.socket.emit('joinRoom', { pedidoId });
   }
 
   sendMessage(pedidoId: number, message: string) {
-    this.socket.emit('sendMessage', {pedidoId, message});
+    this.socket.emit('sendMessage', { pedidoId, message });
   }
 
   onUsersInRoom(callback: (users: any[]) => void) {
     this.socket.on('usersInRoom', callback);
+  }
+
+  onError(): Observable<any> {
+    return new Observable(observer => {
+      this.socket.on('error', (data) => {
+        observer.next(data);  // Emite el mensaje de error
+      });
+    });
   }
 
 

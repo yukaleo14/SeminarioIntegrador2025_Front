@@ -4,34 +4,36 @@
   <mat-card-header>
     <mat-card-title>{{ otherUser()?.mail}}</mat-card-title>
     @if (otherUser()) {
-      <mat-card-subtitle>En línea</mat-card-subtitle>
+    <mat-card-subtitle>En línea</mat-card-subtitle>
     } @else {
-      <mat-card-subtitle>Esperando conexión...</mat-card-subtitle>
+    <mat-card-subtitle>Esperando conexión...</mat-card-subtitle>
     }
   </mat-card-header>
 
   <!-- MENSAJES -->
+
   <div #scrollContainer class="messages-container">
+    @if (mostrarMsj()){
     @for (message of messages(); track message.timestamp) {
-      <div [ngClass]="{'my-message': isCurrentUser(message), 'other-message': !isCurrentUser(message)}"
-           class="message-bubble">
-        <div class="message-text">
-          {{ message.text }}
-        </div>
-        <div class="timestamp">
-          {{ message.timestamp | date:'shortTime' }}
-        </div>
+    <div [ngClass]="{'my-message': isCurrentUser(message), 'other-message': !isCurrentUser(message)}"
+      class="message-bubble">
+      <div class="message-text">
+        {{ message.text }}
       </div>
+      <div class="timestamp">
+        {{ message.timestamp | date:'shortTime' }}
+      </div>
+    </div>
+    }
     }
   </div>
+
+
 
   <!-- INPUT -->
   <mat-card-actions class="input-container">
     <mat-form-field appearance="outline" class="input-field">
-      <input matInput
-             placeholder="Escribí un mensaje..."
-             [(ngModel)]="newMessage"
-             (keyup.enter)="sendMessage()">
+      <input matInput placeholder="Escribí un mensaje..." [(ngModel)]="newMessage" (keyup.enter)="sendMessage()">
     </mat-form-field>
 
     <button mat-raised-button color="primary" (click)="sendMessage()">
