@@ -10,15 +10,23 @@ export interface Pedido {
   id: number;
   numero: string;
   montoTotal: number;
-  fechaHora: string;
-  horaLlegadaEstimada?: string;
+  fechaHora: Date;
+  horaLlegadaEstimada?: Date;
   tiempoPreparacionEstimado?: number;
   tiempoRepartoEstimado?: number;
   estadoId: number;
-  compradorId: number;
-  empresaId: number;
-  repartidorId?: number;
   rutaId?: number;
+  ruta: {
+    id: number;
+    origen: {
+      coordenadaX: number;
+      coordenadaY: number;
+    };
+    destino: {
+      coordenadaX: number;
+      coordenadaY: number;
+    };
+  };
   pagoId?: number;
 
   comprador?: { id: number; nombre: string };
@@ -26,16 +34,13 @@ export interface Pedido {
   repartidor?: { id: number; nombre: string };
   estado?: { id: number; nombre: string };
 
-  rutaOsrm?: {
-    distanciaKm: number;
-    duracionMin: number;
-    geometria: string;
-    pasos: {
-      instruccion: string;
-      distanciaM: number;
-      duracionSeg: number;
+  detalle: {
+    productoId: number;
+    cantidad: number;
+    montoSubtotal: number;
     }[];
-  };
+
+
 }
 
 @Injectable({

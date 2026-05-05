@@ -1,4 +1,5 @@
 export interface Ubicacion{
+    id: number;
     coordenadaX: number;
     coordenadaY: number;
     nombreUbicacion: string;
