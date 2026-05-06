@@ -113,6 +113,25 @@ export class SocketService {
     this.pedidosSubject.next(actuales);
   }
 
+  onPosicionActualizada(): Observable<{ lat: number; lng: number }> {
+    return new Observable((observer) => {
+      this.socket.on('posicionActualizada', (coordenadas: { lat: number; lng: number }) => {
+        observer.next(coordenadas);
+      });
+
+      return () => {
+        this.socket.off('posicionActualizada');
+      };
+    });
+  }
+
+  joinPedidoRoom(pedidoId: string | number) {
+    if (this.socket.connected) {
+      this.socket.emit('joinPedidoRoom', { pedidoId });
+      console.log(`Uniéndose a la sala del pedido con ID: ${pedidoId}`);
+    }
+  }
+
   disconnect() {
     this.socket.removeAllListeners();
     this.socket.disconnect();

@@ -4,11 +4,17 @@ import { Ubicacion } from "./Ubicacion";
 
 export interface Sucursal extends Ubicacion {
     id: number;
+    empresaId: number;
     imagen?: string;
     nombre: string;
     descripcion: string;
-    horario: Horario[];
-    categorias?: Categoria[];
+    horario?: Horario[];
+    ubicacion?: Ubicacion;
+    ubicacionId: number;
+    estadoId: number;
+    productos?: any[]; // Mejorar con el tipo Producto
+
+    categorias?: Categoria[]; //esto se tiene que sacar, se obtiene a través de los productos
 }
 
 export interface CreateSucursalDto {

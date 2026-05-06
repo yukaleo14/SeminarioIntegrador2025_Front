@@ -69,7 +69,7 @@
 <!-- Ubicación -->
 <h3>¿Dónde retiras o te entregamos el pedido?</h3>
 <app-seleccion-ubicaciones 
-  [sucursalLatLng]="[sucursalActual?.latitud || 0, sucursalActual?.longitud || 0]" 
-  [sucursalNombre]="sucursalActual?.nombre || 'Sucursal Principal'"
+  [sucursalLatLng]="[ -32.4123,  -63.2405]" 
+  [sucursalNombre]="'Sucursal Principal'"
   (ubicacionSeleccionada)="onUbicacionSeleccionada($event)">
 </app-seleccion-ubicaciones>

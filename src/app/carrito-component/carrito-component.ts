@@ -6,6 +6,8 @@ import { AuthService } from '../services/auth-service';
 import { PedidoService } from '../services/pedido-service';
 import { Subscription } from 'rxjs';
 import { SeleccionUbicaciones } from './../components/seleccion-ubicaciones/seleccion-ubicaciones';
+import { SucursalService } from '../services/sucursal-service';
+import { Sucursal } from '../models/Sucursal';
 
 @Component({
   selector: 'app-carrito-component',
@@ -18,6 +20,7 @@ export class CarritoComponent implements OnInit {
 private carroService = inject(CarroService);
   private pedidoService = inject(PedidoService);
   private authService = inject(AuthService);
+  private sucursalService = inject(SucursalService);
   private router = inject(Router);
 
   items = signal<CartItem[]>([]);
@@ -25,11 +28,22 @@ private carroService = inject(CarroService);
   totalPrice = signal(0);
   isLoading = signal(false);
   ubicacionEntrega = signal<{ lat: number, lng: number, direccion: string } | null>(null);
-  sucursalActual: any = null; 
+  sucursales = signal<Sucursal[]>([]);
+  sucursalActual = signal<Sucursal | null>(null);
+
 
   private subscription = new Subscription();
 
   ngOnInit() {
+    this.subscription.add(
+      this.sucursalService.findSucursalesByCategoria(1).subscribe(sucursales => {
+        this.sucursales.set(sucursales);
+        if (this.sucursales.length > 0 && !this.sucursalActual()) {
+          this.sucursalActual.set(this.sucursales()[0]);
+        }
+      })
+    );
+
     this.subscription.add(
       this.carroService.watchItems().subscribe(cartItems => {
         console.log('🛒 Carrito actualizado - items con sus IDs:', 
@@ -50,15 +64,13 @@ private carroService = inject(CarroService);
         this.totalPrice.set(this.carroService.getTotalPrice());
 
         if (cartItems.length > 0) {
-          this.sucursalActual = cartItems[0].producto.sucursal;
+          this.sucursalActual.set(cartItems[0].producto.sucursal);
         }
       })
     );
 
     this.refreshCart();
   }
-
-  
 
   private refreshCart() {
     const currentItems = this.carroService.getItems();
@@ -138,11 +150,12 @@ private carroService = inject(CarroService);
       return;
     }
 
-    const sucursal = this.sucursalActual;
-    if (!sucursal?.ubicacion?.posicion) {
-      alert('No se pudo determinar la ubicación de la sucursal. Por favor, intenta nuevamente.');
-      return;
-    }
+    const sucursal = this.sucursalActual();
+    // if (!sucursal) {
+    //   alert('Debes seleccionar una sucursal antes de confirmar tu pedido');
+    //   return;
+    // }
+    
 
     this.isLoading.set(true);
 
@@ -152,26 +165,39 @@ private carroService = inject(CarroService);
       montoTotal: this.totalPrice(),           // ← importante
       tiempoPreparacionEstimado: 30, //mejorar
       tiempoRepartoEstimado: 20, //mejorar
-      empresaId: itemsActuales[0]?.producto.sucursal || 1, // toma de primer producto
-      compradorId: user.id,
+
+      fechaHora: new Date(Date.now()), //mejorar
+
+
+      empresaId: sucursal?.empresaId || 1, //mejorar
+      compradorId: 5, //mejorar con el ID del usuario comprador actual
       rutaId: 1, //mejorar
       repartidorId: 1, //mejorar
-      pagoId: 1,   //mejorar
+
+      pagoId: 1,   //mejorar con el selector de métodos de pago
       estadoId: 1, // CREADO
 
-      origenLat: sucursal.ubicacion.posicion.lat,
-      origenLng: sucursal.ubicacion.posicion.lng,
-      nombreSucursal: sucursal.nombre,
+      infoRuta: {
+        origen: {
+          coordenadas: {
+            lat: sucursal?.ubicacion?.coordenadaX || -32.69,
+            lng: sucursal?.ubicacion?.coordenadaY || -63.29,
+          },
+          
+        },
+        destino: {
+          coordenadas: {
+            lat: this.ubicacionEntrega()?.lat || -32.69,
+            lng: this.ubicacionEntrega()?.lng || -63.29,
+          },
+          calle: this.ubicacionEntrega()?.direccion || '', //mejorar con el desglose de dirección
+        },
+      },
 
-      destinoLat: this.ubicacionEntrega()!.lat,
-      destinoLng: this.ubicacionEntrega()!.lng,
-      calleComprador: this.ubicacionEntrega()!.direccion,
-      
-
-      detallePedidos: itemsActuales.map(i => ({
+      detalle: itemsActuales.map(i => ({
         productoId: i.producto.id,
         cantidad: i.cantidad,
-        precioUnitario: i.producto.precio
+        montoSubtotal: i.producto.precio * i.cantidad,
       }))
     };
 
@@ -183,6 +209,8 @@ private carroService = inject(CarroService);
       },
       error: (err) => {
         console.error('Error al confirmar el pedido:', err);
+        console.log('Datos enviados para crear el pedido:', pedidoData);
+        console.log('Respuesta del servidor:', err.error);
         alert('Error al confirmar el pedido. Por favor, intenta nuevamente.');
         this.isLoading.set(false);
       }
