@@ -10,6 +10,8 @@ import { SeleccionUbicaciones } from './components/seleccion-ubicaciones/selecci
 import { TablaPedidos } from './components/tabla-pedidos/tabla-pedidos';
 import { ProductosPorCategoria } from './productos-por-categoria/productos-por-categoria';
 import { CarritoComponent } from './carrito-component/carrito-component';
+import { ProductoTableComponent } from './components/producto-table/producto-table';
+import {Chat} from './components/chat/chat';
 
 export const routes: Routes = [
     {path:'home' ,component: Home},
@@ -23,6 +25,8 @@ export const routes: Routes = [
     {path: 'categoria/:idCategoria/productos', component: ProductosPorCategoria},
     {path: 'carrito', component: CarritoComponent},
 
+    {path:'producto',component: ProductoTableComponent},
+    {path:'chat',component: Chat},
 
     {path:'**' ,redirectTo:'home'}
 ];

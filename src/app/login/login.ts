@@ -37,7 +37,7 @@ export class Login implements OnInit {
 
   onSubmit() {
     if (!this.formularioLogin.valid){
-      return 
+      return
     }
 
 

@@ -6,7 +6,7 @@ import { User } from './auth-service';
 
 export interface CreateUserDto {
   mail: string;
-  contraseña: string;
+  contrasena: string;
   nombre: string;
   apellido: string;
   rol: string;
