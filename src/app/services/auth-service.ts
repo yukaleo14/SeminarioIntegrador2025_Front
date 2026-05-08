@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {Router} from '@angular/router';
-import {BehaviorSubject, Observable, tap} from 'rxjs';
+import {BehaviorSubject, catchError, Observable, tap} from 'rxjs';
 import {environment} from '../environments/environment';
 import {Rol} from '../models/Rol';
 import {Empresa} from '../models/Empresa';
@@ -89,14 +89,14 @@ export class AuthService {
 
   register(registerDto: RegisterDto): Observable<string> {
    return this.http.post(`${this.apiUrl}/register`, registerDto, {
-    responseType: 'text' as const   // ← Esta es la clave
+    responseType: 'text' as const
   }).pipe(
     tap((token: string) => {
       console.log('✅ Token recibido del backend:', token);
       this.setToken(token);
       this.currentUserSubject.next(this.getUserFromToken());
     }),
-    catchError((error) => {
+    catchError((error :HttpErrorResponse) => {
       console.error('Error en register:', error);
       throw error;
     })

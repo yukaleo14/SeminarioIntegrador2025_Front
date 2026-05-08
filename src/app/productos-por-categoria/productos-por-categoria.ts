@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CategoriaService } from '../services/categoria-service';
 import { ProductoService } from '../services/producto-service';
@@ -8,16 +7,17 @@ import { Categoria } from '../models/Categoria';
 import { CarroService } from '../services/carro-service';
 import { AuthService } from '../services/auth-service';
 import { Header } from "../components/header/header";
+import { ProductoCard } from '../components/producto-card/producto-card';
 
 @Component({
   selector: 'app-productos-por-categoria',
   standalone: true,
-  imports: [CommonModule, Header],
+  imports: [Header, ProductoCard],
   templateUrl: './productos-por-categoria.html',
   styleUrl: './productos-por-categoria.scss'
 })
 export class ProductosPorCategoria implements OnInit {
-  
+
   private carroService = inject(CarroService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -37,59 +37,43 @@ export class ProductosPorCategoria implements OnInit {
     const categoriaId = idParam ? parseInt(idParam) : NaN;
 
     if (!categoriaId || isNaN(categoriaId) || categoriaId <= 0) {
-      console.warn('ID de categoría inválido, redirigiendo a home');
       this.router.navigate(['/']);
       return;
     }
 
     this.cargarDatos(categoriaId);
   }
-  
-  private cargarDatos(categoriaId: number): void {
 
+  private cargarDatos(categoriaId: number): void {
     this.categoriaService.getById(categoriaId).subscribe({
       next: (categoria) => this.categoriaActual.set(categoria),
-      error: (err) => {
+      error: () => {
         this.error.set('No se pudo cargar la categoría');
         this.loading.set(false);
       }
     });
 
-
-      this.productoService.getByCategoria(categoriaId).subscribe({
-        next: (data) => {
-          console.log('📦 Productos recibidos del backend:', JSON.stringify(data, null, 2));
-          this.productos.set(data);
-          this.loading.set(false);
-        },
-        error: (err) => {
-          this.error.set('No se pudieron cargar los productos');
-          this.loading.set(false);
-        }
-      });
-    
+    this.productoService.getByCategoria(categoriaId).subscribe({
+      next: (data) => {
+        this.productos.set(data);
+        this.loading.set(false);
+      },
+      error: () => {
+        this.error.set('No se pudieron cargar los productos');
+        this.loading.set(false);
+      }
+    });
   }
 
   volver() {
-    this.router.navigate(['/home']);
+    window.history.back();
   }
 
-  agregarAlCarrito(producto: Producto) {
-    console.log('→ Agregando producto:', {
-    id: producto.id,
-    nombre: producto.nombre,
-    precio: producto.precio,
-    sucursal: producto.sucursal
-  });
+  agregarAlCarrito(event: { producto: Producto; cantidad: number }) {
     if (!this.authService.isAuthenticated()) {
-      alert('Debes iniciar sesión para agregar productos al carrito');
       this.router.navigate(['/login']);
       return;
     }
-
-    const productoCopia = JSON.parse(JSON.stringify(producto)) as Producto;
-
-    this.carroService.addProduct(productoCopia, 1);
-    alert(`Producto "${producto.nombre}" agregado al carrito!`);
+    this.carroService.addProduct(event.producto, event.cantidad);
   }
 }

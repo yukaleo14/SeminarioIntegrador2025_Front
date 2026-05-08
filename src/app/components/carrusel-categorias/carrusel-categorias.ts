@@ -16,32 +16,39 @@ export class CarruselCategorias implements OnInit {
   private readonly _dataService = inject(CategoriaService);
   private router = inject(Router);
 
-  // State signals
   categorias = signal<Categoria[]>([]);
   loading = signal(false);
   error = signal<string | null>(null);
+  categoriaActivaId = signal<number>(0);
 
-  // Computed signals for derived state
   hasData = computed(() => this.categorias().length > 0);
   isEmpty = computed(() => !this.loading() && this.categorias().length === 0);
 
   ngOnInit(): void {
-    if(this.filtroSucursal()){
-      // Load categorias filtrando
-      this._dataService.getListaBySucursal(this.filtroSucursal()!).pipe().subscribe({
-        next: (data: Categoria[]) => {
-          this.categorias.set(data);
-        }});
-        return;
+    if (this.filtroSucursal()) {
+      this._dataService.getListaBySucursal(this.filtroSucursal()!).subscribe({
+        next: (data: Categoria[]) => this.categorias.set(data),
+        error: (err: HttpErrorResponse) => this.error.set(this.getErrorMessage(err))
+      });
+      return;
     }
     this.loadCategorias();
   }
 
   categoriaSeleccionada = output<Categoria>();
 
+  onTodosClick() {
+    this.categoriaActivaId.set(0);
+    this.categoriaSeleccionada.emit({ id: 0, nombre: 'Todos', imagen: '' });
+  }
+
   onCategoriaClick(categoria: Categoria) {
-    this.categoriaSeleccionada.emit(categoria);
-    this.router.navigate(['/categoria', categoria.id, 'productos']);
+    if (this.filtroSucursal()) {
+      this.categoriaActivaId.set(categoria.id);
+      this.categoriaSeleccionada.emit(categoria);
+    } else {
+      this.router.navigate(['/categoria', categoria.id, 'productos']);
+    }
   }
 
   loadCategorias(): void {

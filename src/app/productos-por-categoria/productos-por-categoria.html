@@ -1,45 +1,27 @@
-<app-header> </app-header>
+<app-header></app-header>
 <div class="productos-container">
-  <div class="header">
-    <button class="btn-volver" (click)="volver()">
-      ← Volver
-    </button>
-    <h2 *ngIf="categoriaActual()">
-      {{ categoriaActual()!.nombre }}
-    </h2>
-    <h2 *ngIf="!categoriaActual()">Productos</h2>
+  <div class="page-header">
+    <button class="btn-volver" (click)="volver()">← Volver</button>
+    <h2>{{ categoriaActual()?.nombre ?? 'Productos' }}</h2>
   </div>
 
-  <!-- Loading -->
-  <div *ngIf="loading()" class="loading">
-    Cargando productos...
-  </div>
+  @if (loading()) {
+    <div class="estado-mensaje">Cargando productos...</div>
+  }
 
-  <!-- Error -->
-  <div *ngIf="error()" class="error">
-    {{ error() }}
-  </div>
+  @if (error()) {
+    <div class="estado-mensaje error">{{ error() }}</div>
+  }
 
-  <!-- Lista de productos -->
-  <div class="productos-grid" *ngIf="!loading() && !error()">
-    <div *ngFor="let producto of productos()" class="producto-card">
-      <img [src]="producto.imagen || 'assets/no-image.png'" 
-           [alt]="producto.nombre"
-           class="producto-imagen">
-      
-      <div class="producto-info">
-        <h3>{{ producto.nombre }}</h3>
-        
-        <p class="precio">${{ producto.precio }}</p>
+  @if (!loading() && !error()) {
+    @if (productos().length > 0) {
+      <div class="productos-grid">
+        @for (producto of productos(); track producto.id) {
+          <app-producto-card [producto]="producto" (agregar)="agregarAlCarrito($event)"></app-producto-card>
+        }
       </div>
-
-      <button class="btn-agregar" (click)="agregarAlCarrito(producto)">
-        Agregar al carrito
-      </button>
-    </div>
-  </div>
-
-  <div *ngIf="!loading() && !error() && productos().length === 0" class="no-resultados">
-    No se encontraron productos en esta categoría.
-  </div>
+    } @else {
+      <div class="estado-mensaje">No se encontraron productos en esta categoría.</div>
+    }
+  }
 </div>

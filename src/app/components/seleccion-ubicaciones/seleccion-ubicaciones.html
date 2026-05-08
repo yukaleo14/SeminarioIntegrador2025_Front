@@ -11,10 +11,15 @@
 <div class="map-container">
   <div id="map" style="height: 500px; width: 100%;"></div>
 </div>
-<p *ngIf="direccionEncontrada"><strong>Dirección seleccionada:</strong> {{ direccionEncontrada }}</p>
+
+@if (direccionEncontrada) {
+  <p><strong>Dirección seleccionada:</strong> {{ direccionEncontrada }}</p>
+}
 
 <!-- <div id="map"></div> -->
 
-<div class="info" *ngIf="direccionEncontrada">
-  <p>📍 {{ direccionEncontrada }}</p>
-</div>
+@if (direccionEncontrada) {
+  <div class="info">
+    <p>📍 {{ direccionEncontrada }}</p>
+  </div>
+}

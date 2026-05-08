@@ -19,6 +19,7 @@ export const routes: Routes = [
     {path:'categoria/:id' ,component: ItemCategoria},
     {path:'registro' ,component: Registro},
     {path:'sucursal/:idEmpresa' ,component: SucursalConsultaComponent},
+    {path:'seguimiento/:pedidoId' ,component: SeguimientoPedido},
     {path:'seguimiento' ,component: SeguimientoPedido},
     {path:'seleccion-ubicacion' , component: SeleccionUbicaciones},
     {path: 'tabla-pedidos', component: TablaPedidos},

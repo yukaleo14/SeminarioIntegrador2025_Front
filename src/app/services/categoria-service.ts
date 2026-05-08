@@ -15,8 +15,7 @@ export class CategoriaService {
     return this.http.get<Categoria[]>(`${this.apiUrl}`);
   }
   getListaBySucursal(sucursalId: number): Observable<Categoria[]> {
-    const params = new HttpParams().set('sucursalId', sucursalId.toString());
-    return this.http.get<Categoria[]>(`${this.apiUrl}`, { params });
+    return this.http.get<Categoria[]>(`${this.apiUrl}/sucursal/${sucursalId}`);
   }
 
   getById(id: number): Observable<Categoria> {

@@ -1,75 +1,178 @@
-<div class="carrito-container">
+<div class="carrito-page">
 
-  <h2>Mi Carrito ({{ totalItems() }} productos)</h2>
-
-  <!-- Lista de productos -->
-  <div *ngIf="items().length > 0; else carritoVacio" class="items-list">
-    
-    <div *ngFor="let item of items(); trackBy: trackByProducto" class="cart-item">
-      
-      <img [src]="item.producto.imagen || 'assets/no-image.png'" 
-           [alt]="item.producto.nombre" 
-           class="item-img">
-
-      <div class="item-info">
-        <h4>{{ item.producto.nombre }}</h4>
-        <p class="precio-unitario">
-          Precio unitario: <strong>${{ item.producto.precio }}</strong>
-        </p>
-      </div>
-
-      <!-- Control de cantidad -->
-      <div class="quantity-control">
-        <button (click)="disminuirCantidad(item)" [disabled]="item.cantidad <= 1">−</button>
-        <span class="cantidad">{{ item.cantidad }}</span>
-        <button (click)="aumentarCantidad(item)">+</button>
-      </div>
-
-      <!-- Subtotal -->
-      <div class="subtotal">
-        <strong>Subtotal:</strong><br>
-        ${{ item.producto.precio * item.cantidad }}
-      </div>
-
-      <!-- Eliminar -->
-      <button class="btn-eliminar" (click)="eliminarProducto(item)">✕</button>
-    </div>
+  <!-- HEADER -->
+  <div class="carrito-header">
+    <button mat-icon-button (click)="volverALaTienda()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1 class="carrito-title">Mi Carrito</h1>
+    @if (totalItems() > 0) {
+      <span class="item-badge">{{ totalItems() }}</span>
+    }
   </div>
 
-  <!-- Resumen del pedido -->
-  <div *ngIf="items().length > 0" class="resumen">
-    <h3>Total a pagar: <strong>${{ totalPrice() }}</strong></h3>
-    
-    <div class="acciones">
-      <button class="btn-secondary" (click)="vaciarCarrito()">Vaciar Carrito</button>
-      <button 
-        class="btn-confirmar" 
-        (click)="confirmarPedido()"
-        [disabled]="isLoading() || !ubicacionEntrega()">
-        {{ isLoading() ? 'Procesando...' : 'Confirmar Pedido' }}
+  @if (items().length > 0) {
+    <div class="carrito-layout">
+
+      <!-- COLUMNA IZQUIERDA: productos + ubicación -->
+      <div class="col-left">
+
+        <!-- Lista de productos -->
+        <mat-card class="products-card">
+          <mat-card-header>
+            <mat-card-title>Productos</mat-card-title>
+            @if (sucursalActual()) {
+              <mat-card-subtitle>{{ sucursalActual()!.nombre }}</mat-card-subtitle>
+            }
+          </mat-card-header>
+          <mat-card-content>
+            @for (item of items(); track item.producto.id) {
+              <div class="cart-item">
+                <img
+                  [src]="item.producto.imagen
+                    ? fileService.getImagenUrl(item.producto.imagen)
+                    : 'assets/no-image.png'"
+                  [alt]="item.producto.nombre"
+                  class="item-img"
+                />
+                <div class="item-info">
+                  <span class="item-nombre">{{ item.producto.nombre }}</span>
+                  <span class="item-precio">{{ item.producto.precio | currency:'$':'symbol':'1.0-0' }} c/u</span>
+                </div>
+                <div class="quantity-control">
+                  <button mat-icon-button (click)="disminuirCantidad(item)">
+                    <mat-icon>{{ item.cantidad <= 1 ? 'delete' : 'remove' }}</mat-icon>
+                  </button>
+                  <span class="qty-display">{{ item.cantidad }}</span>
+                  <button mat-icon-button (click)="aumentarCantidad(item)">
+                    <mat-icon>add</mat-icon>
+                  </button>
+                </div>
+                <span class="item-subtotal">
+                  {{ item.producto.precio * item.cantidad | currency:'$':'symbol':'1.0-0' }}
+                </span>
+              </div>
+              <mat-divider />
+            }
+          </mat-card-content>
+          <mat-card-actions align="end">
+            <button mat-button color="warn" (click)="vaciarCarrito()">
+              <mat-icon>delete_sweep</mat-icon> Vaciar carrito
+            </button>
+          </mat-card-actions>
+        </mat-card>
+
+        <!-- Mapa de ubicación -->
+        <mat-card class="ubicacion-card">
+          <mat-card-header>
+            <mat-card-title>¿Dónde te lo llevamos?</mat-card-title>
+            @if (ubicacionEntrega()) {
+              <mat-card-subtitle>
+                <mat-icon class="loc-ok-icon">check_circle</mat-icon>
+                {{ ubicacionEntrega()!.direccion | slice:0:60 }}…
+              </mat-card-subtitle>
+            }
+          </mat-card-header>
+          <mat-card-content>
+            <app-seleccion-ubicaciones
+              [sucursalLatLng]="[sucursalActual()?.coordenadaX || 0, sucursalActual()?.coordenadaY || 0]"
+              [sucursalNombre]="sucursalActual()?.nombre || 'Sucursal'"
+              (ubicacionSeleccionada)="onUbicacionSeleccionada($event)"
+            />
+          </mat-card-content>
+        </mat-card>
+
+      </div>
+
+      <!-- COLUMNA DERECHA: resumen -->
+      <div class="col-right">
+        <mat-card class="resumen-card">
+          <mat-card-header>
+            <mat-card-title>Resumen del pedido</mat-card-title>
+          </mat-card-header>
+
+          <mat-card-content>
+
+            <!-- Desglose de items -->
+            <div class="resumen-lines">
+              @for (item of items(); track item.producto.id) {
+                <div class="resumen-line">
+                  <span>{{ item.producto.nombre }} ×{{ item.cantidad }}</span>
+                  <span>{{ item.producto.precio * item.cantidad | currency:'$':'symbol':'1.0-0' }}</span>
+                </div>
+              }
+            </div>
+
+            <mat-divider class="resumen-divider" />
+
+            <div class="resumen-total">
+              <span>Total</span>
+              <strong>{{ totalPrice() | currency:'$':'symbol':'1.0-0' }}</strong>
+            </div>
+
+            <mat-divider class="resumen-divider" />
+
+            <!-- Forma de pago (mock) -->
+            <mat-form-field appearance="outline" class="forma-pago-field">
+              <mat-label>Forma de pago</mat-label>
+              <mat-select
+                [ngModel]="formaPagoSeleccionada()"
+                (ngModelChange)="formaPagoSeleccionada.set($event)"
+              >
+                @for (fp of formasPago(); track fp.id) {
+                  <mat-option [value]="fp.id">{{ fp.nombre }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            <!-- Estado de validaciones -->
+            <div class="checklist">
+              <div class="check-item" [class.ok]="ubicacionEntrega()">
+                <mat-icon>{{ ubicacionEntrega() ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+                <span>Ubicación de entrega</span>
+              </div>
+              <div class="check-item" [class.ok]="formaPagoSeleccionada()">
+                <mat-icon>{{ formaPagoSeleccionada() ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+                <span>Forma de pago</span>
+              </div>
+            </div>
+
+          </mat-card-content>
+
+          <mat-card-actions>
+            <button
+              mat-flat-button
+              class="btn-confirmar"
+              (click)="confirmarPedido()"
+              [disabled]="isLoading() || !ubicacionEntrega() || !formaPagoSeleccionada()"
+            >
+              @if (isLoading()) {
+                <mat-spinner diameter="20" />
+                Procesando...
+              } @else {
+                <mat-icon>shopping_bag</mat-icon>
+                Confirmar pedido
+              }
+            </button>
+            <button mat-stroked-button (click)="volverALaTienda()">
+              Seguir comprando
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+
+    </div>
+
+  } @else {
+    <!-- Carrito vacío -->
+    <div class="carrito-vacio">
+      <mat-icon class="empty-icon">shopping_cart</mat-icon>
+      <h2>Tu carrito está vacío</h2>
+      <p>Explorá nuestros productos y agregá algo rico.</p>
+      <button mat-flat-button (click)="volverALaTienda()">
+        <mat-icon>store</mat-icon> Ir a la tienda
       </button>
     </div>
-  </div>
-
-  <!-- Carrito vacío -->
-  <ng-template #carritoVacio>
-    <div class="carrito-vacio">
-      <p>Tu carrito está vacío</p>
-      <button (click)="volverALaTienda()" class="btn-primary">Ver productos</button>
-    </div>
-  </ng-template>
-
-  <!-- Botón siempre visible -->
-  <div class="volver-tienda">
-    <button (click)="volverALaTienda()" class="btn-primary">Seguir comprando</button>
-  </div>
+  }
 
 </div>
-
-<!-- Ubicación -->
-<h3>¿Dónde retiras o te entregamos el pedido?</h3>
-<app-seleccion-ubicaciones 
-  [sucursalLatLng]="[ -32.4123,  -63.2405]" 
-  [sucursalNombre]="'Sucursal Principal'"
-  (ubicacionSeleccionada)="onUbicacionSeleccionada($event)">
-</app-seleccion-ubicaciones>

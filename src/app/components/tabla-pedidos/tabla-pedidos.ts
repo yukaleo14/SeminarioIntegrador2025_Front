@@ -1,5 +1,4 @@
 import { Component, OnInit, OnDestroy, inject, signal, effect } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { SocketService } from '../../services/socket.service'; // ← tu servicio de socket
 import { Pedido, PedidoService } from './../../services/pedido-service'; // ← tu interface/modelo
 import { Subscription } from 'rxjs/internal/Subscription';
@@ -21,7 +20,7 @@ const ESTADOS_PEDIDO = [
 @Component({
   selector: 'app-tabla-pedidos',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './tabla-pedidos.html',
   styleUrl: './tabla-pedidos.scss'
 })

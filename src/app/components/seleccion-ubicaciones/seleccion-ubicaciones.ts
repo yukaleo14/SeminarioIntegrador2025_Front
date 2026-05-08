@@ -2,12 +2,11 @@ import { Component, AfterViewInit, ChangeDetectorRef, OnDestroy, Input, Output, 
 import * as L from 'leaflet';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-seleccion-ubicaciones',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule],
   templateUrl: './seleccion-ubicaciones.html',
   styleUrl: './seleccion-ubicaciones.scss'
 })
@@ -54,7 +53,14 @@ export class SeleccionUbicaciones implements AfterViewInit, OnDestroy {
       attribution: '© OpenStreetMap'
     }).addTo(this.map);
 
-    this.usermarker = L.marker([-31.42, -64.18], { draggable: true }).addTo(this.map);
+    const userIcon = L.icon({
+      iconUrl: 'https://cdn-icons-png.flaticon.com/512/64/64113.png',
+      iconSize: [40, 40],
+      iconAnchor: [20, 40],
+      popupAnchor: [0, -40],
+    });
+
+    this.usermarker = L.marker([-31.42, -64.18], { draggable: true, icon: userIcon }).addTo(this.map);
 
     this.usermarker.on('dragend', () => {
       const pos = this.usermarker.getLatLng();

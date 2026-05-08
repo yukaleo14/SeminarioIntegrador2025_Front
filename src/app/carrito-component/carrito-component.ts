@@ -1,115 +1,97 @@
-import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { CarroService, CartItem } from '../services/carro-service';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth-service';
 import { PedidoService } from '../services/pedido-service';
-import { Subscription } from 'rxjs';
-import { SeleccionUbicaciones } from './../components/seleccion-ubicaciones/seleccion-ubicaciones';
+import { FormaPagoService, FormaPago } from '../services/forma-pago-service';
 import { SucursalService } from '../services/sucursal-service';
 import { Sucursal } from '../models/Sucursal';
+import { Subscription, switchMap } from 'rxjs';
+import { SeleccionUbicaciones } from '../components/seleccion-ubicaciones/seleccion-ubicaciones';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { FormsModule } from '@angular/forms';
+import { CurrencyPipe, SlicePipe } from '@angular/common';
+import { FileService } from '../services/file-service';
 
 @Component({
   selector: 'app-carrito-component',
-  imports: [CommonModule, SeleccionUbicaciones],
+  imports: [
+    SeleccionUbicaciones,
+    MatCardModule,
+    MatButtonModule,
+    MatIconModule,
+    MatDividerModule,
+    MatSelectModule,
+    MatFormFieldModule,
+    MatProgressSpinnerModule,
+    FormsModule,
+    CurrencyPipe,
+    SlicePipe,
+  ],
   templateUrl: './carrito-component.html',
-  styleUrl: './carrito-component.scss'
+  styleUrl: './carrito-component.scss',
 })
-export class CarritoComponent implements OnInit {
-
-private carroService = inject(CarroService);
+export class CarritoComponent implements OnInit, OnDestroy {
+  private carroService = inject(CarroService);
   private pedidoService = inject(PedidoService);
   private authService = inject(AuthService);
   private sucursalService = inject(SucursalService);
+  private formaPagoService = inject(FormaPagoService);
+  private snackBar = inject(MatSnackBar);
   private router = inject(Router);
+  fileService = inject(FileService);
 
   items = signal<CartItem[]>([]);
   totalItems = signal(0);
   totalPrice = signal(0);
   isLoading = signal(false);
-  ubicacionEntrega = signal<{ lat: number, lng: number, direccion: string } | null>(null);
-  sucursales = signal<Sucursal[]>([]);
+  ubicacionEntrega = signal<{ lat: number; lng: number; direccion: string } | null>(null);
   sucursalActual = signal<Sucursal | null>(null);
-
+  formasPago = signal<FormaPago[]>([]);
+  formaPagoSeleccionada = signal<number | null>(null);
 
   private subscription = new Subscription();
 
   ngOnInit() {
     this.subscription.add(
-      this.sucursalService.findSucursalesByCategoria(1).subscribe(sucursales => {
-        this.sucursales.set(sucursales);
-        if (this.sucursales.length > 0 && !this.sucursalActual()) {
-          this.sucursalActual.set(this.sucursales()[0]);
-        }
-      })
-    );
-
-    this.subscription.add(
-      this.carroService.watchItems().subscribe(cartItems => {
-        console.log('🛒 Carrito actualizado - items con sus IDs:', 
-    cartItems.map(i => ({
-      id: i.producto.id,
-      nombre: i.producto.nombre,
-      cantidad: i.cantidad
-    })));
-        const newItems = cartItems.map(item => ({
-        ...item,
-        producto: { ...item.producto }   // copia profunda del producto
-      }));
-
-      this.items.set(newItems);
-      console.log('Items en carrito (desde subscribe):', this.items());
-      console.log('Cantidad de items:', this.items().length);
+      this.carroService.watchItems().subscribe((cartItems) => {
+        this.items.set(cartItems.map((i) => ({ ...i, producto: { ...i.producto } })));
         this.totalItems.set(this.carroService.getTotalItems());
         this.totalPrice.set(this.carroService.getTotalPrice());
-
         if (cartItems.length > 0) {
-          this.sucursalActual.set(cartItems[0].producto.sucursal);
+          this.sucursalActual.set(cartItems[0].producto.sucursal!);
         }
-      })
+      }),
     );
 
+    this.formaPagoService.findAll().subscribe((fp) => this.formasPago.set(fp));
     this.refreshCart();
-  }
-
-  private refreshCart() {
-    const currentItems = this.carroService.getItems();
-    const newItems = currentItems.map(item => ({
-        ...item,
-        producto: { ...item.producto }   // copia profunda del producto
-      }));
-
-      this.items.set(newItems);
-    this.totalItems.set(this.carroService.getTotalItems());
-    this.totalPrice.set(this.carroService.getTotalPrice());
-  }
-
-  trackByProducto(index: number, item: CartItem): number {
-    return item.producto.id;   // o item.producto.id + '-' + item.cantidad si quieres
   }
 
   ngOnDestroy() {
     this.subscription.unsubscribe();
   }
 
-  onUbicacionSeleccionada(event: any ) {
-    const ubicacion = event as { lat: number, lng: number, direccion: string };
-    this.ubicacionEntrega.set(ubicacion);
-    console.log('Ubicación seleccionada:', event);
+  private refreshCart() {
+    const current = this.carroService.getItems();
+    this.items.set(current.map((i) => ({ ...i, producto: { ...i.producto } })));
+    this.totalItems.set(this.carroService.getTotalItems());
+    this.totalPrice.set(this.carroService.getTotalPrice());
+  }
+
+  onUbicacionSeleccionada(event: { lat: number; lng: number; direccion: string }) {
+    this.ubicacionEntrega.set(event);
   }
 
   volverALaTienda() {
     this.router.navigate(['/home']);
-  }
-
-  cambiarCantidad(item: CartItem, event: Event) {
-    const input = event?.target as HTMLInputElement;
-    let nuevaCantidad = parseInt(input.value, 10);
-    if (isNaN(nuevaCantidad) || nuevaCantidad < 1) {
-      nuevaCantidad = 1;
-      input.value = '1';
-    }
-    this.carroService.updateQuantity(item.producto.id, nuevaCantidad);
   }
 
   aumentarCantidad(item: CartItem) {
@@ -117,106 +99,111 @@ private carroService = inject(CarroService);
   }
 
   disminuirCantidad(item: CartItem) {
-    this.carroService.addProduct(item.producto, -1);
-  }
-
-  eliminarProducto(item: CartItem) {
-    this.carroService.removeProduct(item.producto.id);
-  }
-  
-  vaciarCarrito() {
-    if (confirm('¿Estás seguro de que quieres vaciar el carrito?')) {
-      this.carroService.clear();
+    if (item.cantidad <= 1) {
+      this.eliminarProducto(item);
+    } else {
+      this.carroService.addProduct(item.producto, -1);
     }
   }
 
+  eliminarProducto(item: CartItem) {
+    this.carroService.removeProduct(item.producto.id!);
+  }
+
+  vaciarCarrito() {
+    this.carroService.clear();
+  }
 
   confirmarPedido() {
     if (!this.ubicacionEntrega()) {
-      alert('Por favor, selecciona una ubicación de entrega antes de confirmar tu pedido.');
+      this.snackBar.open('Seleccioná una ubicación de entrega antes de confirmar.', 'OK', { duration: 4000 });
+      return;
+    }
+
+    if (!this.formaPagoSeleccionada()) {
+      this.snackBar.open('Elegí una forma de pago antes de confirmar.', 'OK', { duration: 4000 });
       return;
     }
 
     const itemsActuales = this.carroService.getItems();
     if (itemsActuales.length === 0) {
-      alert('El carrito está vacío');
+      this.snackBar.open('Tu carrito está vacío.', 'OK', { duration: 3000 });
       return;
     }
 
-    const user = this.authService.getCurrentUser();
-    if (!user) {
-      alert('Debes iniciar sesión para confirmar tu pedido');
-      this.router.navigate(['/login']);
+    const userId = this.authService.getCurrentUserId();
+    if (!userId) {
+      this.snackBar.open('Debés iniciar sesión para confirmar tu pedido.', 'Iniciar sesión', { duration: 5000 })
+        .onAction()
+        .subscribe(() => this.router.navigate(['/login']));
       return;
     }
 
     const sucursal = this.sucursalActual();
-    // if (!sucursal) {
-    //   alert('Debes seleccionar una sucursal antes de confirmar tu pedido');
-    //   return;
-    // }
-    
-
     this.isLoading.set(true);
 
-    const pedidoData = {
-      numero: `PED-${Date.now()}`,
-      horaLlegadaEstimada: new Date(Date.now() + 45 * 60000).toISOString(), // 45 minutos después
-      montoTotal: this.totalPrice(),           // ← importante
-      tiempoPreparacionEstimado: 30, //mejorar
-      tiempoRepartoEstimado: 20, //mejorar
-
-      fechaHora: new Date(Date.now()), //mejorar
-
-
-      empresaId: sucursal?.empresaId || 1, //mejorar
-      compradorId: 5, //mejorar con el ID del usuario comprador actual
-      rutaId: 1, //mejorar
-      repartidorId: 1, //mejorar
-
-      pagoId: 1,   //mejorar con el selector de métodos de pago
-      estadoId: 1, // CREADO
-
-      infoRuta: {
-        origen: {
-          coordenadas: {
-            lat: sucursal?.ubicacion?.coordenadaX || -32.69,
-            lng: sucursal?.ubicacion?.coordenadaY || -63.29,
-          },
-          
-        },
-        destino: {
-          coordenadas: {
-            lat: this.ubicacionEntrega()?.lat || -32.69,
-            lng: this.ubicacionEntrega()?.lng || -63.29,
-          },
-          calle: this.ubicacionEntrega()?.direccion || '', //mejorar con el desglose de dirección
-        },
-      },
-
-      detalle: itemsActuales.map(i => ({
-        productoId: i.producto.id,
-        cantidad: i.cantidad,
-        montoSubtotal: i.producto.precio * i.cantidad,
-      }))
+    const pagoData = {
+      numero: `PAG-${Date.now()}`,
+      monto: this.totalPrice(),
+      formaPagoId: this.formaPagoSeleccionada()!,
     };
 
-    this.pedidoService.crearPedido(pedidoData).subscribe({
-      next: (pedidoCreado) => {
-        alert('Pedido confirmado con éxito!');
-        this.carroService.clear();
-        this.router.navigate(['/seguimiento', pedidoCreado.id]);
-      },
-      error: (err) => {
-        console.error('Error al confirmar el pedido:', err);
-        console.log('Datos enviados para crear el pedido:', pedidoData);
-        console.log('Respuesta del servidor:', err.error);
-        alert('Error al confirmar el pedido. Por favor, intenta nuevamente.');
-        this.isLoading.set(false);
-      }
-    });
+    this.pedidoService
+      .crearPago(pagoData)
+      .pipe(
+        switchMap((pago) => {
+          const pedidoData = {
+            numero: `PED-${Date.now()}`,
+            horaLlegadaEstimada: new Date(Date.now() + 45 * 60000).toISOString(),
+            montoTotal: this.totalPrice(),
+            tiempoPreparacionEstimado: 30,
+            tiempoRepartoEstimado: 20,
+            fechaHora: new Date().toISOString(),
+
+            empresaId: sucursal?.empresaId ?? 1,
+            compradorId: userId,
+            pagoId: pago.id,
+
+            infoRuta: {
+              origen: {
+                coordenadas: {
+                  lat: sucursal?.coordenadaX ?? -32.69,
+                  lng: sucursal?.coordenadaY ?? -63.29,
+                },
+                calle: sucursal?.nombre ?? '',
+              },
+              destino: {
+                coordenadas: {
+                  lat: this.ubicacionEntrega()!.lat,
+                  lng: this.ubicacionEntrega()!.lng,
+                },
+                calle: this.ubicacionEntrega()!.direccion,
+              },
+            },
+
+            detalle: itemsActuales.map((i) => ({
+              productoId: i.producto.id,
+              cantidad: i.cantidad,
+              montoSubtotal: i.producto.precio * i.cantidad,
+            })),
+          };
+
+          return this.pedidoService.crearPedido(pedidoData);
+        }),
+      )
+      .subscribe({
+        next: (pedidoCreado) => {
+          this.carroService.clear();
+          this.snackBar.open('¡Pedido confirmado con éxito!', 'Ver seguimiento', { duration: 6000 })
+            .onAction()
+            .subscribe(() => this.router.navigate(['/seguimiento', pedidoCreado.id]));
+          this.router.navigate(['/seguimiento', pedidoCreado.id]);
+        },
+        error: (err) => {
+          console.error('Error al confirmar el pedido:', err);
+          this.snackBar.open('Error al confirmar el pedido. Intentá nuevamente.', 'OK', { duration: 5000 });
+          this.isLoading.set(false);
+        },
+      });
   }
-
-
-
 }

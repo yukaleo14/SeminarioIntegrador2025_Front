@@ -68,6 +68,13 @@ export class PedidoService {
   crearPedido(pedido: any): Observable<Pedido> {
     return this.http.post<Pedido>(`${this.apiUrl}`, pedido);
   }
+
+  crearPago(data: { numero: string; monto: number; formaPagoId?: number }): Observable<{ id: number }> {
+    return this.http.post<{ id: number }>(`${environment.apiUrl}/pago`, {
+      ...data,
+      fechaHora: new Date().toISOString(),
+    });
+  }
   
 
   // ==================== HTTP ====================
