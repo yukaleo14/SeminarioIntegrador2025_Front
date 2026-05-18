@@ -23,13 +23,24 @@
       </h3>
     </div>
 
-    <div class="productos-grid">
-      @for (producto of productos(); track producto.id) {
-      <app-producto-card class="producto-card" (agregar)="agregarAlCarrito($event)"
-        [producto]="producto"></app-producto-card>
-      }@empty {
-      <h4>No se encontraron productos</h4>
-      }
+    <div class="productos-grid-wrapper">
+      <div class="productos-grid">
+        @for (producto of productos(); track producto.id) {
+          <app-producto-card class="producto-card" (agregar)="agregarAlCarrito($event)"
+            [producto]="producto"></app-producto-card>
+        } @empty {
+          <h4>No se encontraron productos</h4>
+        }
+      </div>
     </div>
   </section>
 </div>
+
+<!-- FAB flotante del carrito -->
+@if (totalItemsCarrito() > 0) {
+  <button mat-flat-button color="primary" class="carrito-fab" (click)="abrirCarrito()">
+    <mat-icon>shopping_cart</mat-icon>
+    Ver pedido
+    <span class="fab-badge">{{ totalItemsCarrito() }}</span>
+  </button>
+}

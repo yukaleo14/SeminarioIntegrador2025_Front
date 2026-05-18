@@ -1,3 +1,38 @@
+/* FAB flotante del carrito */
+.carrito-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 20px;
+  z-index: 100;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  border-radius: 28px !important;
+  padding: 0 20px !important;
+  height: 56px !important;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .fab-badge {
+    background: #e74c3c;
+    color: #fff;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 4px;
+  }
+}
+
+/* Padding inferior para que el FAB no tape los últimos productos */
+.productos-grid-wrapper {
+  padding-bottom: 80px;
+}
+
 .sucursal-container {
   display: flex;
   flex-direction: column;

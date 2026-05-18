@@ -7,3 +7,17 @@ html {
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* Bottom sheet de confirmación de pedido: full-height en mobile */
+.pedido-sheet-panel {
+  max-width: 600px !important;
+  width: 100% !important;
+  margin: 0 auto;
+
+  .mat-bottom-sheet-container {
+    padding: 0 !important;
+    border-radius: 20px 20px 0 0;
+    max-height: 95dvh !important;
+    overflow: hidden;
+  }
+}

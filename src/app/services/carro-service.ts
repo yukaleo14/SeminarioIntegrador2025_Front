@@ -102,6 +102,10 @@ export class CarroService {
     return this.items.reduce((sum, it) => sum + it.cantidad * (it.producto.precio ?? 0), 0);
   }
 
+  getCurrentSucursalId(): number | null {
+    return this.items[0]?.producto.sucursalId ?? null;
+  }
+
   // Persistence
   private saveToStorage(): void {
     try {

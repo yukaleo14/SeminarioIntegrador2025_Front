@@ -7,15 +7,19 @@ import {
   DestroyRef,
   inject,
   input,
-  signal
+  signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { CarruselCategorias } from '../components/carrusel-categorias/carrusel-categorias';
+import { ConfirmarPedidoSheet } from '../components/confirmar-pedido-sheet/confirmar-pedido-sheet';
 import { ProductoCard } from '../components/producto-card/producto-card';
 import { Categoria } from '../models/Categoria';
 import { Producto } from '../models/Producto';
@@ -36,6 +40,7 @@ import { SucursalService } from '../services/sucursal-service';
     MatChipsModule,
     MatCardModule,
     MatDividerModule,
+    MatDialogModule,
     NgOptimizedImage,
     ProductoCard,
     CarruselCategorias,
@@ -50,6 +55,9 @@ export class SucursalConsultaComponent {
   private readonly _categoriaService = inject(CategoriaService);
   private readonly _carro = inject(CarroService);
   private readonly _fileService = inject(FileService);
+  private readonly _bottomSheet = inject(MatBottomSheet);
+  private readonly _dialog = inject(MatDialog);
+  private readonly _snackBar = inject(MatSnackBar);
 
   private readonly destroyRef = inject(DestroyRef);
   idEmpresa = input.required<number>();
@@ -58,6 +66,9 @@ export class SucursalConsultaComponent {
   isLoading = computed<boolean>(() => this.sucursal() === null && this.productos().length === 0);
   categorias = signal<Categoria[]>([]);
   categoriaSeleccionada = signal<Categoria>({ id: 0, nombre: 'Todos', imagen: '' });
+
+  totalItemsCarrito = computed(() => this._carro.getTotalItems());
+
   getImagenUrl(): string {
     const nombreArchivo: string = this.sucursal()?.imagen ? 'sucursal/' + this.sucursal()!.id + '/' + this.sucursal()!.imagen : 'logo-placeholder.png'
     return this._fileService.getImagenUrl(nombreArchivo);
@@ -69,14 +80,12 @@ export class SucursalConsultaComponent {
       error: console.error
     });
 
-    // Chequeo para idEmpresa undefined
     const idEmpresa = this.idEmpresa();
     if (idEmpresa === undefined) {
       console.error('ID de empresa no disponible');
       return;
     }
 
-    // Get all products for the sucursal (no category filter on init)
     this._productoService.getProductosBySucursalAndCategoria(idEmpresa, 0)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
@@ -87,17 +96,9 @@ export class SucursalConsultaComponent {
 
   onCategoriaSelect(categoria: Categoria) {
     this.categoriaSeleccionada.set(categoria);
-    const filtro = categoria.id === 0 ? undefined : categoria.id;
-
-    // Chequeo para idEmpresa undefined
     const idEmpresa = this.idEmpresa();
-    if (idEmpresa === undefined) {
-      console.error('ID de empresa no disponible');
-      return;
-    }
-
-    // Ajusta si filtro es undefined: Usa un default o maneja
-    const categoriaId = filtro ?? 0; // Ejemplo: Default a 0 si undefined
+    if (idEmpresa === undefined) return;
+    const categoriaId = categoria.id === 0 ? 0 : categoria.id;
     this._productoService
       .getProductosBySucursalAndCategoria(idEmpresa, categoriaId)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -106,12 +107,59 @@ export class SucursalConsultaComponent {
         error: console.error
       });
   }
+
   volverAtras() {
     window.history.back();
   }
 
-
   agregarAlCarrito(obj: { producto: Producto, cantidad: number }) {
-    this._carro.addProduct(obj.producto, obj.cantidad);
+    const sucursalActualId = this._carro.getCurrentSucursalId();
+    const productoSucursalId = obj.producto.sucursalId;
+
+    if (sucursalActualId && sucursalActualId !== productoSucursalId) {
+      const ref = this._dialog.open(ConfirmSucursalDialog);
+      ref.afterClosed().subscribe((confirma: boolean) => {
+        if (confirma) {
+          this._carro.clear();
+          this._carro.addProduct(obj.producto, obj.cantidad);
+          this._snackBar.open('Carrito actualizado', undefined, { duration: 2000 });
+        }
+      });
+    } else {
+      this._carro.addProduct(obj.producto, obj.cantidad);
+      this._snackBar.open(`${obj.producto.nombre} agregado`, undefined, { duration: 1500 });
+    }
   }
+
+  abrirCarrito() {
+    const sucursal = this.sucursal();
+    if (!sucursal || this._carro.getTotalItems() === 0) return;
+    this._bottomSheet.open(ConfirmarPedidoSheet, {
+      data: { sucursal },
+      panelClass: 'pedido-sheet-panel',
+    });
+  }
+}
+
+// ── Diálogo inline de confirmación de cambio de sucursal ──────────────────────
+import { Component as Comp } from '@angular/core';
+import { MatDialogRef } from '@angular/material/dialog';
+
+@Comp({
+  selector: 'app-confirm-sucursal-dialog',
+  standalone: true,
+  imports: [MatButtonModule, MatDialogModule],
+  template: `
+    <h2 mat-dialog-title>¿Cambiar sucursal?</h2>
+    <mat-dialog-content>
+      Tu carrito tiene productos de otra sucursal. Si continuás, se vaciará el carrito actual.
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+      <button mat-stroked-button [mat-dialog-close]="false">Cancelar</button>
+      <button mat-flat-button color="warn" [mat-dialog-close]="true">Vaciar y continuar</button>
+    </mat-dialog-actions>
+  `,
+})
+export class ConfirmSucursalDialog {
+  constructor(public dialogRef: MatDialogRef<ConfirmSucursalDialog>) {}
 }
