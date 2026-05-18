@@ -1,7 +1,7 @@
 <app-header></app-header>
 
 <!-- Vista EMPRESA -->
-@if (rol === Rol.EMPRESA) {
+@if (isEmpresa) {
   <div class="empresa-home">
     <div class="empresa-header">
       <h2>Bienvenido, {{ nombreUsuario }}</h2>
@@ -34,7 +34,7 @@
 }
 
 <!-- Vista REPARTIDOR -->
-@if (rol === Rol.REPARTIDOR) {
+@if (isRepartidor) {
   <div class="empresa-home">
     <div class="empresa-header">
       <h2>Bienvenido, {{ nombreUsuario }}</h2>
@@ -55,7 +55,7 @@
 }
 
 <!-- Vista COMPRADOR (o no logueado) -->
-@if (rol === Rol.COMPRADOR || rol === null) {
+@if (isComprador) {
   <div class="center">
     <app-saludo class="w-100"></app-saludo>
     <app-buscador class="w-100"></app-buscador>

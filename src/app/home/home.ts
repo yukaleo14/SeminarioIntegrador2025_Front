@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { Buscador } from '../components/buscador/buscador';
 import { CarruselCategorias } from '../components/carrusel-categorias/carrusel-categorias';
 import { Header } from '../components/header/header';
@@ -29,12 +29,17 @@ import { MatIconModule } from '@angular/material/icon';
 })
 export class Home {
   private authService = inject(AuthService);
-  private router = inject(Router);
 
-  readonly Rol = Rol;
+  get isEmpresa(): boolean {
+    return this.authService.isEmpresa();
+  }
 
-  get rol(): Rol | null {
-    return this.authService.getCurrentUser()?.rol ?? null;
+  get isRepartidor(): boolean {
+    return this.authService.hasRole(Rol.REPARTIDOR);
+  }
+
+  get isComprador(): boolean {
+    return !this.isEmpresa && !this.isRepartidor;
   }
 
   get nombreUsuario(): string {
