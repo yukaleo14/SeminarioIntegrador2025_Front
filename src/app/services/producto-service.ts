@@ -27,6 +27,12 @@ export class ProductoService {
     );
   }
 
+  getProductosByEmpresa(empresaId: number): Observable<Producto[]> {
+    return this.http.get<Producto[]>(`${this.apiUrl}/empresa/${empresaId}`).pipe(
+      catchError(this.handleError)
+    );
+  }
+
   getProducto(id: number): Observable<Producto> {
     return this.http.get<Producto>(`${this.apiUrl}/${id}`).pipe(
       catchError(this.handleError)

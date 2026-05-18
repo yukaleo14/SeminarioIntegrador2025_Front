@@ -44,7 +44,12 @@ export class ProductoTableComponent implements OnInit, AfterViewInit {
 
   loadProductos() {
     this.isLoading = true;
-    this.productoService.getProductos().subscribe({
+    const empresaId = this.authService.getEmpresaId();
+    const source$ = empresaId
+      ? this.productoService.getProductosByEmpresa(empresaId)
+      : this.productoService.getProductos();
+
+    source$.subscribe({
       next: (productos) => {
         this.dataSource.data = productos;
         this.isLoading = false;

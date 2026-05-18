@@ -1,7 +1,65 @@
 <app-header></app-header>
-<div class="center">
-    <app-saludo></app-saludo>
+
+<!-- Vista EMPRESA -->
+@if (rol === Rol.EMPRESA) {
+  <div class="empresa-home">
+    <div class="empresa-header">
+      <h2>Bienvenido, {{ nombreUsuario }}</h2>
+      <p class="subtitulo">¿Qué querés gestionar hoy?</p>
+    </div>
+    <div class="dashboard-grid">
+      <mat-card class="dashboard-card" routerLink="/tabla-pedidos">
+        <mat-card-content>
+          <mat-icon class="card-icon pedidos-icon">receipt_long</mat-icon>
+          <h3>Gestión de Pedidos</h3>
+          <p>Ver y actualizar el estado de los pedidos en tiempo real</p>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-flat-button color="primary">Ir a Pedidos</button>
+        </mat-card-actions>
+      </mat-card>
+
+      <mat-card class="dashboard-card" routerLink="/producto">
+        <mat-card-content>
+          <mat-icon class="card-icon productos-icon">storefront</mat-icon>
+          <h3>Mis Productos</h3>
+          <p>Administrar el catálogo de productos de tu sucursal</p>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-flat-button color="accent">Ir a Productos</button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </div>
+}
+
+<!-- Vista REPARTIDOR -->
+@if (rol === Rol.REPARTIDOR) {
+  <div class="empresa-home">
+    <div class="empresa-header">
+      <h2>Bienvenido, {{ nombreUsuario }}</h2>
+    </div>
+    <div class="dashboard-grid">
+      <mat-card class="dashboard-card" routerLink="/chat">
+        <mat-card-content>
+          <mat-icon class="card-icon chat-icon">chat</mat-icon>
+          <h3>Chat</h3>
+          <p>Comunicarte con los clientes y la empresa</p>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-flat-button color="primary">Abrir Chat</button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </div>
+}
+
+<!-- Vista COMPRADOR (o no logueado) -->
+@if (rol === Rol.COMPRADOR || rol === null) {
+  <div class="center">
+    <app-saludo class="w-100"></app-saludo>
     <app-buscador class="w-100"></app-buscador>
     <app-carrusel-categorias class="w-100"></app-carrusel-categorias>
     <app-listado-sucursales class="w-100"></app-listado-sucursales>
-</div>
+  </div>
+}

@@ -1,12 +1,86 @@
-.center{
-    padding: 8px 0;
-    display: flex;
-    width: 100%;
-    align-items: center;
+.center {
+  padding: 8px 0;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.empresa-home {
+  padding: 32px 24px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.empresa-header {
+  margin-bottom: 32px;
+
+  h2 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0 0 6px;
+  }
+
+  .subtitulo {
+    color: #7f8c8d;
+    margin: 0;
+    font-size: 1rem;
+  }
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 24px;
+}
+
+.dashboard-card {
+  cursor: pointer;
+  border-radius: 12px !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  text-align: center;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+  }
+
+  mat-card-content {
+    padding: 24px 16px 8px;
+  }
+
+  h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 12px 0 8px;
+    color: #2c3e50;
+  }
+
+  p {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    margin: 0;
+  }
+
+  mat-card-actions {
     justify-content: center;
-    flex-direction: column;
-    gap: 16px;
+    padding: 8px 16px 20px;
+  }
 }
-.w-100{
-    width:100%
+
+.card-icon {
+  font-size: 3rem;
+  width: 3rem;
+  height: 3rem;
 }
+
+.pedidos-icon { color: #3498db; }
+.productos-icon { color: #9b59b6; }
+.chat-icon { color: #27ae60; }

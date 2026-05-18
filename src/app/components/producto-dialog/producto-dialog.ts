@@ -11,6 +11,7 @@ import { Categoria } from '../../models/Categoria';
 import { Sucursal } from '../../models/Sucursal';
 import { CategoriaService } from '../../services/categoria-service';
 import { SucursalService } from '../../services/sucursal-service';
+import { AuthService } from '../../services/auth-service';
 
 @Component({
   selector: 'app-producto-dialog',
@@ -37,6 +38,7 @@ export class ProductoDialogComponent implements OnInit {
     private fb: FormBuilder,
     private categoriaService: CategoriaService,
     private sucursalService: SucursalService,
+    private authService: AuthService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -49,7 +51,11 @@ export class ProductoDialogComponent implements OnInit {
       error: (err) => console.error('Error al cargar categorías:', err)
     });
 
-    this.sucursalService.findAll().subscribe({
+    const empresaId = this.authService.getEmpresaId();
+    const sucursales$ = empresaId
+      ? this.sucursalService.findByEmpresa(empresaId)
+      : this.sucursalService.findAll();
+    sucursales$.subscribe({
       next: (data) => { this.sucursales = data; this.cdr.detectChanges(); },
       error: (err) => console.error('Error al cargar sucursales:', err)
     });

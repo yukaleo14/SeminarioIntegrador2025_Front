@@ -3,11 +3,6 @@
   <!-- Header con título y botón -->
   <div class="header">
     <h2>📋 Pedidos en Curso</h2>
-    @if (empresaId) {
-      <small class="text-muted">
-        Empresa ID: {{ empresaId }}
-      </small>
-    }
     <button class="btn btn-outline-primary btn-home" (click)="goToHome()">
       <i class="bi bi-house-door"></i>
       Volver al Inicio

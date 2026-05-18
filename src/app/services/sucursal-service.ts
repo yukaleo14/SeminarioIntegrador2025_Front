@@ -28,6 +28,10 @@ export class SucursalService {
     return this.http.get<Sucursal[]>(`${this.apiUrl}`);
   }
 
+  findByEmpresa(empresaId: number): Observable<Sucursal[]> {
+    return this.http.get<Sucursal[]>(`${this.apiUrl}/empresa/${empresaId}`);
+  }
+
   create(sucursal: Sucursal): Observable<Sucursal>{
     return this.http.post<Sucursal>(`${this.apiUrl}`, sucursal);
   }
