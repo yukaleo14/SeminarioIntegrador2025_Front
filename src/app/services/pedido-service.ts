@@ -86,7 +86,7 @@ export class PedidoService {
   // ==================== WebSocket ====================
 
   actualizarEstado(pedidoId: number, estado: string) {
-    return this.http.patch<any>(`${this.apiUrl}/pedidos/${pedidoId}/estado`, { estado });
+    return this.http.patch<any>(`${this.apiUrl}/${pedidoId}/estado`, { estado });
   }
 
   connectAndJoinRoom(): void {

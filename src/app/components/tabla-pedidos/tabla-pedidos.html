@@ -60,22 +60,25 @@
             </td>
 
             <td>
-              <select
-                class="form-select form-select-sm"
-                [value]="pedido.estado?.nombre"
-                (change)="cambiarEstado(pedido, $any($event.target).value)">
-
-                @for (estado of estadosDisponibles; track estado) {
-                  <option [value]="estado">
-                    {{ estado }}
-                  </option>
-                }
-              </select>
+              <div class="estado-cell">
+                <span [ngClass]="getEstadoClass(pedido.estado?.nombre)">
+                  {{ pedido.estado?.nombre || '—' }}
+                </span>
+                <mat-form-field appearance="outline" subscriptSizing="dynamic" class="estado-select">
+                  <mat-select
+                    [value]="pedido.estado?.nombre"
+                    (selectionChange)="cambiarEstado(pedido, $event.value)">
+                    @for (estado of estadosDisponibles; track estado) {
+                      <mat-option [value]="estado">{{ estado }}</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+              </div>
             </td>
 
             <td class="text-center">
-              <button class="btn btn-sm btn-info btn-detalle" (click)="verDetalle(pedido)">
-                <i class="bi bi-eye"></i> Ver
+              <button mat-stroked-button color="primary" (click)="verDetalle(pedido)">
+                <mat-icon>visibility</mat-icon> Ver
               </button>
             </td>
           </tr>

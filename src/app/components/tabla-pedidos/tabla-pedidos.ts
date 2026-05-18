@@ -1,15 +1,21 @@
-import { Component, OnInit, OnDestroy, inject, signal, effect } from '@angular/core';
-import { SocketService } from '../../services/socket.service'; // ← tu servicio de socket
-import { Pedido, PedidoService } from './../../services/pedido-service'; // ← tu interface/modelo
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { SocketService } from '../../services/socket.service';
+import { Pedido, PedidoService } from './../../services/pedido-service';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth-service';
+import { NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 
 const ESTADOS_PEDIDO = [
   'CREADO',
   'ENPREPARACION',
-  'TOMADO',
+  'ASIGNADO',
   'ENRUTA',
   'ENTREGADO',
   'CANCELADO',
@@ -20,7 +26,15 @@ const ESTADOS_PEDIDO = [
 @Component({
   selector: 'app-tabla-pedidos',
   standalone: true,
-  imports: [FormsModule],
+  imports: [
+    NgClass,
+    FormsModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatChipsModule,
+    MatIconModule,
+    MatButtonModule,
+  ],
   templateUrl: './tabla-pedidos.html',
   styleUrl: './tabla-pedidos.scss'
 })
@@ -72,6 +86,14 @@ export class TablaPedidos implements OnInit, OnDestroy {
         this.pedidos = this.ordenarPedidos([...this.pedidos, nuevoPedido]);
       })
     );
+
+    // Escuchar cambios de estado en tiempo real
+    this.subscriptions.add(
+      this.socketService.onPedidoActualizado().subscribe((pedidoActualizado: Pedido) => {
+        console.log('Pedido actualizado:', pedidoActualizado.numero, '→', pedidoActualizado.estado?.nombre);
+        this.actualizarPedidoEnLista(pedidoActualizado);
+      })
+    );
   }
 
   cambiarEstado(pedido: Pedido, nuevoEstado: string) {
@@ -113,33 +135,22 @@ export class TablaPedidos implements OnInit, OnDestroy {
 
 
   getEstadoClass(estadoNombre?: string): string {
-  if (!estadoNombre) return 'bg-secondary';
-
-  const estado = estadoNombre.toUpperCase().trim();
-
-  switch (estado) {
-    case 'CREADO':
-      return 'bg-primary';
-    case 'ENPREPARACION':
-    case 'EN PREPARACION':
-      return 'bg-warning text-dark';
-    case 'TOMADO':
-      return 'bg-info';
-    case 'ENRUTA':
-    case 'EN RUTA':
-      return 'bg-orange';
-    case 'ENTREGADO':
-      return 'bg-success';
-    case 'CANCELADO':
-      return 'bg-danger';
-    case 'DEMORADO':
-      return 'bg-danger';
-    case 'PENDIENTE':
-      return 'bg-secondary';
-    default:
-      return 'bg-secondary';
+    if (!estadoNombre) return 'estado-chip estado-default';
+    const estado = estadoNombre.toUpperCase().trim();
+    switch (estado) {
+      case 'CREADO':         return 'estado-chip estado-creado';
+      case 'ENPREPARACION':
+      case 'EN PREPARACION': return 'estado-chip estado-preparacion';
+      case 'ASIGNADO':       return 'estado-chip estado-asignado';
+      case 'ENRUTA':
+      case 'EN RUTA':        return 'estado-chip estado-ruta';
+      case 'ENTREGADO':      return 'estado-chip estado-entregado';
+      case 'CANCELADO':
+      case 'DEMORADO':       return 'estado-chip estado-danger';
+      case 'PENDIENTE':      return 'estado-chip estado-default';
+      default:               return 'estado-chip estado-default';
+    }
   }
-}
 
   verDetalle(pedido: Pedido) {
     console.log('Ver detalle del pedido:', pedido);

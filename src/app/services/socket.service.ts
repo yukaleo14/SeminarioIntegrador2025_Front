@@ -3,28 +3,32 @@ import { io, Socket } from 'socket.io-client';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { environment } from '../environments/environment';
 import { Pedido } from './pedido-service';
+import { AuthService } from './auth-service';
 
 @Injectable({ providedIn: 'root' })
 export class SocketService {
   private socket!: Socket;
   private pedidosSubject = new BehaviorSubject<Pedido[]>([]);
 
-  constructor() {
-    this.initSocket();
-  }
+  constructor(private authService: AuthService) {}
 
   private initSocket() {
-    const url = `${environment.apiUrl}/pedidos`; // Asegúrate de que apiUrl esté definido en tu environment
+    const url = `${environment.apiUrl}/pedidos`;
+    const token = this.authService.getToken();
     this.socket = io(url, {
-      transports: ['websocket', 'polling'], // Forzar uso de WebSocket
-      autoConnect: false, // No conectar automáticamente
-      reconnection: true, // Habilitar reconexión automática
-      reconnectionAttempts: 10, // Intentar reconectar indefinidamente
-      reconnectionDelay: 1500, // Esperar 1 segundo antes de intentar reconectar
+      auth: { token },
+      transports: ['websocket', 'polling'],
+      autoConnect: false,
+      reconnection: true,
+      reconnectionAttempts: 10,
+      reconnectionDelay: 1500,
     });
   }
-  
+
   connect() {
+    if (!this.socket) {
+      this.initSocket();
+    }
     if (!this.socket.connected) {
       console.log('Conectando al servidor de WebSocket...');
       this.socket.connect();
@@ -64,25 +68,25 @@ export class SocketService {
   // Escuchar nuevos pedidos
   onNuevoPedido(): Observable<Pedido> {
     return new Observable((observer) => {
-      this.socket.on('Nuevo pedido', (pedido: Pedido) => {
+      this.socket.on('nuevoPedido', (pedido: Pedido) => {
         console.log('Nuevo pedido recibido:', pedido);
-        this.addPedido(pedido); 
+        this.addPedido(pedido);
         observer.next(pedido);
       });
       return () => {
-        this.socket.off('Nuevo pedido');
+        this.socket.off('nuevoPedido');
       };
     });
   }
 
   onPedidoActualizado(): Observable<Pedido> {
     return new Observable((observer) => {
-      this.socket.on('Pedido actualizado', (pedido: Pedido) => {
+      this.socket.on('pedidoActualizado', (pedido: Pedido) => {
         this.updatePedidos(pedido);
         observer.next(pedido);
       });
       return () => {
-        this.socket.off('Pedido actualizado');
+        this.socket.off('pedidoActualizado');
       };
     });
   }

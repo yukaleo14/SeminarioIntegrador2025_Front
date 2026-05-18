@@ -88,20 +88,42 @@ h2 {
   color: #7f8c8d;
 }
 
-.badge {
-  padding: 8px 14px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  border-radius: 30px;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
+.estado-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.btn-detalle {
-  padding: 6px 14px;
-  border-radius: 6px;
-  font-size: 0.9rem;
+.estado-select {
+  width: 160px;
+  font-size: 0.85rem;
+
+  ::ng-deep .mat-mdc-form-field-infix {
+    min-height: 36px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
 }
+
+.estado-chip {
+  display: inline-block;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.estado-creado      { background-color: #3498db; }
+.estado-preparacion { background-color: #f39c12; color: #2c3e50; }
+.estado-asignado    { background-color: #16a085; }
+.estado-ruta        { background-color: #e67e22; }
+.estado-entregado   { background-color: #27ae60; }
+.estado-danger      { background-color: #e74c3c; }
+.estado-default     { background-color: #95a5a6; }
 
 .no-pedidos {
   color: #95a5a6;
