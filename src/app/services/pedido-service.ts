@@ -76,6 +76,10 @@ export class PedidoService {
     });
   }
   
+  findOne(pedidoId: number): Observable<Pedido> {
+    return this.http.get<Pedido>(`${this.apiUrl}/${pedidoId}`);
+  }
+
 
   // ==================== HTTP ====================
 

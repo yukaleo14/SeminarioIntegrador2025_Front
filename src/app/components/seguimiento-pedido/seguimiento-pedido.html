@@ -1,4 +1,17 @@
+<div class="seguimiento-header" *ngIf="datosPedido">
+  <h3>Pedido {{ datosPedido.numero }}</h3>
+  <p>Tiempo estimado: <strong>{{ tiempoRestante }} min</strong></p>
+</div>
+
 <div id="map"></div>
-<div class="info">
-  <p>Seguimiento de pedido en tiempo real 🚴</p>
+
+<div class="seguimiento-footer" *ngIf="datosPedido">
+  <div class="ubicacion-row">
+    <span>🏪</span>
+    <p><strong>Origen:</strong> origen </p>
+  </div>
+  <div class="ubicacion-row">
+    <span>🏠</span>
+    <p><strong>Destino:</strong> destino </p>
+  </div>
 </div>
