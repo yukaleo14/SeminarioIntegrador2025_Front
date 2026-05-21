@@ -18,6 +18,20 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     padding: 0 !important;
     border-radius: 20px 20px 0 0;
     max-height: 95dvh !important;
+    height: 90dvh;
     overflow: hidden;
+  }
+}
+
+/* Diálogo de confirmación de pedido: superficie sin padding en desktop */
+.pedido-dialog-panel {
+  .mat-mdc-dialog-surface {
+    padding: 0;
+    overflow: hidden;
+    border-radius: 16px;
+  }
+
+  .mat-mdc-dialog-container {
+    padding: 0;
   }
 }

@@ -4,19 +4,22 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
+import { ConfirmarPedidoLauncher } from '../../services/confirmar-pedido-launcher';
 import { AuthService, User } from '../../services/auth-service';
 import { CarroService } from '../../services/carro-service';
+import { MatBadge } from '@angular/material/badge';
+
 @Component({
   selector: 'app-header',
-  imports: [MatToolbarModule, MatButtonModule, MatIconModule, MatMenuModule, RouterLink, MatMenuModule],
+  imports: [MatToolbarModule, MatButtonModule,MatBadge, MatIconModule, MatMenuModule, RouterLink, MatMenuModule],
   templateUrl: './header.html',
   styleUrl: './header.scss'
 })
 export class Header {
   private readonly _usersService = inject(AuthService);
-  private router = inject(Router);
   private carroService = inject(CarroService);
+  private pedidoLauncher = inject(ConfirmarPedidoLauncher);
 
   totalItems = computed(() => this.carroService.getTotalItems());
 
@@ -30,12 +33,15 @@ export class Header {
       }
     });
   }
+
   logout() {
-    this._usersService.logout()
+    this._usersService.logout();
     this.isLoggedIn.set(false);
   }
 
   irAlCarrito() {
-    this.router.navigate(['/carrito']);
+    const sucursal = this.carroService.getItems()[0]?.producto.sucursal;
+    if (!sucursal) return;
+    this.pedidoLauncher.abrir(sucursal);
   }
 }

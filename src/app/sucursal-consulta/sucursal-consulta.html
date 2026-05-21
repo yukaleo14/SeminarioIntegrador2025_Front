@@ -26,8 +26,8 @@
     <div class="productos-grid-wrapper">
       <div class="productos-grid">
         @for (producto of productos(); track producto.id) {
-          <app-producto-card class="producto-card" (agregar)="agregarAlCarrito($event)"
-            [producto]="producto"></app-producto-card>
+          <app-producto-card-compra class="producto-card" (agregar)="agregarAlCarrito($event)"
+            [producto]="producto"></app-producto-card-compra>
         } @empty {
           <h4>No se encontraron productos</h4>
         }

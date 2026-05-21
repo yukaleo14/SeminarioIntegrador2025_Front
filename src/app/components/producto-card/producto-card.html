@@ -1,27 +1,15 @@
-<mat-card class="producto-card">
-    <img [ngSrc]="producto()?.imagen ?? 'assets/placeholder.jpg'" width="150" height="150" [alt]="producto().nombre" />
+<mat-card class="producto-card" (click)="irASucursal()">
+  <div class="card-image-wrapper">
+    <img [ngSrc]="producto().imagen ?? 'assets/placeholder.jpg'" width="300" height="200" [alt]="producto().nombre" />
+  </div>
 
-    <div class="card-content">
-        <h4>{{ producto().nombre }}</h4>
-        <p>{{ producto()?.sucursal?.nombre ?? 'Sin sucursal' }}</p>
-        <div class="precio">${{ producto().precio }}</div>
-    </div>
-
-    <div class="actions">
-        @if (!expandido()) {
-        <button mat-fab color="primary" class="add-button" (click)="expandir()">
-            <mat-icon>add</mat-icon>
-        </button>
-        } @else {
-        <div class="cantidad-container">
-            <input type="number" min="1" [(ngModel)]="cantidad" class="cantidad-input" />
-            <button mat-mini-fab color="primary" (click)="confirmar()">
-                <mat-icon>check</mat-icon>
-            </button>
-            <button mat-mini-fab color="warn" (click)="cancelar()">
-                <mat-icon>close</mat-icon>
-            </button>
-        </div>
-        }
-    </div>
+  <div class="card-body">
+    <h4 class="producto-nombre">{{ producto().nombre }}</h4>
+    @if (producto().sucursal?.nombre) {
+      <p class="sucursal-chip">
+        <span class="dot"></span>{{ producto().sucursal?.nombre }}
+      </p>
+    }
+    <div class="precio">${{ producto().precio }}</div>
+  </div>
 </mat-card>

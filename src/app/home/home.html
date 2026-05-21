@@ -61,5 +61,24 @@
     <app-buscador class="w-100"></app-buscador>
     <app-carrusel-categorias class="w-100"></app-carrusel-categorias>
     <app-listado-sucursales class="w-100"></app-listado-sucursales>
+
+    @if (productos().length > 0) {
+      <section class="productos-gallery w-100">
+        <h2 class="gallery-title">Productos destacados</h2>
+        <div class="productos-grid">
+          @for (producto of productos(); track producto.id) {
+            <app-producto-card [producto]="producto" />
+          }
+        </div>
+      </section>
+    }
   </div>
+
+  @if (totalItemsCarrito() > 0) {
+    <button mat-flat-button color="primary" class="carrito-fab" (click)="abrirCarrito()">
+      <mat-icon>shopping_cart</mat-icon>
+      Ver pedido
+      <span class="fab-badge">{{ totalItemsCarrito() }}</span>
+    </button>
+  }
 }

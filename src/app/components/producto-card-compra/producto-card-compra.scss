@@ -1,0 +1,79 @@
+.producto-card-compra {
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+  border-radius: 12px;
+  padding-bottom: 3.5rem;
+}
+
+.card-image-wrapper {
+  overflow: hidden;
+  height: 130px;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+}
+
+.card-body {
+  padding: 0.75rem 1rem 0.25rem;
+}
+
+.producto-nombre {
+  margin: 0 0 0.3rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.precio {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--mat-sys-primary);
+}
+
+.actions {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.cantidad-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: white;
+  border-radius: 28px;
+  padding: 2px 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+// .stepper-btn {
+//   width: 32px;
+//   height: 32px;
+//   line-height: 32px;
+// }
+
+.cantidad-valor {
+  min-width: 24px;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.confirm-btn {
+  --mdc-icon-button-icon-color: var(--mat-sys-primary);
+  color: var(--mat-sys-primary);
+}
+
+.cancel-btn {
+  --mdc-icon-button-icon-color: var(--mat-sys-error);
+  color: var(--mat-sys-error);
+}

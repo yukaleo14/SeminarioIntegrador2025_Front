@@ -7,12 +7,12 @@ import { Categoria } from '../models/Categoria';
 import { CarroService } from '../services/carro-service';
 import { AuthService } from '../services/auth-service';
 import { Header } from "../components/header/header";
-import { ProductoCard } from '../components/producto-card/producto-card';
+import { ProductoCardCompra } from '../components/producto-card-compra/producto-card-compra';
 
 @Component({
   selector: 'app-productos-por-categoria',
   standalone: true,
-  imports: [Header, ProductoCard],
+  imports: [Header, ProductoCardCompra],
   templateUrl: './productos-por-categoria.html',
   styleUrl: './productos-por-categoria.scss'
 })

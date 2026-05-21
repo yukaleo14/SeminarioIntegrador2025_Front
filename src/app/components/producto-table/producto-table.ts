@@ -6,17 +6,19 @@ import { ProductoDialogComponent } from '../producto-dialog/producto-dialog';
 import { MatIconModule } from "@angular/material/icon";
 import { CurrencyPipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 import { ProductoService } from '../../services/producto-service';
 import { AuthService } from '../../services/auth-service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { Producto } from '../../models/Producto';
+import { Header } from '../header/header';
 
 @Component({
   selector: 'app-producto-table',
   templateUrl: './producto-table.html',
   styleUrls: ['./producto-table.scss'],
-  imports: [MatIconModule, MatPaginatorModule, CurrencyPipe, MatTableModule, MatButtonModule]
+  imports: [Header, MatIconModule, MatPaginatorModule, CurrencyPipe, MatTableModule, MatButtonModule, MatCardModule]
 })
 export class ProductoTableComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = ['nombre', 'categoria', 'precio', 'acciones'];

@@ -10,7 +10,6 @@ import {
   signal,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { MatBottomSheet } from '@angular/material/bottom-sheet';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
@@ -19,8 +18,8 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { CarruselCategorias } from '../components/carrusel-categorias/carrusel-categorias';
-import { ConfirmarPedidoSheet } from '../components/confirmar-pedido-sheet/confirmar-pedido-sheet';
-import { ProductoCard } from '../components/producto-card/producto-card';
+import { ConfirmarPedidoLauncher } from '../services/confirmar-pedido-launcher';
+import { ProductoCardCompra } from '../components/producto-card-compra/producto-card-compra';
 import { Categoria } from '../models/Categoria';
 import { Producto } from '../models/Producto';
 import { Sucursal } from '../models/Sucursal';
@@ -42,7 +41,7 @@ import { SucursalService } from '../services/sucursal-service';
     MatDividerModule,
     MatDialogModule,
     NgOptimizedImage,
-    ProductoCard,
+    ProductoCardCompra,
     CarruselCategorias,
   ],
   templateUrl: './sucursal-consulta.html',
@@ -55,7 +54,7 @@ export class SucursalConsultaComponent {
   private readonly _categoriaService = inject(CategoriaService);
   private readonly _carro = inject(CarroService);
   private readonly _fileService = inject(FileService);
-  private readonly _bottomSheet = inject(MatBottomSheet);
+  private readonly _pedidoLauncher = inject(ConfirmarPedidoLauncher);
   private readonly _dialog = inject(MatDialog);
   private readonly _snackBar = inject(MatSnackBar);
 
@@ -134,10 +133,7 @@ export class SucursalConsultaComponent {
   abrirCarrito() {
     const sucursal = this.sucursal();
     if (!sucursal || this._carro.getTotalItems() === 0) return;
-    this._bottomSheet.open(ConfirmarPedidoSheet, {
-      data: { sucursal },
-      panelClass: 'pedido-sheet-panel',
-    });
+    this._pedidoLauncher.abrir(sucursal);
   }
 }
 

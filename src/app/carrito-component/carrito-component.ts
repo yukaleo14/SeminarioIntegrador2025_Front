@@ -160,7 +160,7 @@ export class CarritoComponent implements OnInit, OnDestroy {
             tiempoRepartoEstimado: 20,
             fechaHora: new Date().toISOString(),
 
-            empresaId: sucursal?.empresaId ?? 1,
+            empresaId: sucursal?.empresa?.usuarioId ?? 1,
             compradorId: userId,
             pagoId: pago.id,
 

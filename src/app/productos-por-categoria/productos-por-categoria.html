@@ -17,7 +17,7 @@
     @if (productos().length > 0) {
       <div class="productos-grid">
         @for (producto of productos(); track producto.id) {
-          <app-producto-card [producto]="producto" (agregar)="agregarAlCarrito($event)"></app-producto-card>
+          <app-producto-card-compra [producto]="producto" (agregar)="agregarAlCarrito($event)"></app-producto-card-compra>
         }
       </div>
     } @else {

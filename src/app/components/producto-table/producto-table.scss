@@ -1,6 +1,23 @@
-table {
+.page-container {
+  padding: 24px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.table-card {
+  border-radius: 12px !important;
+
+  mat-card-header {
+    padding: 16px 16px 0;
+  }
+
+  mat-card-content {
+    padding: 16px 0 0;
+  }
+}
+
+.full-width {
   width: 100%;
-  margin-bottom: 16px;
 }
 
 .mat-header-cell {

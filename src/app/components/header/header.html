@@ -8,14 +8,11 @@
   <!-- CARRITO (nuevo) -->
   @if (isLoggedIn()) {
     <button mat-icon-button 
+            [matBadge]="totalItems()"
             aria-label="Ver carrito"
             (click)="irAlCarrito()"
             class="cart-button">
       <mat-icon class="material-symbols-outlined">shopping_cart</mat-icon>
-      <!-- Contador de items (opcional pero muy recomendado) -->
-      @if (totalItems() > 0) {
-        <span class="cart-count">{{ totalItems() }}</span>
-      }
     </button>
   }
 

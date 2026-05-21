@@ -1,0 +1,125 @@
+<div class="pedido-form">
+
+  <header class="pedido-form__header">
+    <div class="title-group">
+      <h2>Confirmá tu pedido</h2>
+      <p class="subtitle">Completá los 3 pasos para finalizar</p>
+    </div>
+    <button mat-icon-button (click)="onCerrar()" aria-label="Cerrar">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
+
+  <div class="pedido-form__body">
+
+    <!-- ── Sección 1: Tu pedido ─────────────────────────────── -->
+    <section class="form-section">
+      <div class="section-head">
+        <span class="step-badge">1</span>
+        <h3>Tu pedido</h3>
+      </div>
+
+      @for (item of items(); track item.producto.id) {
+        <div class="cart-row">
+          <div class="cart-row__info">
+            <span class="item-nombre">{{ item.producto.nombre }}</span>
+            <span class="item-precio">{{ item.producto.precio | currency:'$':'symbol':'1.0-0' }} c/u</span>
+          </div>
+          <div class="qty-control">
+            <button mat-icon-button (click)="disminuir(item)">
+              <mat-icon>{{ item.cantidad <= 1 ? 'delete' : 'remove' }}</mat-icon>
+            </button>
+            <span class="qty">{{ item.cantidad }}</span>
+            <button mat-icon-button (click)="aumentar(item)">
+              <mat-icon>add</mat-icon>
+            </button>
+          </div>
+          <span class="item-subtotal">
+            {{ item.producto.precio * item.cantidad | currency:'$':'symbol':'1.0-0' }}
+          </span>
+        </div>
+        <mat-divider />
+      } @empty {
+        <p class="empty-hint">Tu carrito está vacío.</p>
+      }
+    </section>
+
+    <!-- ── Sección 2: Entrega ───────────────────────────────── -->
+    <section class="form-section">
+      <div class="section-head">
+        <span class="step-badge" [class.done]="ubicacion()">
+          @if (ubicacion()) { <mat-icon>check</mat-icon> } @else { 2 }
+        </span>
+        <h3>¿Dónde te lo llevamos?</h3>
+      </div>
+      <p class="section-hint">Buscá tu dirección o tocá el mapa para marcar el punto exacto.</p>
+
+      <div class="search-row">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Dirección de entrega</mat-label>
+          <input matInput
+                 [(ngModel)]="textoBusqueda"
+                 (keyup.enter)="buscarDireccion()"
+                 placeholder="Ej: Av. Colón 1234, Córdoba" />
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+        <button mat-flat-button color="primary" class="search-btn"
+                (click)="buscarDireccion()" [disabled]="buscando()">
+          @if (buscando()) { <mat-spinner diameter="18" /> } @else { Buscar }
+        </button>
+      </div>
+
+      <div #mapEl class="mapa" role="application" aria-label="Mapa de entrega"></div>
+
+      @if (ubicacion(); as ubi) {
+        <div class="ubicacion-confirmada">
+          <mat-icon>place</mat-icon>
+          <span>{{ ubi.direccion }}</span>
+        </div>
+      }
+    </section>
+
+    <!-- ── Sección 3: Pago ──────────────────────────────────── -->
+    <section class="form-section">
+      <div class="section-head">
+        <span class="step-badge" [class.done]="formaPagoId()">
+          @if (formaPagoId()) { <mat-icon>check</mat-icon> } @else { 3 }
+        </span>
+        <h3>Forma de pago</h3>
+      </div>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Elegí cómo pagar</mat-label>
+        <mat-select [ngModel]="formaPagoId()" (ngModelChange)="formaPagoId.set($event)">
+          @for (fp of formasPago(); track fp.id) {
+            <mat-option [value]="fp.id">{{ fp.nombre }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <div class="resumen">
+        <div class="resumen__line">
+          <mat-icon>store</mat-icon>
+          <span>{{ sucursal.nombre }}</span>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <footer class="pedido-form__footer">
+    <div class="total">
+      <span>Total</span>
+      <strong>{{ totalPrice() | currency:'$':'symbol':'1.0-0' }}</strong>
+    </div>
+    <button mat-flat-button color="primary" class="btn-confirmar"
+            (click)="confirmar()" [disabled]="!puedeConfirmar">
+      @if (isLoading()) {
+        <span class="btn-content"><mat-spinner diameter="20" /> Procesando…</span>
+      } @else {
+        <span class="btn-content"><mat-icon>check_circle</mat-icon> Confirmar pedido</span>
+      }
+    </button>
+  </footer>
+
+</div>

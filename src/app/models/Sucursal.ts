@@ -1,4 +1,5 @@
 import { Categoria } from "./Categoria";
+import { Empresa } from "./Empresa";
 import { Horario } from "./Horario";
 import { Ubicacion } from "./Ubicacion";
 
@@ -13,7 +14,7 @@ export interface Sucursal extends Ubicacion {
     ubicacionId: number;
     estadoId: number;
     productos?: any[]; // Mejorar con el tipo Producto
-
+    empresa?:Empresa;
     categorias?: Categoria[]; //esto se tiene que sacar, se obtiene a través de los productos
 }
 
