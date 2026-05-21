@@ -1,12 +1,13 @@
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {Router} from '@angular/router';
-import {BehaviorSubject, catchError, Observable, tap} from 'rxjs';
+import {BehaviorSubject, catchError, Observable, tap, map, of} from 'rxjs';
 import {environment} from '../environments/environment';
 import {Rol} from '../models/Rol';
 import {Empresa} from '../models/Empresa';
 import {Comprador} from '../models/Comprador';
 import {Repartidor} from '../models/Repartidor';
+import { CompradorService } from './comprador-service';
 
 export interface LoginDto {
   mail: string;
@@ -42,7 +43,7 @@ export class User {
   mail: string;
   rol: Rol;
   empresa?: Empresa;
-  comprador?: Comprador;
+  comprador?:  Comprador;
   repartidor?: Repartidor;
 
   constructor(id: number, mail: string, rol: Rol) {
@@ -71,12 +72,12 @@ export class AuthService {
   private apiUrl = `${environment.apiUrl}/auth`;
   private currentUserSubject = new BehaviorSubject<User | null>(this.getUserFromToken());
   public currentUser$ = this.currentUserSubject.asObservable();
+  private compradorService = inject(CompradorService);
 
   constructor(
     private http: HttpClient,
-    private router: Router
-  ) {
-  }
+    private router: Router,
+  ) {}
 
   login(loginDto: LoginDto): Observable<{ token: string }> {
     return this.http.post<{ token: string }>(`${this.apiUrl}/login`, loginDto).pipe(
@@ -156,6 +157,19 @@ export class AuthService {
   getCurrentUser(): User | null {
     return this.currentUserSubject.value;
   }
+
+  getCurrentCompradorId(): Observable<number | null> {
+    const userId = this.getCurrentUserId();
+  
+  if (!userId) {
+    return of(null);
+  }
+
+  return this.compradorService.getCompradorByUserId(userId).pipe(
+    map((comprador) => comprador?.id ?? null),
+    catchError(() => of(null))
+  );
+}
 
   hasRole(role: Rol): boolean {
     const user = this.getCurrentUser();

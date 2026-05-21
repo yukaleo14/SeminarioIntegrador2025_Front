@@ -1,4 +1,5 @@
 export interface Comprador {
+  id: number;
   nombre: string;
   apellido: string;
   cuitCuil: string;
