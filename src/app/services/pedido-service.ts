@@ -18,13 +18,18 @@ export interface Pedido {
   rutaId?: number;
   ruta: {
     id: number;
+    tarifaDistancia?: number;
     origen: {
-      coordenadaX: number;
-      coordenadaY: number;
+      calle?: string;
+      altura?: string;
+      nombre?: string;
+      posicion: { coordenadaX: number; coordenadaY: number };
     };
     destino: {
-      coordenadaX: number;
-      coordenadaY: number;
+      calle?: string;
+      altura?: string;
+      nombre?: string;
+      posicion: { coordenadaX: number; coordenadaY: number };
     };
   };
   pagoId?: number;
@@ -91,6 +96,22 @@ export class PedidoService {
 
   actualizarEstado(pedidoId: number, estado: string) {
     return this.http.patch<any>(`${this.apiUrl}/${pedidoId}/estado`, { estado });
+  }
+
+  cancelarPedido(pedidoId: number): Observable<Pedido> {
+    return this.http.patch<Pedido>(`${this.apiUrl}/${pedidoId}/cancelar`, {});
+  }
+
+  findDisponibles(): Observable<Pedido[]> {
+    return this.http.get<Pedido[]>(`${this.apiUrl}/disponibles`);
+  }
+
+  findMisPedidos(): Observable<Pedido[]> {
+    return this.http.get<Pedido[]>(`${this.apiUrl}/repartidor/me`);
+  }
+
+  tomarPedido(pedidoId: number): Observable<Pedido> {
+    return this.http.patch<Pedido>(`${this.apiUrl}/${pedidoId}/tomar`, {});
   }
 
   connectAndJoinRoom(): void {
