@@ -9,8 +9,8 @@ import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-seguimiento-pedido',
-  standalone: true, // Asumiendo que es standalone por tu 'imports: []'
-  imports: [CommonModule], // Asegúrate de importar CommonModule si usas *ngIf, *ngFor, etc.
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './seguimiento-pedido.html',
   styleUrl: './seguimiento-pedido.scss'
 })
@@ -23,10 +23,27 @@ export class SeguimientoPedido implements OnInit, AfterViewInit, OnDestroy {
 
   private intervalId: any;
   private routeCoords: L.LatLngTuple[] = [];
-  
-  // Las hacemos públicas para poder mostrarlas en el HTML
-  tiempoRestante = 0; 
+  private simulacionIniciada = false;
+
+  tiempoRestante = 0;
   datosPedido: any = null;
+  estadoActual: string = '';
+
+  private readonly ESTADO_ORDER = [
+    'CREADO', 'ENPREPARACION', 'ASIGNADO', 'ENRUTA', 'ENTREGADO',
+  ];
+
+  isPastOrCurrent(estado: string): boolean {
+    const current = this.ESTADO_ORDER.indexOf(this.estadoActual);
+    const target = this.ESTADO_ORDER.indexOf(estado);
+    return current >= target && target !== -1;
+  }
+
+  isPast(estado: string): boolean {
+    const current = this.ESTADO_ORDER.indexOf(this.estadoActual);
+    const target = this.ESTADO_ORDER.indexOf(estado);
+    return current > target && target !== -1;
+  }
 
   private destroy$ = new Subject<void>();
   private pedidoId!: number;
@@ -40,7 +57,6 @@ export class SeguimientoPedido implements OnInit, AfterViewInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // Obtenemos el ID de la URL (/seguimiento/123)
     this.pedidoId = Number(this.route.snapshot.paramMap.get('pedidoId'));
   }
 
@@ -51,7 +67,7 @@ export class SeguimientoPedido implements OnInit, AfterViewInit, OnDestroy {
 
   private initMap(): void {
     this.map = L.map('map', {
-      center: [-32.4105, -63.2436], // Centro de Villa María por defecto
+      center: [-32.4105, -63.2436],
       zoom: 14
     });
 
@@ -64,20 +80,15 @@ export class SeguimientoPedido implements OnInit, AfterViewInit, OnDestroy {
   private cargarDatosPedido(): void {
     this.pedidoService.findOne(this.pedidoId).subscribe({
       next: (pedido: any) => {
-        // 1. Imprimimos el pedido para ver qué trajo realmente la BD
-        console.log('📦 Pedido recibido desde la BD:', pedido);
-
-        // 2. Validación de seguridad para evitar que la app crashee
-        if (!pedido || !pedido.ruta || !pedido.ruta.origen || !pedido.ruta.destino) {
-          console.error('❌ Error: El pedido no tiene la estructura infoRuta completa.', pedido);
-          // Opcional: podrías mostrar un snackbar aquí avisando del error
-          return; // Cortamos la ejecución para no intentar dibujar un mapa sin coordenadas
+        if (!pedido?.ruta?.origen?.posicion || !pedido?.ruta?.destino?.posicion) {
+          console.error('El pedido no tiene ruta completa:', pedido);
+          return;
         }
 
         this.datosPedido = pedido;
+        this.estadoActual = pedido.estado?.nombre ?? '';
         this.cdr.detectChanges();
 
-        // 3. Extraemos las coordenadas de forma segura
         const coordsOrigen = pedido.ruta.origen.posicion;
         const coordsDestino = pedido.ruta.destino.posicion;
 
@@ -85,35 +96,36 @@ export class SeguimientoPedido implements OnInit, AfterViewInit, OnDestroy {
         const end: L.LatLngTuple = [coordsDestino.coordenadaX, coordsDestino.coordenadaY];
 
         this.obtenerRutaYMostrar(start, end);
+
+        // Listen for state changes on this pedido's room
+        this.socketService.connect();
+        this.socketService.emit('joinPedidoRoom', { pedidoId: this.pedidoId });
+        this.escucharGpsReal();
+        this.escucharCambiosEstado();
       },
       error: (err) => console.error('Error al cargar el pedido:', err)
     });
   }
 
   private obtenerRutaYMostrar(start: L.LatLngTuple, end: L.LatLngTuple): void {
-    // Atención: OSRM usa formato [longitud, latitud]
     const url = `https://router.project-osrm.org/route/v1/driving/${start[1]},${start[0]};${end[1]},${end[0]}?overview=full&geometries=geojson`;
 
-    // Usamos fetch nativo de JavaScript para que el AuthInterceptor de Angular NO agregue el token aquí
     fetch(url)
       .then(response => {
         if (!response.ok) throw new Error('Error en la respuesta de OSRM');
         return response.json();
       })
       .then((data: any) => {
-        // Convertimos las coordenadas de OSRM [lng, lat] al formato Leaflet [lat, lng]
         this.routeCoords = data.routes[0].geometry.coordinates.map(
           (c: any): L.LatLngTuple => [c[1], c[0]]
         );
 
         this.tiempoRestante = Math.round(data.routes[0].duration / 60);
 
-        // Dibujar ruta
         this.rutaPolyline = L.polyline(this.routeCoords, { color: '#3498db', weight: 5 }).addTo(this.map);
 
-        // Nombres dinámicos para los popups
-        const nombreSucursal = this.datosPedido.ruta.origen.calle;
-        const calleDestino = this.datosPedido.ruta.destino.calle;
+        const nombreSucursal = this.datosPedido?.ruta?.origen?.calle ?? 'Origen';
+        const calleDestino = this.datosPedido?.ruta?.destino?.calle ?? 'Destino';
 
         this.comercioMarker = L.marker(start)
           .addTo(this.map)
@@ -123,33 +135,51 @@ export class SeguimientoPedido implements OnInit, AfterViewInit, OnDestroy {
           .addTo(this.map)
           .bindPopup(`🏠 <b>${calleDestino}</b>`);
 
-        this.repartidorMarker = L.marker(start, {
-          icon: L.icon({
-            iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png',
-            iconSize: [40, 40],
-            iconAnchor: [20, 40]
-          })
-        }).addTo(this.map)
-          .bindPopup(`🚴‍♂️ ETA: ${this.tiempoRestante} min`);
-
-        // Ajustar vista para que quepan ambos puntos
         const bounds = L.latLngBounds(this.routeCoords);
         this.map.fitBounds(bounds, { padding: [50, 50] });
 
-        // Conectamos Socket y empezamos simulación
-        this.socketService.connect();
-        this.socketService.emit('joinPedidoRoom', { pedidoId: this.pedidoId });
-        this.escucharGpsReal();
-        this.simularEmisionGpsPorSocket();
-        
-        // Forzamos actualización de la vista por si el tiempo estimado tardó en llegar
-        this.cdr.detectChanges(); 
+        // Only add the repartidor marker and start simulation if already ENRUTA
+        if (this.estadoActual === 'ENRUTA') {
+          this.iniciarSeguimientoRepartidor(start);
+        }
+
+        this.cdr.detectChanges();
       })
       .catch(err => console.error('Error obteniendo ruta OSRM:', err));
   }
 
+  private iniciarSeguimientoRepartidor(start: L.LatLngTuple): void {
+    if (this.simulacionIniciada) return;
+    this.simulacionIniciada = true;
+
+    this.repartidorMarker = L.marker(start, {
+      icon: L.icon({
+        iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png',
+        iconSize: [40, 40],
+        iconAnchor: [20, 40]
+      })
+    }).addTo(this.map)
+      .bindPopup(`🚴‍♂️ ETA: ${this.tiempoRestante} min`);
+
+    this.simularEmisionGpsPorSocket();
+  }
+
+  private escucharCambiosEstado(): void {
+    this.socketService.onPedidoActualizado().pipe(takeUntil(this.destroy$)).subscribe((actualizado: any) => {
+      if (actualizado.id !== this.pedidoId) return;
+
+      const nuevoEstado: string = actualizado.estado?.nombre ?? '';
+      this.estadoActual = nuevoEstado;
+      this.cdr.detectChanges();
+
+      if (nuevoEstado === 'ENRUTA' && this.routeCoords.length && !this.simulacionIniciada) {
+        const start = this.routeCoords[0];
+        this.iniciarSeguimientoRepartidor(start);
+      }
+    });
+  }
+
   private escucharGpsReal(): void {
-    // Asegurate de usar el nombre correcto del evento ('posicionActualizada' o tu método 'onPosicionActualizada()')
     this.socketService.onPosicionActualizada().pipe(takeUntil(this.destroy$)).subscribe((coordenadas: any) => {
       const nuevaPosicion: L.LatLngTuple = [coordenadas.lat, coordenadas.lng];
       if (this.repartidorMarker) {
@@ -162,33 +192,32 @@ export class SeguimientoPedido implements OnInit, AfterViewInit, OnDestroy {
   private simularEmisionGpsPorSocket(): void {
     let i = 0;
     const totalPuntos = this.routeCoords.length;
-    const velocidad = 800; // milisegundos por paso, bajalo para que el repartidor vaya más rápido
+    const velocidad = 800;
 
     this.intervalId = setInterval(() => {
       if (i >= totalPuntos) {
         clearInterval(this.intervalId);
-        this.repartidorMarker.bindPopup('✅ <b>¡Pedido entregado!</b>').openPopup();
+        if (this.repartidorMarker) {
+          this.repartidorMarker.bindPopup('✅ <b>¡Pedido entregado!</b>').openPopup();
+        }
         return;
       }
 
       const puntoActual = this.routeCoords[i];
-      
-      // Emitimos al socket para simular que el celu del repartidor envía la data
-      this.socketService.emit('actualizarGps', { 
-        pedidoId: this.pedidoId, 
-        lat: puntoActual[0], 
-        lng: puntoActual[1] 
+
+      this.socketService.emit('actualizarGps', {
+        pedidoId: this.pedidoId,
+        lat: puntoActual[0],
+        lng: puntoActual[1]
       });
 
-      // Calcular tiempo restante visual
       const porcentaje = i / totalPuntos;
       const tiempoActual = Math.round(this.tiempoRestante * (1 - porcentaje));
-      
-      // Actualizamos el tooltip solo cada cierto tiempo para no saturar
-      if (i % 5 === 0) { 
+
+      if (i % 5 === 0 && this.repartidorMarker) {
         this.repartidorMarker.bindPopup(`🚴‍♂️ En camino — ETA: ${tiempoActual} min`);
       }
-      
+
       i++;
     }, velocidad);
   }
@@ -196,8 +225,7 @@ export class SeguimientoPedido implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-    
-    // Matamos el intervalo si el usuario cambia de pantalla antes de que llegue el pedido
+
     if (this.intervalId) {
       clearInterval(this.intervalId);
     }

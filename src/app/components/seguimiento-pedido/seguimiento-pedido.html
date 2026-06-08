@@ -1,17 +1,87 @@
-<div class="seguimiento-header" *ngIf="datosPedido">
-  <h3>Pedido {{ datosPedido.numero }}</h3>
-  <p>Tiempo estimado: <strong>{{ tiempoRestante }} min</strong></p>
+@if (datosPedido) {
+  <div class="seg-header">
+    <div class="seg-order-number">Pedido #{{ datosPedido.numero }}</div>
+
+    <div class="seg-estado" [ngClass]="'seg-estado--' + estadoActual.toLowerCase()">
+      <span class="seg-estado__dot"></span>
+      <span class="seg-estado__label">
+        @switch (estadoActual) {
+          @case ('CREADO') { Esperando confirmación del local }
+          @case ('ENPREPARACION') { El local está preparando tu pedido }
+          @case ('ASIGNADO') { Buscando repartidor… }
+          @case ('ENRUTA') { En camino · ETA {{ tiempoRestante }} min }
+          @case ('ENTREGADO') { ¡Entregado! }
+          @case ('CANCELADO') { Pedido cancelado }
+          @default { {{ estadoActual }} }
+        }
+      </span>
+    </div>
+
+    <div class="seg-steps">
+      <div class="seg-step" [class.seg-step--done]="isPastOrCurrent('CREADO')" [class.seg-step--active]="estadoActual === 'CREADO'">
+        <div class="seg-step__circle">
+          @if (isPastOrCurrent('CREADO') && estadoActual !== 'CREADO') { <span class="seg-step__check">✓</span> }
+          @else { <span>1</span> }
+        </div>
+        <span class="seg-step__label">Recibido</span>
+      </div>
+      <div class="seg-step__line" [class.seg-step__line--done]="isPast('CREADO')"></div>
+
+      <div class="seg-step" [class.seg-step--done]="isPastOrCurrent('ENPREPARACION')" [class.seg-step--active]="estadoActual === 'ENPREPARACION'">
+        <div class="seg-step__circle">
+          @if (isPast('ENPREPARACION')) { <span class="seg-step__check">✓</span> }
+          @else { <span>2</span> }
+        </div>
+        <span class="seg-step__label">Preparando</span>
+      </div>
+      <div class="seg-step__line" [class.seg-step__line--done]="isPast('ENPREPARACION')"></div>
+
+      <div class="seg-step" [class.seg-step--done]="isPastOrCurrent('ENRUTA')" [class.seg-step--active]="estadoActual === 'ENRUTA'">
+        <div class="seg-step__circle">
+          @if (isPast('ENRUTA')) { <span class="seg-step__check">✓</span> }
+          @else { <span>3</span> }
+        </div>
+        <span class="seg-step__label">En camino</span>
+      </div>
+      <div class="seg-step__line" [class.seg-step__line--done]="isPast('ENRUTA')"></div>
+
+      <div class="seg-step" [class.seg-step--done]="estadoActual === 'ENTREGADO'" [class.seg-step--active]="estadoActual === 'ENTREGADO'">
+        <div class="seg-step__circle">
+          @if (estadoActual === 'ENTREGADO') { <span class="seg-step__check">✓</span> }
+          @else { <span>4</span> }
+        </div>
+        <span class="seg-step__label">Entregado</span>
+      </div>
+    </div>
+  </div>
+}
+
+<div class="seg-map-wrapper">
+  <div id="map"></div>
 </div>
 
-<div id="map"></div>
+@if (datosPedido) {
+  <div class="seg-footer">
+    <div class="seg-location-card">
+      <div class="seg-location-card__icon seg-location-card__icon--origin">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+      </div>
+      <div class="seg-location-card__text">
+        <span class="seg-location-card__label">Origen</span>
+        <span class="seg-location-card__value">{{ datosPedido.ruta?.origen?.calle ?? '—' }}</span>
+      </div>
+    </div>
 
-<div class="seguimiento-footer" *ngIf="datosPedido">
-  <div class="ubicacion-row">
-    <span>🏪</span>
-    <p><strong>Origen:</strong> origen </p>
+    <div class="seg-location-divider"></div>
+
+    <div class="seg-location-card">
+      <div class="seg-location-card__icon seg-location-card__icon--dest">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      </div>
+      <div class="seg-location-card__text">
+        <span class="seg-location-card__label">Destino</span>
+        <span class="seg-location-card__value">{{ datosPedido.ruta?.destino?.calle ?? '—' }}</span>
+      </div>
+    </div>
   </div>
-  <div class="ubicacion-row">
-    <span>🏠</span>
-    <p><strong>Destino:</strong> destino </p>
-  </div>
-</div>
+}
