@@ -1,0 +1,218 @@
+<div class="repartidor-page">
+
+  <!-- Hero header -->
+  <div class="repartidor-header">
+    <div class="header-inner">
+      <mat-icon class="hero-icon">delivery_dining</mat-icon>
+      <div class="header-text">
+        <h1 class="header-title">Panel de Repartidor</h1>
+        <p class="header-subtitle">Gestiona tus entregas en tiempo real</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main tabs -->
+  <mat-tab-group class="tabs-group" animationDuration="200ms" mat-stretch-tabs="false">
+
+    <!-- ── TAB 1: Disponibles ─────────────────────── -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">list_alt</mat-icon>
+        Disponibles
+        @if (disponibles().length > 0) {
+          <span class="tab-badge">{{ disponibles().length }}</span>
+        }
+      </ng-template>
+
+      <div class="tab-content">
+
+        @if (isLoadingDisponibles()) {
+          <div class="state-container">
+            <mat-spinner diameter="48"></mat-spinner>
+            <p class="state-text">Buscando pedidos disponibles…</p>
+          </div>
+        } @else if (disponibles().length === 0) {
+          <div class="state-container">
+            <mat-icon class="state-icon">inbox</mat-icon>
+            <h3 class="state-title">Sin pedidos disponibles</h3>
+            <p class="state-text">
+              No hay pedidos publicados en este momento.<br>
+              Volvé a revisar en unos minutos.
+            </p>
+            <button mat-stroked-button color="primary" (click)="cargarDisponibles()">
+              <mat-icon>refresh</mat-icon> Actualizar
+            </button>
+          </div>
+        } @else {
+          @for (pedido of disponibles(); track pedido.id) {
+            <mat-card class="pedido-card">
+              <div class="card-top-bar"></div>
+
+              <mat-card-header>
+                <div class="card-header-row">
+                  <span class="pedido-numero">Pedido #{{ pedido.numero }}</span>
+                  <span [class]="'estado-chip ' + getEstadoClass(pedido.estado?.nombre)">
+                    {{ formatEstado(pedido.estado?.nombre) }}
+                  </span>
+                </div>
+              </mat-card-header>
+
+              <mat-card-content>
+                <div class="info-row">
+                  <mat-icon>store</mat-icon>
+                  <span>{{ pedido.empresa?.nombre || '—' }}</span>
+                </div>
+                <div class="info-row">
+                  <mat-icon>person</mat-icon>
+                  <span>{{ pedido.comprador?.nombre || '—' }}</span>
+                </div>
+
+                <mat-divider class="card-divider"></mat-divider>
+
+                <div class="info-grid">
+                  <div class="info-item">
+                    <mat-icon>payments</mat-icon>
+                    <div>
+                      <span class="info-label">Monto</span>
+                      <span class="info-value">${{ formatMonto(pedido.montoTotal) }}</span>
+                    </div>
+                  </div>
+                  <div class="info-item">
+                    <mat-icon>schedule</mat-icon>
+                    <div>
+                      <span class="info-label">Reparto est.</span>
+                      <span class="info-value">{{ pedido.tiempoRepartoEstimado || '—' }} min</span>
+                    </div>
+                  </div>
+                </div>
+              </mat-card-content>
+
+              <mat-card-actions>
+                <button mat-flat-button color="primary" class="full-btn"
+                        (click)="tomarPedido(pedido)">
+                  <mat-icon>local_shipping</mat-icon>
+                  Tomar pedido
+                </button>
+              </mat-card-actions>
+            </mat-card>
+          }
+        }
+      </div>
+    </mat-tab>
+
+    <!-- ── TAB 2: Mis Entregas ────────────────────── -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">route</mat-icon>
+        Mis Entregas
+        @if (misPedidos().length > 0) {
+          <span class="tab-badge">{{ misPedidos().length }}</span>
+        }
+      </ng-template>
+
+      <div class="tab-content">
+
+        @if (isLoadingMisPedidos()) {
+          <div class="state-container">
+            <mat-spinner diameter="48"></mat-spinner>
+            <p class="state-text">Cargando tus entregas…</p>
+          </div>
+        } @else if (misPedidos().length === 0) {
+          <div class="state-container">
+            <mat-icon class="state-icon">moped</mat-icon>
+            <h3 class="state-title">Sin entregas asignadas</h3>
+            <p class="state-text">
+              Tomá un pedido disponible para comenzar a entregar.
+            </p>
+          </div>
+        } @else {
+          @for (pedido of misPedidos(); track pedido.id) {
+            <mat-card class="pedido-card"
+                      [class.card-active]="isActiveDelivery(pedido.id)">
+              <div class="card-top-bar"
+                   [class.bar-enruta]="pedido.estado?.nombre === 'ENRUTA'"
+                   [class.bar-entregado]="pedido.estado?.nombre === 'ENTREGADO'"></div>
+
+              <mat-card-header>
+                <div class="card-header-row">
+                  <span class="pedido-numero">Pedido #{{ pedido.numero }}</span>
+                  <span [class]="'estado-chip ' + getEstadoClass(pedido.estado?.nombre)">
+                    {{ formatEstado(pedido.estado?.nombre) }}
+                  </span>
+                </div>
+              </mat-card-header>
+
+              <mat-card-content>
+                <div class="info-row">
+                  <mat-icon>store</mat-icon>
+                  <span>{{ pedido.empresa?.nombre || '—' }}</span>
+                </div>
+                <div class="info-row">
+                  <mat-icon>person</mat-icon>
+                  <span>{{ pedido.comprador?.nombre || '—' }}</span>
+                </div>
+
+                <mat-divider class="card-divider"></mat-divider>
+
+                <div class="info-grid">
+                  <div class="info-item">
+                    <mat-icon>payments</mat-icon>
+                    <div>
+                      <span class="info-label">Monto</span>
+                      <span class="info-value">${{ formatMonto(pedido.montoTotal) }}</span>
+                    </div>
+                  </div>
+                  <div class="info-item">
+                    <mat-icon>schedule</mat-icon>
+                    <div>
+                      <span class="info-label">Reparto est.</span>
+                      <span class="info-value">{{ pedido.tiempoRepartoEstimado || '—' }} min</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Mapa en vivo — solo cuando está ENRUTA y es la entrega activa -->
+                @if (pedido.estado?.nombre === 'ENRUTA' && isActiveDelivery(pedido.id)) {
+                  <div class="map-wrapper">
+                    <div class="gps-pill">
+                      <span class="gps-dot"></span>
+                      GPS activo — tu posición se actualiza en tiempo real
+                    </div>
+                    <div id="repartidor-map" class="delivery-map"></div>
+                  </div>
+                }
+              </mat-card-content>
+
+              <mat-card-actions>
+                @if (pedido.estado?.nombre === 'ASIGNADO') {
+                  <button mat-flat-button color="accent" class="full-btn"
+                          (click)="iniciarEntrega(pedido)">
+                    <mat-icon>navigation</mat-icon>
+                    Iniciar entrega
+                  </button>
+                } @else if (pedido.estado?.nombre === 'ENRUTA') {
+                  <button mat-stroked-button color="primary" class="half-btn"
+                          (click)="irAChat(pedido.id)">
+                    <mat-icon>chat_bubble_outline</mat-icon>
+                    Chat
+                  </button>
+                  <button mat-flat-button color="primary" class="half-btn"
+                          (click)="marcarEntregado(pedido)">
+                    <mat-icon>check_circle</mat-icon>
+                    Entregar
+                  </button>
+                } @else if (pedido.estado?.nombre === 'ENTREGADO') {
+                  <div class="entregado-label">
+                    <mat-icon>verified</mat-icon>
+                    Entrega completada
+                  </div>
+                }
+              </mat-card-actions>
+            </mat-card>
+          }
+        }
+      </div>
+    </mat-tab>
+
+  </mat-tab-group>
+</div>

@@ -11,6 +11,7 @@ import { TablaPedidos } from './components/tabla-pedidos/tabla-pedidos';
 import { ProductosPorCategoria } from './productos-por-categoria/productos-por-categoria';
 import { ProductoTableComponent } from './components/producto-table/producto-table';
 import {Chat} from './components/chat/chat';
+import { RepartidorComponent } from './repartidor/repartidor';
 
 export const routes: Routes = [
     {path:'home' ,component: Home},
@@ -26,6 +27,7 @@ export const routes: Routes = [
 
     {path:'producto',component: ProductoTableComponent},
     {path:'chat',component: Chat},
+    {path:'repartidor', component: RepartidorComponent},
 
     {path:'**' ,redirectTo:'home'}
 ];
