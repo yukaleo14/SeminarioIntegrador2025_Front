@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Producto } from '../models/Producto';
 import { AuthService } from './auth-service';
@@ -19,6 +19,7 @@ export class CarroService {
   private storageKey = 'carro_items_v1';
   private items: CartItem[] = [];
   private items$ = new BehaviorSubject<CartItem[]>([]);
+  readonly itemsSignal = signal<CartItem[]>([]);
 
   constructor() {
     this.loadFromStorage();
@@ -95,7 +96,7 @@ export class CarroService {
   }
 
   getTotalItems(): number {
-    return this.items.reduce((sum, it) => sum + it.cantidad, 0);
+    return this.itemsSignal().reduce((sum, it) => sum + it.cantidad, 0);
   }
 
   getTotalPrice(): number {
@@ -111,7 +112,9 @@ export class CarroService {
     try {
       localStorage.setItem(this.storageKey, JSON.stringify(this.items));
     } catch (e) {}
-    this.items$.next([...this.items]);
+    const snapshot = [...this.items];
+    this.items$.next(snapshot);
+    this.itemsSignal.set(snapshot);
   }
 
   private loadFromStorage(): void {
@@ -125,6 +128,8 @@ export class CarroService {
     } catch (e) {
       this.items = [];
     }
-    this.items$.next([...this.items]);
+    const snapshot = [...this.items];
+    this.items$.next(snapshot);
+    this.itemsSignal.set(snapshot);
   }
 }
