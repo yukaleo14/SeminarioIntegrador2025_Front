@@ -4,6 +4,7 @@ import { NgOptimizedImage } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { Router } from '@angular/router';
+import { FileService } from '../../services/file-service';
 
 @Component({
   selector: 'app-producto-card',
@@ -16,9 +17,13 @@ export class ProductoCard {
   producto = input.required<Producto>();
 
   private readonly router = inject(Router);
-
+  private readonly _fileService = inject(FileService);
   irASucursal() {
     const id = this.producto().sucursal?.id;
     if (id) this.router.navigate(['/sucursal', id]);
+  }
+  
+  getImagenUrl(nombreArchivo: string): string {
+    return this._fileService.getImagenUrl(`productos/${nombreArchivo}`);
   }
 }
