@@ -1,4 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { NgOptimizedImage } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -12,7 +13,7 @@ import { MatBadge } from '@angular/material/badge';
 
 @Component({
   selector: 'app-header',
-  imports: [MatToolbarModule, MatButtonModule,MatBadge, MatIconModule, MatMenuModule, RouterLink, MatMenuModule],
+  imports: [MatToolbarModule, MatButtonModule, MatBadge, MatIconModule, MatMenuModule, RouterLink, NgOptimizedImage],
   templateUrl: './header.html',
   styleUrl: './header.scss'
 })
