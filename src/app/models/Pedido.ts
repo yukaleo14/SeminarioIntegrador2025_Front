@@ -11,6 +11,7 @@ export interface Pedido{
     tiempoRepartoEstimado: number;
     fechaHora: Date;
     repartidor: any; // TODO: DEFINIR CLASE REPARTIDOR?
+    comprador: any; // TODO: DEFINIR CLASE COMPRADOR?
     ruta: Ruta;
     detalle: DetallePedido[];
     estado: Estado;
