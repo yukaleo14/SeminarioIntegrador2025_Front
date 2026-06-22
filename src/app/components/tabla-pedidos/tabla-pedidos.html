@@ -80,7 +80,7 @@
         }
 
         <!-- Mensaje cuando no hay pedidos -->
-        @if (pedidos.length === 0) {
+        @if (pedidos().length === 0) {
           <tr>
             <td colspan="7" class="text-center py-5">
               <div class="no-pedidos">
