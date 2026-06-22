@@ -24,6 +24,6 @@ export class ProductoCard {
   }
   
   getImagenUrl(nombreArchivo: string): string {
-    return this._fileService.getImagenUrl(`productos/${nombreArchivo}`);
+    return "http://localhost:3000/file/productos/" + nombreArchivo;
   }
 }

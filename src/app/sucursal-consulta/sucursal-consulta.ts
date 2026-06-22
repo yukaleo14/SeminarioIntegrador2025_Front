@@ -68,9 +68,8 @@ export class SucursalConsultaComponent {
 
   totalItemsCarrito = computed(() => this._carro.getTotalItems());
 
-  getImagenUrl(): string {
-    const nombreArchivo: string = this.sucursal()?.imagen ? 'sucursal/' + this.sucursal()!.id + '/' + this.sucursal()!.imagen : 'logo-placeholder.png'
-    return this._fileService.getImagenUrl(nombreArchivo);
+  getImagenUrl(nombreArchivo: string): string {
+    return "http://localhost:3000/file/sucursal/" + nombreArchivo;
   }
 
   ngOnInit() {

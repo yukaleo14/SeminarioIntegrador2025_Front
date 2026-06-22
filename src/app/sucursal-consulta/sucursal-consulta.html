@@ -6,7 +6,7 @@
     <span class="title">Local</span>
   </header>
 
-  <img [ngSrc]="getImagenUrl()" width="512" height="256"
+  <img [ngSrc]="getImagenUrl(sucursal()?.imagen || 'logo-placeholder.png')" width="512" height="256"  [alt]="sucursal()?.nombre"
     class="sucursal-banner" />
 
   <section class="sucursal-info">

@@ -35,6 +35,10 @@ export class ProductoCardCompra {
   incrementar() {
     this.cantidad++;
   }
+  
+  getImagenUrl(nombreArchivo: string): string {
+    return "http://localhost:3000/file/productos/" + nombreArchivo;
+  }
 
   confirmar() {
     if (this.cantidad > 0) {

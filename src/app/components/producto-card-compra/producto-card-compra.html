@@ -1,6 +1,6 @@
 <mat-card class="producto-card-compra">
   <div class="card-image-wrapper">
-    <img [ngSrc]="producto().imagen ?? 'assets/placeholder.jpg'" width="300" height="200" [alt]="producto().nombre" />
+    <img [ngSrc]="getImagenUrl(producto().imagen || '.')" width="150" height="150" [alt]="producto().nombre" />
   </div>
 
   <div class="card-body">
