@@ -23,7 +23,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (pedido of pedidos; track pedido.id) {
+        @for (pedido of pedidos(); track pedido.id) {
           <tr class="pedido-row">
             <td>
               <strong class="pedido-numero">{{ pedido.numero }}</strong>

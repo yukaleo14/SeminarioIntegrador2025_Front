@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal } from '@angular/core';
 import { SocketService } from '../../services/socket.service';
 import { Pedido, PedidoService } from './../../services/pedido-service';
 import { Subscription } from 'rxjs/internal/Subscription';
@@ -40,7 +40,7 @@ const ESTADOS_PEDIDO = [
 })
 export class TablaPedidos implements OnInit, OnDestroy {
 
-  pedidos: Pedido[] = [];
+  pedidos = signal<Pedido[]>([]);
   empresaId: number | null = null;
   isLoading: boolean = true;
   estadosDisponibles = ESTADOS_PEDIDO;
@@ -75,7 +75,7 @@ export class TablaPedidos implements OnInit, OnDestroy {
     // Recibir lista inicial de pedidos
     this.socketService.onPedidosList((pedidosIniciales: Pedido[]) => {
       console.log('Pedidos iniciales recibidos:', pedidosIniciales.length);
-      this.pedidos = this.ordenarPedidos(pedidosIniciales);
+      this.pedidos.set(this.ordenarPedidos(pedidosIniciales));
       this.isLoading = false;
     });
 
@@ -83,7 +83,7 @@ export class TablaPedidos implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.socketService.onNuevoPedido().subscribe((nuevoPedido: Pedido) => {
         console.log('Nuevo pedido recibido:', nuevoPedido.numero);
-        this.pedidos = this.ordenarPedidos([...this.pedidos, nuevoPedido]);
+        this.pedidos.update(current => this.ordenarPedidos([...current, nuevoPedido]));
       })
     );
 
@@ -111,9 +111,9 @@ export class TablaPedidos implements OnInit, OnDestroy {
   }
 
   private actualizarPedidoEnLista(pedidoActualizado: Pedido) {
-    this.pedidos = this.pedidos.map(p =>
-      p.id === pedidoActualizado.id ? { ...p, estado: pedidoActualizado.estado } : p
-    )
+    this.pedidos.update(current =>
+      current.map(p => p.id === pedidoActualizado.id ? { ...p, estado: pedidoActualizado.estado } : p)
+    );
   }
 
   // Ordenar pedidos: primero por horaLlegadaEstimada (más cercano primero)
