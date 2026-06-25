@@ -1,6 +1,8 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { Router, RouterLink } from '@angular/router';
 import { Buscador } from '../components/buscador/buscador';
@@ -13,6 +15,7 @@ import { Rol } from '../models/Rol';
 import { AuthService } from '../services/auth-service';
 import { CarroService } from '../services/carro-service';
 import { ConfirmarPedidoLauncher } from '../services/confirmar-pedido-launcher';
+import { Pedido, PedidoService } from '../services/pedido-service';
 import { ProductoService } from '../services/producto-service';
 
 @Component({
@@ -27,6 +30,8 @@ import { ProductoService } from '../services/producto-service';
     MatCardModule,
     MatButtonModule,
     MatIconModule,
+    MatBadgeModule,
+    MatChipsModule,
   ],
   templateUrl: './home.html',
   styleUrl: './home.scss',
@@ -36,9 +41,11 @@ export class Home implements OnInit {
   private productoService = inject(ProductoService);
   private carroService = inject(CarroService);
   private pedidoLauncher = inject(ConfirmarPedidoLauncher);
+  private pedidoService = inject(PedidoService);
   private router = inject(Router);
 
   productos = signal<Producto[]>([]);
+  pedidosPendientes = signal<Pedido[]>([]);
   totalItemsCarrito = computed(() => this.carroService.getTotalItems());
 
   ngOnInit() {
@@ -46,6 +53,18 @@ export class Home implements OnInit {
       next: (data) => this.productos.set(data),
       error: console.error,
     });
+
+    if (this.authService.isEmpresa()) {
+      this.pedidoService.getPedidosDeMiEmpresa().subscribe({
+        next: (pedidos) => {
+          const pendientes = pedidos.filter(
+            (p) => p.estado?.nombre === 'CREADO' || p.estado?.nombre === 'PENDIENTE'
+          );
+          this.pedidosPendientes.set(pendientes);
+        },
+        error: console.error,
+      });
+    }
   }
 
   get isEmpresa(): boolean {

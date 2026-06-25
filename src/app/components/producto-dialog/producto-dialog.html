@@ -1,11 +1,11 @@
 <h2 mat-dialog-title>
-  {{ isEditMode ? (data.producto ? 'Editar Producto' : 'Crear Producto') : 'Ver Producto' }}
+  {{ isEditMode() ? (data.producto ? 'Editar Producto' : 'Crear Producto') : 'Ver Producto' }}
 </h2>
 
 <mat-dialog-content>
 
   <!-- ===== MODO VER ===== -->
-  @if (!isEditMode) {
+  @if (!isEditMode()) {
     <p><strong>Nombre:</strong> {{ data.producto?.nombre }}</p>
     <p><strong>Descripción:</strong> {{ data.producto?.descripcion }}</p>
     <p><strong>Categoría:</strong> {{ data.producto?.categoria?.nombre ?? 'Sin categoría' }}</p>
@@ -14,9 +14,11 @@
     <p><strong>Tiempo de Preparación:</strong> {{ data.producto?.tiempoPreparacionEstimado }} min</p>
 
     @if (data.producto?.imagen) {
-      <div>
-        <strong>Imagen:</strong>
-        <img [ngSrc]="data.producto!.imagen ?? ''" width="300" height="200" alt="Imagen del producto">
+      <div class="imagen-container">
+        <span class="imagen-label">Imagen</span>
+        <div class="imagen-fill-container">
+          <img [ngSrc]="data.producto!.imagen!" fill alt="Imagen del producto" style="object-fit: contain;">
+        </div>
       </div>
     }
   }
@@ -25,55 +27,71 @@
   @else {
     <form [formGroup]="productoForm" (ngSubmit)="onSubmit()">
 
-      <mat-form-field appearance="fill" style="width: 100%">
+      <mat-form-field appearance="fill">
         <mat-label>Nombre</mat-label>
         <input matInput formControlName="nombre">
-        <mat-error *ngIf="productoForm.get('nombre')?.hasError('required')">Requerido</mat-error>
+        @if (productoForm.get('nombre')?.hasError('required')) {
+          <mat-error>Requerido</mat-error>
+        }
       </mat-form-field>
 
-      <mat-form-field appearance="fill" style="width: 100%">
+      <mat-form-field appearance="fill">
         <mat-label>Descripción</mat-label>
         <textarea matInput formControlName="descripcion"></textarea>
       </mat-form-field>
 
-      <!-- Las opciones vienen del backend a través de CategoriaService -->
-      <mat-form-field appearance="fill" style="width: 100%">
+      <mat-form-field appearance="fill">
         <mat-label>Categoría</mat-label>
         <mat-select formControlName="categoriaId">
-          <mat-option *ngFor="let cat of categorias" [value]="cat.id">{{ cat.nombre }}</mat-option>
+          @for (cat of categorias(); track cat.id) {
+            <mat-option [value]="cat.id">{{ cat.nombre }}</mat-option>
+          }
         </mat-select>
-        <mat-error *ngIf="productoForm.get('categoriaId')?.hasError('required')">Requerido</mat-error>
+        @if (productoForm.get('categoriaId')?.hasError('required')) {
+          <mat-error>Requerido</mat-error>
+        }
       </mat-form-field>
 
-      <!-- Las opciones vienen del backend a través de SucursalService -->
-      <mat-form-field appearance="fill" style="width: 100%">
+      <mat-form-field appearance="fill">
         <mat-label>Sucursal</mat-label>
         <mat-select formControlName="sucursalId">
-          <mat-option *ngFor="let suc of sucursales" [value]="suc.id">{{ suc.nombre }}</mat-option>
+          @for (suc of sucursales(); track suc.id) {
+            <mat-option [value]="suc.id">{{ suc.nombre }}</mat-option>
+          }
         </mat-select>
-        <mat-error *ngIf="productoForm.get('sucursalId')?.hasError('required')">Requerido</mat-error>
+        @if (productoForm.get('sucursalId')?.hasError('required')) {
+          <mat-error>Requerido</mat-error>
+        }
       </mat-form-field>
 
-      <mat-form-field appearance="fill" style="width: 100%">
+      <mat-form-field appearance="fill">
         <mat-label>Precio</mat-label>
         <input matInput type="number" formControlName="precio">
-        <mat-error *ngIf="productoForm.get('precio')?.hasError('required')">Requerido</mat-error>
-        <mat-error *ngIf="productoForm.get('precio')?.hasError('min')">El precio debe ser mayor a 0</mat-error>
+        @if (productoForm.get('precio')?.hasError('required')) {
+          <mat-error>Requerido</mat-error>
+        }
+        @if (productoForm.get('precio')?.hasError('min')) {
+          <mat-error>El precio debe ser mayor a 0</mat-error>
+        }
       </mat-form-field>
 
-      <mat-form-field appearance="fill" style="width: 100%">
+      <mat-form-field appearance="fill">
         <mat-label>Tiempo de Preparación Estimado (minutos)</mat-label>
         <input matInput type="number" formControlName="tiempoPreparacionEstimado">
-        <mat-error *ngIf="productoForm.get('tiempoPreparacionEstimado')?.hasError('required')">Requerido</mat-error>
-        <mat-error *ngIf="productoForm.get('tiempoPreparacionEstimado')?.hasError('min')">Debe ser al menos 1 minuto</mat-error>
+        @if (productoForm.get('tiempoPreparacionEstimado')?.hasError('required')) {
+          <mat-error>Requerido</mat-error>
+        }
+        @if (productoForm.get('tiempoPreparacionEstimado')?.hasError('min')) {
+          <mat-error>Debe ser al menos 1 minuto</mat-error>
+        }
       </mat-form-field>
 
-      <!-- Imagen: pendiente de coordinación con backend para soporte de archivos -->
-      <div>
-        <p><strong>Imagen</strong> (opcional)</p>
-        <input type="file" (change)="onFileChange($event)" accept="image/*" style="display: block; margin-top: 4px;">
-        @if (imagePreview) {
-          <img [src]="imagePreview" alt="Preview" style="max-width: 100%; height: auto; margin-top: 8px;">
+      <div class="file-input-wrapper">
+        <label>Imagen (opcional)</label>
+        <input type="file" (change)="onFileChange($event)" accept="image/*">
+        <!-- data: URLs are not supported by NgOptimizedImage — keep [src] for FileReader previews -->
+        @if (imagePreview()) {
+          <img [src]="imagePreview()" alt="Preview" class="image-preview">
         }
       </div>
 
@@ -82,11 +100,10 @@
 
 </mat-dialog-content>
 
-<!-- Solo botones, sin datos mezclados -->
 <mat-dialog-actions align="end">
   <button mat-button (click)="onClose()">Cerrar</button>
 
-  @if (!isEditMode) {
+  @if (!isEditMode()) {
     <button mat-raised-button color="primary" (click)="onEdit()">Editar</button>
   } @else {
     <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="!productoForm.valid">

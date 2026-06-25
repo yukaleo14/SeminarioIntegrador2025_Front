@@ -84,6 +84,81 @@
 .pedidos-icon { color: #3498db; }
 .productos-icon { color: #9b59b6; }
 .chat-icon { color: #27ae60; }
+.stats-icon { color: #e67e22; }
+
+.pending-alert {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff3cd;
+  border: 1px solid #ffc107;
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin-bottom: 24px;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover {
+    background: #ffe9a0;
+  }
+
+  .pending-alert-left {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .alert-icon {
+    color: #f39c12;
+    font-size: 1.6rem;
+    width: 1.6rem;
+    height: 1.6rem;
+    margin-top: 2px;
+  }
+
+  strong {
+    font-size: 0.95rem;
+    color: #856404;
+    display: block;
+    margin-bottom: 6px;
+  }
+}
+
+.pending-numbers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pending-chip {
+  font-size: 0.75rem !important;
+  height: 24px !important;
+  background: #ffc107 !important;
+  color: #5c4200 !important;
+}
+
+.icon-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-badge {
+  position: absolute;
+  top: -6px;
+  right: -10px;
+  background: #e74c3c;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 .productos-gallery {
   padding: 8px 16px 24px;

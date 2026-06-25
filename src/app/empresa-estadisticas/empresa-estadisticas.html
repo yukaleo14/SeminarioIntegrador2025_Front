@@ -1,0 +1,104 @@
+<app-header></app-header>
+
+<div class="estadisticas-container">
+  <div class="page-header">
+    <button mat-icon-button routerLink="/home" class="back-btn">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div>
+      <h1>Estadísticas</h1>
+      <p class="subtitulo">Resumen de actividad de tu empresa</p>
+    </div>
+  </div>
+
+  @if (cargando()) {
+    <div class="loading-center">
+      <mat-spinner diameter="48"></mat-spinner>
+      <p>Cargando estadísticas...</p>
+    </div>
+  } @else {
+    <!-- KPIs -->
+    <div class="kpi-grid">
+      <mat-card class="kpi-card kpi-total">
+        <mat-card-content>
+          <mat-icon>receipt_long</mat-icon>
+          <div class="kpi-value">{{ totalPedidos() }}</div>
+          <div class="kpi-label">Total de pedidos</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="kpi-card kpi-ingresos">
+        <mat-card-content>
+          <mat-icon>attach_money</mat-icon>
+          <div class="kpi-value">${{ (totalIngresos() / 100).toFixed(2) }}</div>
+          <div class="kpi-label">Ingresos totales</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="kpi-card kpi-pendientes">
+        <mat-card-content>
+          <mat-icon>pending_actions</mat-icon>
+          <div class="kpi-value">{{ pedidosPendientes() }}</div>
+          <div class="kpi-label">En preparación</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="kpi-card kpi-entregados">
+        <mat-card-content>
+          <mat-icon>check_circle</mat-icon>
+          <div class="kpi-value">{{ pedidosEntregados() }}</div>
+          <div class="kpi-label">Entregados</div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Charts row 1 -->
+    <div class="charts-row">
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>Pedidos por estado</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div #chartEstados class="chart-container"></div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>Pedidos por día (últimos 14 días)</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div #chartDiario class="chart-container"></div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Charts row 2 -->
+    <div class="charts-row">
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>Ingresos diarios (últimos 14 días)</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div #chartIngresos class="chart-container"></div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>Productos más pedidos (Top 10)</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div #chartProductos class="chart-container"></div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    @if (pedidos().length === 0) {
+      <div class="empty-state">
+        <mat-icon>bar_chart</mat-icon>
+        <p>Aún no hay pedidos para mostrar estadísticas.</p>
+      </div>
+    }
+  }
+</div>

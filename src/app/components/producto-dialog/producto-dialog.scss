@@ -1,17 +1,77 @@
 mat-dialog-content {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
+  padding-top: 8px;
 }
 
+/* View mode: info rows */
+p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--mat-sys-on-surface);
+
+  strong {
+    color: var(--mat-sys-on-surface-variant);
+    font-weight: 600;
+    margin-right: 4px;
+  }
+}
+
+/* Image in view mode */
+.imagen-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.imagen-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+/* NgOptimizedImage fill container — must be position:relative with explicit height */
+.imagen-fill-container {
+  position: relative;
+  width: 100%;
+  height: 260px;
+  border-radius: 8px;
+  border: 1px solid var(--mat-sys-outline-variant);
+  background: var(--mat-sys-surface-container-low);
+  overflow: hidden;
+}
+
+/* Edit / create form */
 form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 4px;
 }
 
-img {
-  border: 1px solid #ccc;
-  padding: 8px;
-  margin-top: 8px;
+mat-form-field {
+  width: 100%;
+}
+
+/* File input area */
+.file-input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+/* Preview in edit mode */
+.image-preview {
+  width: 100%;
+  max-height: 200px;
+  object-fit: contain;
+  border-radius: 8px;
+  border: 1px solid var(--mat-sys-outline-variant);
+  background: var(--mat-sys-surface-container-low);
 }

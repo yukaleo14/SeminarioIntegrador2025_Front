@@ -1,14 +1,13 @@
 import { CommonModule, CurrencyPipe, NgOptimizedImage } from '@angular/common';
-import { ChangeDetectorRef, Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, inject, Inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogContent, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
-import { MatFormField, MatLabel } from "@angular/material/form-field";
-import { MatOption, MatSelectModule } from "@angular/material/select";
-import { MatAnchor } from "@angular/material/button";
+import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatOption, MatSelectModule } from '@angular/material/select';
+import { MatAnchor } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { Producto } from '../../models/Producto';
-import { Categoria } from '../../models/Categoria';
-import { Sucursal } from '../../models/Sucursal';
 import { CategoriaService } from '../../services/categoria-service';
 import { SucursalService } from '../../services/sucursal-service';
 import { AuthService } from '../../services/auth-service';
@@ -23,82 +22,66 @@ import { AuthService } from '../../services/auth-service';
     MatDialogModule, CommonModule, MatAnchor, MatInputModule
   ]
 })
-export class ProductoDialogComponent implements OnInit {
-  isEditMode = false;
-  productoForm!: FormGroup;
-  imagePreview: string | null = null;
+export class ProductoDialogComponent {
+  private fb = inject(FormBuilder);
+  private categoriaService = inject(CategoriaService);
+  private sucursalService = inject(SucursalService);
+  private authService = inject(AuthService);
 
-  // Estos arrays se llenan desde el backend, ya no son mocks
-  categorias: Categoria[] = [];
-  sucursales: Sucursal[] = [];
+  isEditMode = signal(false);
+  imagePreview = signal<string | null>(null);
+
+  categorias = toSignal(this.categoriaService.getLista(), { initialValue: [] });
+  sucursales = toSignal(
+    this.authService.getEmpresaId()
+      ? this.sucursalService.findByEmpresa(this.authService.getEmpresaId()!)
+      : this.sucursalService.findAll(),
+    { initialValue: [] }
+  );
+
+  productoForm = this.fb.group({
+    id: [null as number | null],
+    nombre: ['', Validators.required],
+    descripcion: [''],
+    categoriaId: [null as number | null, Validators.required],
+    sucursalId: [null as number | null, Validators.required],
+    precio: [null as number | null, [Validators.required, Validators.min(0.01)]],
+    tiempoPreparacionEstimado: [null as number | null, [Validators.required, Validators.min(1)]],
+    imagen: [null as string | null]
+  });
 
   constructor(
     public dialogRef: MatDialogRef<ProductoDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { producto: Producto | null, isCreate: boolean },
-    private fb: FormBuilder,
-    private categoriaService: CategoriaService,
-    private sucursalService: SucursalService,
-    private authService: AuthService,
-    private cdr: ChangeDetectorRef
-  ) {}
+    @Inject(MAT_DIALOG_DATA) public data: { producto: Producto | null; isCreate: boolean }
+  ) {
+    this.isEditMode.set(data.isCreate);
 
-  ngOnInit(): void {
-    this.isEditMode = this.data.isCreate || false;
-
-    // Cargamos las listas desde el backend al abrir el dialog
-    this.categoriaService.getLista().subscribe({
-      next: (data) => { this.categorias = data; this.cdr.detectChanges(); },
-      error: (err) => console.error('Error al cargar categorías:', err)
-    });
-
-    const empresaId = this.authService.getEmpresaId();
-    const sucursales$ = empresaId
-      ? this.sucursalService.findByEmpresa(empresaId)
-      : this.sucursalService.findAll();
-    sucursales$.subscribe({
-      next: (data) => { this.sucursales = data; this.cdr.detectChanges(); },
-      error: (err) => console.error('Error al cargar sucursales:', err)
-    });
-
-    // Los campos coinciden exactamente con el CreateProductoDto del backend.
-    // estadoId fue eliminado: el backend lo asigna automáticamente.
-    this.productoForm = this.fb.group({
-      id: [null],   // necesario para que updateProducto() pueda identificar cuál editar
-      nombre: ['', Validators.required],
-      descripcion: [''],
-      categoriaId: [null, Validators.required],
-      sucursalId: [null, Validators.required],
-      precio: [null, [Validators.required, Validators.min(0.01)]],
-      tiempoPreparacionEstimado: [null, [Validators.required, Validators.min(1)]],
-      imagen: [null]
-    });
-
-    // Si estamos editando, precargamos los valores del producto
-    if (this.data.producto) {
+    if (data.producto) {
       this.productoForm.patchValue({
-        id: this.data.producto.id,   // ← cargamos el id para no perderlo al cerrar
-        nombre: this.data.producto.nombre,
-        descripcion: this.data.producto.descripcion,
-        categoriaId: this.data.producto.categoriaId ?? this.data.producto.categoria?.id ?? null,
-        sucursalId: this.data.producto.sucursalId ?? this.data.producto.sucursal?.id ?? null,
-        precio: this.data.producto.precio,
-        tiempoPreparacionEstimado: this.data.producto.tiempoPreparacionEstimado,
+        id: data.producto.id ?? null,
+        nombre: data.producto.nombre,
+        descripcion: data.producto.descripcion ?? '',
+        categoriaId: data.producto.categoriaId ?? data.producto.categoria?.id ?? null,
+        sucursalId: data.producto.sucursalId ?? data.producto.sucursal?.id ?? null,
+        precio: data.producto.precio,
+        tiempoPreparacionEstimado: data.producto.tiempoPreparacionEstimado,
       });
-      this.imagePreview = this.data.producto.imagen ?? null;
+      this.imagePreview.set(data.producto.imagen ?? null);
     }
   }
 
   onEdit(): void {
-    this.isEditMode = true;
+    this.isEditMode.set(true);
   }
 
-  onFileChange(event: any): void {
-    const file = event.target.files[0];
+  onFileChange(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        this.imagePreview = e.target?.result as string;
-        this.productoForm.patchValue({ imagen: this.imagePreview });
+        const result = e.target?.result as string;
+        this.imagePreview.set(result);
+        this.productoForm.patchValue({ imagen: result });
       };
       reader.readAsDataURL(file);
     }
@@ -106,17 +89,12 @@ export class ProductoDialogComponent implements OnInit {
 
   onSubmit(): void {
     if (this.productoForm.valid) {
-      const producto = {
-        ...this.productoForm.value,
-        // El backend rechaza null: si no se cargó imagen enviamos string vacío
-        imagen: this.productoForm.value.imagen ?? '',
-        // El backend requiere estadoId aunque tenga estado por defecto en su lógica.
-        // Enviamos 1 (Activo) hasta que el equipo de backend lo haga verdaderamente opcional.
-        estadoId: 1
-      };
-
       this.dialogRef.close({
-        producto,
+        producto: {
+          ...this.productoForm.value,
+          imagen: this.productoForm.value.imagen ?? '',
+          estadoId: 1
+        },
         isCreate: this.data.isCreate
       });
     }

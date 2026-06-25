@@ -12,6 +12,7 @@ import { ProductosPorCategoria } from './productos-por-categoria/productos-por-c
 import { ProductoTableComponent } from './components/producto-table/producto-table';
 import {Chat} from './components/chat/chat';
 import { RepartidorComponent } from './repartidor/repartidor';
+import { EmpresaEstadisticas } from './empresa-estadisticas/empresa-estadisticas';
 
 export const routes: Routes = [
     {path:'home' ,component: Home},
@@ -28,6 +29,7 @@ export const routes: Routes = [
     {path:'producto',component: ProductoTableComponent},
     {path:'chat',component: Chat},
     {path:'repartidor', component: RepartidorComponent},
+    {path:'estadisticas', component: EmpresaEstadisticas},
 
     {path:'**' ,redirectTo:'home'}
 ];

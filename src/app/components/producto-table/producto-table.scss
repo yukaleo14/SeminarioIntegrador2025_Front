@@ -1,18 +1,27 @@
 .page-container {
   padding: 24px;
-  max-width: 960px;
+  max-width: 1000px;
   margin: 0 auto;
 }
 
 .table-card {
-  border-radius: 12px !important;
+  border-radius: 16px !important;
+  overflow: hidden;
 
   mat-card-header {
-    padding: 16px 16px 0;
+    padding: 20px 24px 12px;
+    background: var(--mat-sys-surface-container-low);
+    border-bottom: 1px solid var(--mat-sys-outline-variant);
+  }
+
+  mat-card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--mat-sys-on-surface);
   }
 
   mat-card-content {
-    padding: 16px 0 0;
+    padding: 0;
   }
 }
 
@@ -20,12 +29,48 @@
   width: 100%;
 }
 
-.mat-header-cell {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+/* Header row */
+.mat-mdc-header-row {
+  background: var(--mat-sys-surface-container);
 }
 
-.mat-cell, .mat-header-cell {
-  padding: 8px;
+.mat-mdc-header-cell {
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--mat-sys-on-surface-variant);
+  padding: 12px 16px;
+}
+
+/* Data rows */
+.mat-mdc-row {
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: var(--mat-sys-surface-container-low);
+  }
+
+  &:not(:last-child) {
+    border-bottom: 1px solid var(--mat-sys-outline-variant);
+  }
+}
+
+.mat-mdc-cell {
+  padding: 12px 16px;
+  color: var(--mat-sys-on-surface);
+  font-size: 0.9rem;
+}
+
+/* Acciones column header: align icon with text */
+.actions-header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Paginator */
+mat-paginator {
+  border-top: 1px solid var(--mat-sys-outline-variant);
+  background: var(--mat-sys-surface-container-low);
 }

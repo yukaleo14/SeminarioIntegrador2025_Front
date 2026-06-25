@@ -1,0 +1,133 @@
+.estadisticas-container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+
+  h1 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0 0 4px;
+  }
+
+  .subtitulo {
+    color: #7f8c8d;
+    margin: 0;
+    font-size: 0.95rem;
+  }
+}
+
+.loading-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 80px 0;
+  color: #7f8c8d;
+}
+
+/* KPIs */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.kpi-card {
+  border-radius: 12px !important;
+
+  mat-card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px !important;
+    text-align: center;
+
+    mat-icon {
+      font-size: 2rem;
+      width: 2rem;
+      height: 2rem;
+      margin-bottom: 10px;
+    }
+  }
+}
+
+.kpi-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.kpi-label {
+  font-size: 0.85rem;
+  color: #7f8c8d;
+}
+
+.kpi-total mat-icon { color: #3498db; }
+.kpi-total .kpi-value { color: #3498db; }
+
+.kpi-ingresos mat-icon { color: #2ecc71; }
+.kpi-ingresos .kpi-value { color: #2ecc71; }
+
+.kpi-pendientes mat-icon { color: #f39c12; }
+.kpi-pendientes .kpi-value { color: #f39c12; }
+
+.kpi-entregados mat-icon { color: #27ae60; }
+.kpi-entregados .kpi-value { color: #27ae60; }
+
+/* Charts */
+.charts-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
+  gap: 20px;
+  margin-bottom: 20px;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chart-card {
+  border-radius: 12px !important;
+
+  mat-card-header {
+    padding: 16px 16px 0;
+  }
+
+  mat-card-content {
+    padding: 8px 8px 16px !important;
+  }
+}
+
+.chart-container {
+  width: 100%;
+  height: 280px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 60px;
+  color: #bdc3c7;
+
+  mat-icon {
+    font-size: 3rem;
+    width: 3rem;
+    height: 3rem;
+  }
+
+  p {
+    font-size: 1rem;
+  }
+}
