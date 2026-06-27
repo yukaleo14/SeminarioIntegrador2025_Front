@@ -57,6 +57,8 @@ export class SucursalConsultaComponent {
   private readonly _pedidoLauncher = inject(ConfirmarPedidoLauncher);
   private readonly _dialog = inject(MatDialog);
   private readonly _snackBar = inject(MatSnackBar);
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
 
   private readonly destroyRef = inject(DestroyRef);
   idEmpresa = input.required<number>();
@@ -124,6 +126,10 @@ export class SucursalConsultaComponent {
         }
       });
     } else {
+      if (!this.authService.isAuthenticated()) {
+      this.router.navigate(['/login']);
+      return;
+    }
       this._carro.addProduct(obj.producto, obj.cantidad);
       this._snackBar.open(`${obj.producto.nombre} agregado`, undefined, { duration: 1500 });
     }
@@ -139,6 +145,8 @@ export class SucursalConsultaComponent {
 // ── Diálogo inline de confirmación de cambio de sucursal ──────────────────────
 import { Component as Comp } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
+import { AuthService } from '../services/auth-service';
+import { Router } from '@angular/router';
 
 @Comp({
   selector: 'app-confirm-sucursal-dialog',
