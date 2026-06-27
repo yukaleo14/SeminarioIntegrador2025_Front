@@ -18,6 +18,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RouterLink } from '@angular/router';
 import { Header } from '../components/header/header';
 import { Pedido, PedidoService } from '../services/pedido-service';
+import { AuthService } from '../services/auth-service';
 
 @Component({
   selector: 'app-empresa-estadisticas',
@@ -37,6 +38,7 @@ export class EmpresaEstadisticas implements OnInit, AfterViewInit, OnDestroy {
   readonly pedidos = signal<Pedido[]>([]);
   readonly cargando = signal(true);
   private readonly viewReady = signal(false);
+  private empresaId = inject(AuthService).getEmpresaId();
 
   readonly totalPedidos = computed(() => this.pedidos().length);
   readonly totalIngresos = computed(() =>
@@ -66,7 +68,7 @@ export class EmpresaEstadisticas implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.pedidoService.getPedidosDeMiEmpresa().subscribe({
+    this.pedidoService.getPedidosDeMiEmpresa(this.empresaId!).subscribe({
       next: (pedidos) => {
         this.pedidos.set(pedidos);
         this.cargando.set(false);

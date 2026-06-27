@@ -55,7 +55,7 @@ export class Home implements OnInit {
     });
 
     if (this.authService.isEmpresa()) {
-      this.pedidoService.getPedidosDeMiEmpresa().subscribe({
+      this.pedidoService.getPedidosDeMiEmpresa(this.authService.getEmpresaId()!).subscribe({
         next: (pedidos) => {
           const pendientes = pedidos.filter(
             (p) => p.estado?.nombre === 'CREADO' || p.estado?.nombre === 'PENDIENTE'

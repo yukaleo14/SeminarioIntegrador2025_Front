@@ -88,8 +88,9 @@ export class PedidoService {
 
   // ==================== HTTP ====================
 
-  getPedidosDeMiEmpresa(): Observable<Pedido[]> {
-    return this.http.get<Pedido[]>(`${this.apiUrl}/empresa/me`);
+  getPedidosDeMiEmpresa(empresaId: number): Observable<Pedido[]> {
+    console.log('url de la API para obtener pedidos de la empresa:', `${this.apiUrl}/${empresaId}/me`);
+    return this.http.get<Pedido[]>(`${this.apiUrl}/${empresaId}/me`);
   }
 
   // ==================== WebSocket ====================
