@@ -73,18 +73,56 @@
   <div class="empresa-home">
     <div class="empresa-header">
       <h2>Bienvenido, {{ nombreUsuario }}</h2>
+      <p class="subtitulo">Seleccioná una sucursal en el mapa para ver los pedidos listos para retirar.</p>
     </div>
-    <div class="dashboard-grid">
-      <mat-card class="dashboard-card" routerLink="/chat">
-        <mat-card-content>
-          <mat-icon class="card-icon chat-icon">chat</mat-icon>
-          <h3>Chat</h3>
-          <p>Comunicarte con los clientes y la empresa</p>
-        </mat-card-content>
-        <mat-card-actions>
-          <button mat-flat-button color="primary">Abrir Chat</button>
-        </mat-card-actions>
-      </mat-card>
+    
+    <div class="repartidor-layout">
+      <!-- Panel Izquierdo: Tabla -->
+      <div class="repartidor-panel-izq">
+        @if (sucursalSeleccionada(); as sucursal) {
+          <h3 class="sucursal-title">Sucursal: {{ sucursal.nombre }}</h3>
+          
+          @if (pedidosPreparacion().length > 0) {
+            <table mat-table [dataSource]="pedidosPreparacion()" class="mat-elevation-z2 w-100">
+              
+              <ng-container matColumnDef="numero">
+                <th mat-header-cell *matHeaderCellDef> Pedido </th>
+                <td mat-cell *matCellDef="let p"> {{ p.numero }} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="monto">
+                <th mat-header-cell *matHeaderCellDef> Total </th>
+                <td mat-cell *matCellDef="let p"> {{ p.montoTotal | currency:'$':'symbol':'1.0-0' }} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="acciones">
+                <th mat-header-cell *matHeaderCellDef> Acción </th>
+                <td mat-cell *matCellDef="let p">
+                  <button mat-flat-button color="primary" (click)="cambiarEstado(p, 'ASIGNADO')">Tomar</button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="['numero', 'monto', 'acciones']"></tr>
+              <tr mat-row *matRowDef="let row; columns: ['numero', 'monto', 'acciones'];"></tr>
+            </table>
+          } @else {
+            <div class="empty-state">
+              <mat-icon>check_circle_outline</mat-icon>
+              <p>No hay pedidos en preparación para esta sucursal.</p>
+            </div>
+          }
+        } @else {
+          <div class="empty-state">
+            <mat-icon>place</mat-icon>
+            <p>Hacé click en una sucursal en el mapa para visualizar los pedidos.</p>
+          </div>
+        }
+      </div>
+
+      <!-- Panel Derecho: Mapa -->
+      <div class="repartidor-panel-der">
+        <div #mapEl class="mapa-repartidor" role="application" aria-label="Mapa de sucursales"></div>
+      </div>
     </div>
   </div>
 }
@@ -92,8 +130,11 @@
 <!-- Vista COMPRADOR (o no logueado) -->
 @if (isComprador) {
   <div class="center">
+    <h2 class="gallery-title">Bienvenido, {{ nombreUsuario }}</h2>
     <app-buscador class="w-100"></app-buscador>
+    <h2 class="gallery-title">Categorías</h2>
     <app-carrusel-categorias class="w-100"></app-carrusel-categorias>
+    <h2 class="gallery-title">Sucursales</h2>
     <app-listado-sucursales class="w-100"></app-listado-sucursales>
 
     @if (productos().length > 0) {

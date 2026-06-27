@@ -85,6 +85,10 @@ export class PedidoService {
     return this.http.get<Pedido>(`${this.apiUrl}/${pedidoId}`);
   }
 
+  findBySucursal(empresaId: number): Observable<Pedido[]> {
+    return this.http.get<Pedido[]>(`${this.apiUrl}/${empresaId}/me`);
+  }
+
 
   // ==================== HTTP ====================
 
