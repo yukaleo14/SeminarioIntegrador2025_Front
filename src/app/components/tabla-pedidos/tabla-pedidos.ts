@@ -11,17 +11,29 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { MatSelectChange } from '@angular/material/select';
 
 const ESTADOS_PEDIDO = [
   'CREADO',
   'ENPREPARACION',
+  'PUBLICADO',
   'ASIGNADO',
   'ENRUTA',
   'ENTREGADO',
   'CANCELADO',
-  'DEMORADO',
-  'PENDIENTE'
+  'DEMORADO'
 ];
+
+const TRANSICIONES_PERMITIDAS: Record<string, string[]> = {
+  'CREADO': ['ENPREPARACION', 'CANCELADO'],
+  'ENPREPARACION': ['PUBLICADO'],
+  'PUBLICADO': ['ASIGNADO'],
+  'ASIGNADO': ['ENRUTA', 'CANCELADO'],
+  'ENRUTA': ['ENTREGADO', 'DEMORADO'],
+  'DEMORADO': ['ENTREGADO', 'CANCELADO'],
+  'ENTREGADO': [], // Estado final
+  'CANCELADO': []  // Estado final
+};
 
 @Component({
   selector: 'app-tabla-pedidos',
@@ -96,18 +108,37 @@ export class TablaPedidos implements OnInit, OnDestroy {
     );
   }
 
-  cambiarEstado(pedido: Pedido, nuevoEstado: string) {
-      if (!nuevoEstado || pedido.estado?.nombre === nuevoEstado) return;
+  cambiarEstado(pedido: Pedido, event: MatSelectChange) {
+    const nuevoEstado = event.value;
+    const estadoActual = pedido.estado?.nombre?.toUpperCase() || '';
+    const estadoDestino = nuevoEstado?.toUpperCase() || '';
 
-      this.pedidoService.actualizarEstado(pedido.id, nuevoEstado).subscribe({
-        next: (pedidoActualizado) => {
-          console.log(`Pedido ${pedido.numero} actualizado a estado ${nuevoEstado}`);
-        },
-        error: (err) => {
-          console.error('Error al actualizar estado del pedido:', err);
-          alert('Error al actualizar el estado del pedido. Por favor, intenta nuevamente.');
-        }
-      });
+    if (!nuevoEstado || estadoActual === estadoDestino) return;
+
+    // Obtener las transiciones permitidas para el estado actual
+    const transicionesPosibles = TRANSICIONES_PERMITIDAS[estadoActual] || [];
+
+    // Validar si el nuevo estado está permitido
+    if (!transicionesPosibles.includes(estadoDestino)) {
+      alert(`⚠️ Acción no permitida.\n\nUn pedido en estado "${estadoActual}" no puede pasar directamente a "${estadoDestino}".`);
+      
+      // Revertir visualmente la selección en el mat-select al estado original
+      event.source.value = pedido.estado?.nombre;
+      return;
+    }
+
+    // Si es válido, procedemos con la actualización
+    this.pedidoService.actualizarEstado(pedido.id, nuevoEstado).subscribe({
+      next: (pedidoActualizado) => {
+        console.log(`Pedido ${pedido.numero} actualizado a estado ${nuevoEstado}`);
+      },
+      error: (err) => {
+        console.error('Error al actualizar estado del pedido:', err);
+        alert('Error al actualizar el estado del pedido. Por favor, intenta nuevamente.');
+        // Revertir en caso de error del servidor
+        event.source.value = pedido.estado?.nombre;
+      }
+    });
   }
 
   private actualizarPedidoEnLista(pedidoActualizado: Pedido) {
@@ -138,7 +169,7 @@ export class TablaPedidos implements OnInit, OnDestroy {
     if (!estadoNombre) return 'estado-chip estado-default';
     const estado = estadoNombre.toUpperCase().trim();
     switch (estado) {
-      case 'CREADO':         return 'estado-chip estado-creado';
+      case 'PAGADO':         return 'estado-chip estado-pagado';
       case 'ENPREPARACION':
       case 'EN PREPARACION': return 'estado-chip estado-preparacion';
       case 'ASIGNADO':       return 'estado-chip estado-asignado';

@@ -62,8 +62,7 @@
                 <mat-form-field appearance="outline" subscriptSizing="dynamic" class="estado-select">
                   <mat-select
                     [value]="pedido.estado?.nombre"
-                    (selectionChange)="cambiarEstado(pedido, $event.value)">
-                    @for (estado of estadosDisponibles; track estado) {
+                    (selectionChange)="cambiarEstado(pedido, $event)"> @for (estado of estadosDisponibles; track estado) {
                       <mat-option [value]="estado">{{ estado }}</mat-option>
                     }
                   </mat-select>
