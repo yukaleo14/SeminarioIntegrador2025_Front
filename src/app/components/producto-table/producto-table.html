@@ -2,8 +2,10 @@
 
 
 <div class="page-container">
-
-  <div class="page-header">
+  <div class="page-header"> </div>
+  
+  <mat-card class="table-card">    
+    <div class="page-header">
     <button mat-icon-button (click)="goToHome()" class="back-btn">
       <mat-icon>arrow_back</mat-icon>
     </button>
@@ -11,7 +13,6 @@
       <h1>Mis Productos</h1>
     </div>
   </div>
-  <mat-card class="table-card">    
     <mat-card-content>
       <table mat-table [dataSource]="dataSource" class="full-width">
 

@@ -12,6 +12,86 @@
 .card-header{display:flex;
 justify-content: center;
 align-items: center;
+}.card-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; /* Ocupa todo el alto de la pantalla */
+    position: relative;
+    overflow: hidden;
+
+    /* Fondo desenfocado usando un pseudo-elemento */
+    &::before {
+        content: '';
+        position: absolute;
+        top: -5%; /* Margen extra para que el borde del blur no se note */
+        left: -5%;
+        width: 110%;
+        height: 110%;
+        
+        /* Imagen temporal de una moto de delivery (puedes cambiar la URL por tu asset local, ej: url('/assets/moto.jpg')) */
+        background-image: url('https://images.unsplash.com/photo-1526367790999-0150786686a2?q=80&w=2071&auto=format&fit=crop');
+        background-size: cover;
+        background-position: center;
+        
+        /* Efecto borroso y oscurecido */
+        filter: blur(8px) brightness(0.5);
+        z-index: -1; 
+    }
+}
+
+.login-card {
+    width: 100%;
+    max-width: 420px;
+    padding: 20px;
+    border-radius: 12px !important;
+    background: rgba(255, 255, 255, 0.95); /* Fondo blanco apenas transparente */
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+}
+
+.card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 10px;
+}
+
+.card-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    h1 {
+        margin: 0;
+        color: #2c3e50;
+        font-weight: 600;
+    }
+}
+
+.login-card-actions {
+    display: flex;
+    justify-content: space-between;
+    padding: 16px 8px 8px 8px;
+}
+
+/* Estilos de la advertencia de error */
+.error-alert {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: #fdecea;
+    color: #d32f2f;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 1px solid #f5c2c7;
+    font-size: 0.9rem;
+    font-weight: 500;
+    
+    mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+    }
 }
 
 .login-card-actions{

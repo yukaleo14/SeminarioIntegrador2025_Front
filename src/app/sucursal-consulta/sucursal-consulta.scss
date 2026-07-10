@@ -1,56 +1,57 @@
-/* FAB flotante del carrito */
-.carrito-fab {
-  position: fixed;
-  bottom: 24px;
-  right: 20px;
-  z-index: 100;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-  border-radius: 28px !important;
-  padding: 0 20px !important;
-  height: 56px !important;
-  font-size: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+/* ==========================================================================
+   Fondo Global de la Pantalla
+   ========================================================================== */
+:host {
+  display: block;
+  min-height: 100vh;
+  position: relative;
+  padding-bottom: 40px;
 
-  .fab-badge {
-    background: #e74c3c;
-    color: #fff;
-    border-radius: 50%;
-    width: 22px;
-    height: 22px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: 4px;
+  &::before {
+    content: '';
+    position: fixed;
+    top: -5%;
+    left: -5%;
+    width: 110%;
+    height: 110%;
+    /* Misma imagen de la moto */
+    background-image: url('https://images.unsplash.com/photo-1526367790999-0150786686a2?q=80&w=2071&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+    filter: blur(8px) brightness(0.5);
+    z-index: -1;
   }
 }
 
-/* Padding inferior para que el FAB no tape los últimos productos */
-.productos-grid-wrapper {
-  padding-bottom: 80px;
-}
-
+/* ==========================================================================
+   Panel Translúcido (Glassmorphism)
+   ========================================================================== */
+/* ==========================================================================
+   Panel Translúcido (Glassmorphism)
+   ========================================================================== */
 .sucursal-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  box-sizing: border-box;
-  background-color: #fafafa;
+  /* Al quitar flex y align-items, permitimos que el contenedor maneje su bloque naturalmente */
+  width: 90%;
+  max-width: 1200px;
+  margin: 40px auto;
+  
+  /* Efecto Glass */
+  background: rgba(255, 255, 255, 0.93);
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
   color: #212121;
+  overflow: hidden; 
 }
 
 .sucursal-header {
   display: flex;
   align-items: center;
   width: 100%;
-  padding: 12px 16px;
-  background: #ffffff;
-  border-bottom: 1px solid #e0e0e0;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  padding: 16px 24px;
+  box-sizing: border-box; /* CRUCIAL para que no se desborde */
+  background: transparent;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 
   .back-button {
     margin-right: 8px;
@@ -66,27 +67,33 @@
 .sucursal-banner {
   width: 100%;
   max-height: 300px;
-  object-fit: contain;
-  border-bottom: 1px solid #e0e0e0;
+  object-fit: cover; /* Cambiado a 'cover' para que la imagen llene el espacio horizontal de forma elegante */
+  display: block; /* Evita pequeños márgenes fantasma debajo de las imágenes */
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .sucursal-info {
   width: 100%;
-  max-width: 1200px;
-  padding: 24px;
+  padding: 40px; /* Un poco más de respiro para que el texto no toque los bordes */
+  box-sizing: border-box; /* CRUCIAL: Obliga al navegador a incluir el padding dentro del 100% de ancho */
   display: flex;
   flex-direction: column;
   gap: 16px;
 
+  /* Hacemos que en celulares el padding sea menor para aprovechar la pantalla */
+  @media (max-width: 768px) {
+    padding: 24px 16px;
+  }
+
   .sucursal-nombre {
-    font-size: 1.8rem;
-    font-weight: 600;
+    font-size: 2rem;
+    font-weight: 700;
     margin: 0;
-    color: #333;
+    color: #2c3e50;
   }
 
   .sucursal-descripcion {
-    font-size: 1rem;
+    font-size: 1.05rem;
     line-height: 1.5;
     color: #555;
     margin: 0 0 12px;
@@ -95,25 +102,31 @@
   .categorias-section {
     margin-top: 8px;
     margin-bottom: 16px;
+    width: 100%; /* Asegura que el carrusel respete el ancho interior */
   }
+
+  /* ... (El resto de las clases hijas de .sucursal-info se mantienen igual: .productos-header, .productos-grid, etc.) ... */
+}
 
   .productos-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-block: 8px 12px;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+    padding-bottom: 12px;
 
     .productos-titulo {
-      font-size: 1.4rem;
-      font-weight: 500;
-      color: #424242;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #2c3e50;
       margin: 0;
     }
   }
 
   .productos-grid {
     display: grid;
-    gap: 16px;
+    gap: 24px;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     justify-items: center;
   }
@@ -121,11 +134,44 @@
   .producto-card {
     width: 100%;
     max-width: 300px;
+    /* Para asegurar que destaquen sobre el panel semitransparente */
+    background: #ffffff;
+    border-radius: 12px;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 
     &:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
     }
+  }
+
+/* ==========================================================================
+   Carrito FAB
+   ========================================================================== */
+.productos-grid-wrapper {
+  padding-bottom: 80px;
+}
+
+.carrito-fab {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  z-index: 100;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  border-radius: 28px !important;
+  padding: 0 24px !important;
+  height: 56px !important;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .fab-badge {
+    background: #fff;
+    color: #1976d2;
+    border-radius: 50%;
+    padding: 2px 8px;
+    margin-left: 8px;
+    font-weight: bold;
   }
 }

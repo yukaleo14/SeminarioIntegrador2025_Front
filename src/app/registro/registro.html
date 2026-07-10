@@ -1,87 +1,108 @@
-<div class="registro-container">
-    <mat-card>
+<div class="card-container">
+    <mat-card class="registro-card">
         <mat-card-header class="card-header">
             <h1>Registro</h1>
         </mat-card-header>
         <form [formGroup]="formularioRegistro" (ngSubmit)="onSubmit()">
-            <mat-card-content>
-                <div class="card-content">
-                    <div class="form-row">
-                        <mat-form-field appearance="outline" class="field">
-                            <mat-label>Nombre</mat-label>
-                            <input matInput formControlName="nombre" type="text" placeholder="Nombre">
-                            <mat-icon matSuffix>person</mat-icon>
-                        </mat-form-field>
-                        <mat-form-field appearance="outline" class="field">
-                            <mat-label>Apellido</mat-label>
-                            <input matInput formControlName="apellido" type="text" placeholder="Apellido">
-                        </mat-form-field>
+            <mat-card-content class="card-content">
+                
+                @if (errorMessage()) {
+                    <div class="error-alert">
+                        <mat-icon>error_outline</mat-icon>
+                        <span>{{ errorMessage() }}</span>
                     </div>
+                }
+
+                <mat-form-field appearance="outline" class="field full-width">
+                    <mat-label>¿Qué tipo de cuenta deseas crear?</mat-label>
+                    <mat-select formControlName="tipoUsuario">
+                        <mat-option value="COMPRADOR">Soy Comprador</mat-option>
+                        <mat-option value="EMPRESA">Soy una Empresa / Local</mat-option>
+                        <mat-option value="REPARTIDOR">Soy Repartidor</mat-option>
+                    </mat-select>
+                    <mat-icon matSuffix>assignment_ind</mat-icon>
+                </mat-form-field>
+
+                @if (tipoSeleccionado()) {
+                    
                     <div class="form-row">
                         <mat-form-field appearance="outline" class="field">
-                            <mat-label>DNI</mat-label>
-                            <input matInput formControlName="dni" placeholder="DNI">
-                            <mat-icon matSuffix>badge</mat-icon>
+                            <mat-label>{{ tipoSeleccionado() === 'EMPRESA' ? 'Nombre de la Empresa' : 'Nombre' }}</mat-label>
+                            <input matInput formControlName="nombre" type="text" [placeholder]="tipoSeleccionado() === 'EMPRESA' ? 'Nombre de la empresa' : 'Nombre'">
+                            <mat-icon matSuffix>{{ tipoSeleccionado() === 'EMPRESA' ? 'store' : 'person' }}</mat-icon>
                         </mat-form-field>
-                        <mat-form-field appearance="outline" class="field">
-                            <mat-label>Cuit/Cuil</mat-label>
-                            <input matInput formControlName="cuitCuil" placeholder="Cuit/Cuil">
-                            <mat-icon matSuffix>account_box</mat-icon>
-                        </mat-form-field>
+
+                        @if (tipoSeleccionado() !== 'EMPRESA') {
+                            <mat-form-field appearance="outline" class="field">
+                                <mat-label>Apellido</mat-label>
+                                <input matInput formControlName="apellido" type="text" placeholder="Apellido">
+                            </mat-form-field>
+                        }
                     </div>
+
                     <div class="form-row">
-                        <mat-form-field appearance="outline" class="field">
-                            <mat-label>Telefono</mat-label>
-                            <input matInput formControlName="telefono" placeholder="Telefono">
-                            <mat-icon matSuffix>phone</mat-icon>
-                        </mat-form-field>
-                        <mat-form-field appearance="outline" class="field">
+                        @if (tipoSeleccionado() === 'EMPRESA') {
+                            <mat-form-field appearance="outline" class="field">
+                                <mat-label>CUIT</mat-label>
+                                <input matInput formControlName="cuitCuil" placeholder="CUIT (11 números)">
+                                <mat-icon matSuffix>account_box</mat-icon>
+                            </mat-form-field>
+                        }
+
+                        @if (tipoSeleccionado() !== 'EMPRESA') {
+                            <mat-form-field appearance="outline" class="field">
+                                <mat-label>DNI</mat-label>
+                                <input matInput formControlName="dni" placeholder="DNI">
+                                <mat-icon matSuffix>badge</mat-icon>
+                            </mat-form-field>
+                            <mat-form-field appearance="outline" class="field">
+                                <mat-label>Teléfono</mat-label>
+                                <input matInput formControlName="telefono" placeholder="Teléfono">
+                                <mat-icon matSuffix>phone</mat-icon>
+                            </mat-form-field>
+                        }
+                    </div>
+
+                    <div class="form-row">
+                        <mat-form-field appearance="outline" class="field full-width">
                             <mat-label>Mail</mat-label>
                             <input matInput formControlName="mail" type="email" placeholder="Mail">
                             <mat-icon matSuffix>mail</mat-icon>
                         </mat-form-field>
                     </div>
+
                     <div class="form-row">
                         <mat-form-field appearance="outline" class="field">
                             <mat-label>Contraseña</mat-label>
-                            <input formControlName="contrasena" [type]="hide() ? 'password' : 'text'" matInput
-                                placeholder="Contraseña">
-                            <button mat-icon-button matSuffix (click)="toggleHide()"
-                                [attr.aria-pressed]="hide()" type="button"><mat-icon>{{hide() ?  'visibility': 'visibility_off'}}</mat-icon></button>
+                            <input formControlName="contrasena" [type]="hide() ? 'password' : 'text'" matInput placeholder="Mínimo 6 caracteres">
+                            <button mat-icon-button matSuffix (click)="toggleHide()" type="button">
+                                <mat-icon>{{hide() ? 'visibility': 'visibility_off'}}</mat-icon>
+                            </button>
                         </mat-form-field>
+
                         <mat-form-field appearance="outline" class="field">
                             <mat-label>Confirmar Contraseña</mat-label>
-                            <input formControlName="confContraseña" [type]="hide2() ? 'password' : 'text'" matInput
-                                placeholder="Confirmar contraseña">
-                            <button mat-icon-button matSuffix (click)="toggleHide2()"
-                             [attr.aria-pressed]="hide2()"
-                                type="button"><mat-icon>{{hide2() ? 'visibility': 'visibility_off'}}</mat-icon></button>
-                                @if(formularioRegistro.get('confContraseña')?.hasError('passwordNoMatch') && formularioRegistro.get('confContraseña')?.touched) {
-                                    <mat-error>Las contraseñas no coinciden.</mat-error>
-                                }
-                            </mat-form-field>
-                        </div>
-                    <mat-form-field appearance="outline" class="field">
-                        <mat-label>Tipo de Usuario</mat-label>
-                        <mat-select formControlName="tipoUsuario" placeholder="Tipo de Usuario">
-                            <mat-option value="COMPRADOR">Comprador</mat-option>
-                            <mat-option value="EMPRESA">Empresa</mat-option>
-                            <mat-option value="REPARTIDOR">Repartidor</mat-option>
-                        </mat-select>
-                    </mat-form-field>
-                    <p>
-                        <mat-checkbox formControlName="termCondiciones">Acepto los terminos y condiciones</mat-checkbox>
-                    </p>
-                </div>
-            </mat-card-content>
-            <mat-card-actions>
-                <button mat-flat-button type="submit" [disabled]="!formularioRegistro.valid" aria-label="Registrarse">
-                    Registrarse
-                </button>
+                            <input formControlName="confContraseña" [type]="hide2() ? 'password' : 'text'" matInput placeholder="Repita la contraseña">
+                            <button mat-icon-button matSuffix (click)="toggleHide2()" type="button">
+                                <mat-icon>{{hide2() ? 'visibility': 'visibility_off'}}</mat-icon>
+                            </button>
+                            @if(formularioRegistro.get('confContraseña')?.hasError('passwordNoMatch') && formularioRegistro.get('confContraseña')?.touched) {
+                                <mat-error>Las contraseñas no coinciden.</mat-error>
+                            }
+                        </mat-form-field>
+                    </div>
 
+                    <p class="terminos">
+                        <mat-checkbox formControlName="termCondiciones">Acepto los términos y condiciones</mat-checkbox>
+                    </p>
+                }
+            </mat-card-content>
+
+            <mat-card-actions class="card-actions">
+                <button mat-flat-button color="primary" type="submit" [disabled]="!formularioRegistro.valid" aria-label="Registrarse">
+                    Crear Cuenta
+                </button>
             </mat-card-actions>
         </form>
-
     </mat-card>
-
 </div>

@@ -1,7 +1,41 @@
+/* ==========================================================================
+   Fondo Global de la Pantalla
+   ========================================================================== */
+:host {
+  display: block;
+  min-height: 100vh;
+  position: relative;
+  padding-bottom: 40px;
+
+  &::before {
+    content: '';
+    position: fixed;
+    top: -5%;
+    left: -5%;
+    width: 110%;
+    height: 110%;
+    background-image: url('https://images.unsplash.com/photo-1526367790999-0150786686a2?q=80&w=2071&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+    filter: blur(8px) brightness(0.5);
+    z-index: -1;
+  }
+}
+
+/* ==========================================================================
+   Panel Translúcido (Glassmorphism)
+   ========================================================================== */
 .productos-container {
+  width: 90%;
   max-width: 1200px;
-  margin: 0 auto;
-  padding: 24px 16px;
+  margin: 40px auto;
+  padding: 32px;
+  
+  /* Efecto Glass */
+  background: rgba(255, 255, 255, 0.93);
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
 }
 
 .page-header {
@@ -9,33 +43,37 @@
   align-items: center;
   gap: 16px;
   margin-bottom: 24px;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+  padding-bottom: 16px;
 
   h2 {
-    font-size: 1.6rem;
-    font-weight: 600;
+    font-size: 1.8rem;
+    font-weight: 700;
     margin: 0;
-    color: #212121;
+    color: #2c3e50;
   }
 }
 
 .btn-volver {
   background: none;
-  border: 1px solid #e0e0e0;
+  border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 8px;
-  padding: 6px 14px;
-  font-size: 0.9rem;
+  padding: 8px 16px;
+  font-size: 0.95rem;
+  font-weight: 500;
   cursor: pointer;
   color: #424242;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, transform 0.1s;
 
   &:hover {
-    background-color: #f5f5f5;
+    background-color: rgba(0, 0, 0, 0.03);
+    transform: translateX(-2px);
   }
 }
 
 .productos-grid {
   display: grid;
-  gap: 16px;
+  gap: 24px;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   justify-items: center;
 }
@@ -43,10 +81,11 @@
 .estado-mensaje {
   text-align: center;
   padding: 48px 16px;
-  font-size: 1rem;
-  color: #757575;
+  font-size: 1.1rem;
+  color: #7f8c8d;
+  font-weight: 500;
 
   &.error {
-    color: #c62828;
+    color: #e74c3c;
   }
 }

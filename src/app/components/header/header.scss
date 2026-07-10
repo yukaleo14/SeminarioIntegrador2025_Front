@@ -1,47 +1,107 @@
+/* ==========================================================================
+   Glass Header (Encabezado Translúcido)
+   ========================================================================== */
+.glass-header {
+  /* Fondo blanco semitransparente */
+  background: rgba(255, 255, 255, 0.85) !important;
+  
+  /* Efecto de desenfoque del fondo */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px); /* Soporte para Safari */
+  
+  /* Sombra sutil para separarlo del contenido */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+  
+  /* Para que se quede pegado arriba al hacer scroll */
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  
+  /* Color base del texto/iconos en oscuro para contrastar con el blanco */
+  color: #2c3e50 !important; 
+  padding: 0 24px;
+}
+
+/* ==========================================================================
+   Botones de Acción (Carrito y Usuario)
+   ========================================================================== */
+.action-btn {
+  color: #2c3e50 !important; /* Fuerza a que los iconos sean azul oscuro/grisáceo */
+  transition: transform 0.2s ease, color 0.2s ease;
+  
+  &:hover {
+    transform: scale(1.1);
+    color: #3498db !important; /* Se pintan de celeste al pasar el mouse */
+  }
+}
+
+.cart-button {
+  margin-right: 8px;
+}
+
+/* Redondear un poco el badge del carrito para hacerlo más suave */
+::ng-deep .mat-badge-content {
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(231, 76, 60, 0.4);
+}
+
+/* ==========================================================================
+   Logo y Espaciado
+   ========================================================================== */
 .logo-link {
   display: flex;
   align-items: center;
   text-decoration: none;
+  transition: opacity 0.2s ease;
+  
+  &:hover {
+    opacity: 0.8;
+  }
 }
 
 .logo {
-  height: 36px;
+  height: 38px; /* Un pelín más grande para que destaque en el cristal */
   width: auto;
-}
-
-.ubicacion-container {
-  display: flex;
-  align-items: center;
-  gap: 4px; // spacing between "Enviar a" and the button
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); /* Sombra suave al logo */
 }
 
 .example-spacer {
   flex: 1 1 auto;
 }
 
+/* ==========================================================================
+   Ubicación (Si lo usas en el futuro)
+   ========================================================================== */
+.ubicacion-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .label {
-  font-size: 0.85rem; // make "Enviar a" slightly smaller
-  opacity: 0.8;       // lighter so it looks secondary
+  font-size: 0.85rem;
+  opacity: 0.8;
 }
 
 .ubicacion-btn {
-  color: rgb(255, 166, 0); // or any accent color you want
-  font-weight: 500;
-  text-transform: none; // keeps normal case instead of uppercase
+  color: #e67e22; 
+  font-weight: 600;
+  text-transform: none;
   display: flex;
   align-items: center;
   gap: 2px;
 }
-.ubicacion-text{
-  color: rgb(255, 145, 0); // or any accent color you want
-  font-weight: 500;
+
+.ubicacion-text {
+  color: #e67e22;
+  font-weight: 600;
 }
 
 .ubicacion-btn .arrow {
   font-size: 18px;
 }
 
-.cart-button {
-  position: relative;
-  margin-right: 8px;           // espacio entre carrito y usuario
+.text-danger {
+  color: #e74c3c !important;
 }

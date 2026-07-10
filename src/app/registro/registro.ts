@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnInit, signal } from '@angular/core';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -17,12 +17,20 @@ import { AuthService, RegisterDto } from '../services/auth-service';
   styleUrl: './registro.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class Registro {
+export class Registro implements OnInit {
   hide = signal<boolean>(true);
   hide2 = signal<boolean>(true);
+
+  tipoSeleccionado = signal<string | null>(null);
+  errorMessage = signal<string | null>(null);
+
   private _fb = inject(FormBuilder);
   private _authService = inject(AuthService);
+  private readonly router = inject(Router);
+
   formularioRegistro: FormGroup = new FormGroup({});
+  
+
   constructor() {
     this.formularioRegistro = this._fb.group({
         nombre: ['', Validators.required],
@@ -40,47 +48,89 @@ export class Registro {
 
   }
 
-  private readonly router = inject(Router);
-  onSubmit() {
-    if (!this.formularioRegistro.valid) return
+  ngOnInit(): void {
+    // Escuchamos los cambios en el tipo de usuario para ajustar el formulario
+    this.formularioRegistro.get('tipoUsuario')?.valueChanges.subscribe(tipo => {
+      this.tipoSeleccionado.set(tipo);
+      this.actualizarValidaciones(tipo);
+    });
 
-    const rq = this.getObject();
-
-    this._authService.register(rq).subscribe({
-      next: (token: string) => {
-
-        console.log('Usuario registrado correctamente, token:', token);
-        
-        this.router.navigate(['/dashboard']); 
-
-      },
-      error: (err) => {
-        console.error('Error al registrar:', err);
-        let mensajeError = 'Error al registrar, por favor intente nuevamente.';
-
-        if (err.error?.message) {
-        mensajeError = err.error.message;
-      } else if (err.status === 409) {
-        mensajeError = 'Ya existe un usuario con ese correo electrónico.';
-      } else if (err.status === 400) {
-        mensajeError = 'Datos inválidos. Verifique la información ingresada.';
-      }
-
-      alert(mensajeError);
+    // Limpiamos el error si el usuario modifica el formulario
+    this.formularioRegistro.valueChanges.subscribe(() => {
+      if (this.errorMessage()) {
+        this.errorMessage.set(null);
       }
     });
   }
 
-  getObject(): RegisterDto {
+  private actualizarValidaciones(tipo: string) {
+    const controls = this.formularioRegistro.controls;
+
+    if (tipo === 'EMPRESA') {
+      controls['apellido'].clearValidators();
+      controls['dni'].clearValidators();
+      controls['telefono'].clearValidators();
+      
+      controls['cuitCuil'].setValidators([Validators.required, Validators.minLength(11), Validators.maxLength(11)]);
+    } else {
+      // COMPRADOR o REPARTIDOR
+      controls['apellido'].setValidators([Validators.required]);
+      controls['dni'].setValidators([Validators.required, Validators.minLength(8), Validators.maxLength(8)]);
+      controls['telefono'].setValidators([Validators.required]);
+      
+      controls['cuitCuil'].clearValidators();
+    }
+
+    // Actualizamos el estado de validez de los campos modificados
+    ['apellido', 'dni', 'telefono', 'cuitCuil'].forEach(field => {
+      controls[field].updateValueAndValidity();
+    });
+  }
+
+  onSubmit() {
+    if (!this.formularioRegistro.valid) return;
+
+    this.errorMessage.set(null);
+    const rq = this.getObject();
+    this.formularioRegistro.disable();
+
+    this._authService.register(rq).subscribe({
+      next: (token: string) => {
+        console.log('Usuario registrado correctamente');
+        this.router.navigate(['/']); 
+      },
+      error: (err) => {
+        this.formularioRegistro.enable();
+        
+        if (err.status === 400 && err.error?.message) {
+          if (Array.isArray(err.error.message)) {
+            this.errorMessage.set('Datos inválidos: ' + err.error.message.join(' | '));
+          } else {
+            this.errorMessage.set(err.error.message);
+          }
+        } else if (err.status === 409) {
+          this.errorMessage.set('Ya existe un usuario con ese correo electrónico o DNI/CUIT.');
+        } else {
+          this.errorMessage.set('Error al registrar, por favor intente nuevamente.');
+        }
+      }
+    });
+  }
+
+  getObject(): RegisterDto {const isEmpresa = this.tipoSeleccionado() === 'EMPRESA';
     return {
-      nombre: this.formularioRegistro.controls['nombre'].value,
-      apellido: this.formularioRegistro.controls['apellido'].value,
-      contrasena: this.formularioRegistro.controls['contrasena'].value,
-      cuitCuil: this.formularioRegistro.controls['cuitCuil'].value,
-      dni: this.formularioRegistro.controls['dni'].value,
-      mail: this.formularioRegistro.controls['mail'].value,
-      telefono: this.formularioRegistro.controls['telefono'].value,
       rol: this.formularioRegistro.controls['tipoUsuario'].value,
+      nombre: this.formularioRegistro.controls['nombre'].value,
+      mail: this.formularioRegistro.controls['mail'].value,
+      contrasena: this.formularioRegistro.controls['contrasena'].value,
+      
+      // Enviamos strings vacíos si el campo no aplica al rol seleccionado
+      apellido: isEmpresa ? '' : this.formularioRegistro.controls['apellido'].value,
+      dni: isEmpresa ? '' : this.formularioRegistro.controls['dni'].value,
+      telefono: isEmpresa ? '' : this.formularioRegistro.controls['telefono'].value,
+      cuitCuil: isEmpresa ? this.formularioRegistro.controls['cuitCuil'].value : '',
+      
+      // Campos por defecto de tu DTO original
       imagenPerfil: '',
       altura: '',
       calle: '',
@@ -90,13 +140,8 @@ export class Registro {
     };
   }
 
-  toggleHide() {
-    this.hide.update(valorActual => !valorActual);
-  };
-  toggleHide2() {
-    this.hide2.update(valorActual => !valorActual);
-  };
-
+  toggleHide() { this.hide.update(v => !v); }
+  toggleHide2() { this.hide2.update(v => !v); }
 }
 
 export const confirmPasswordValidator: ValidatorFn = (group: AbstractControl): ValidationErrors | null => {

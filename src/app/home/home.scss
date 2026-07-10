@@ -1,29 +1,67 @@
+/* ==========================================================================
+   Fondo Global de la Pantalla
+   Usamos :host para aplicarlo a todo el componente Home
+   ========================================================================== */
+:host {
+  display: block;
+  min-height: 100vh;
+  position: relative;
+  padding-bottom: 40px; /* Espacio al final de la página */
+
+  /* Imagen de fondo fija y desenfocada */
+  &::before {
+    content: '';
+    position: fixed;
+    top: -5%;
+    left: -5%;
+    width: 110%;
+    height: 110%;
+    /* Misma imagen del login */
+    background-image: url('https://images.unsplash.com/photo-1526367790999-0150786686a2?q=80&w=2071&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+    filter: blur(8px) brightness(0.5);
+    z-index: -1;
+  }
+}
+
+/* ==========================================================================
+   Contenedores Principales (Paneles Translúcidos / Glassmorphism)
+   ========================================================================== */
+.empresa-home, .center {
+  /* Fondo blanco apenas transparente */
+  background: rgba(255, 255, 255, 0.93);
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+  padding: 32px;
+  max-width: 1100px;
+  margin: 40px auto; /* Margen superior para separarlo del header */
+  backdrop-filter: blur(4px);
+}
+
 .center {
-  padding: 8px 0;
   display: flex;
-  width: 100%;
-  align-items: center;
-  justify-content: center;
   flex-direction: column;
+  align-items: center;
   gap: 16px;
+  width: 90%; /* Evita que toque los bordes en pantallas chicas */
 }
 
 .w-100 {
   width: 100%;
 }
 
-.empresa-home {
-  padding: 32px 24px;
-  max-width: 900px;
-  margin: 0 auto;
-}
-
+/* ==========================================================================
+   Encabezados
+   ========================================================================== */
 .empresa-header {
   margin-bottom: 32px;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+  padding-bottom: 16px;
 
   h2 {
-    font-size: 1.8rem;
-    font-weight: 600;
+    font-size: 2rem;
+    font-weight: 700;
     color: #2c3e50;
     margin: 0 0 6px;
   }
@@ -31,10 +69,13 @@
   .subtitulo {
     color: #7f8c8d;
     margin: 0;
-    font-size: 1rem;
+    font-size: 1.1rem;
   }
 }
 
+/* ==========================================================================
+   Vista Empresa: Tarjetas (Cards)
+   ========================================================================== */
 .dashboard-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -44,95 +85,102 @@
 .dashboard-card {
   cursor: pointer;
   border-radius: 12px !important;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  background: #ffffff !important; /* Blancos sólidos para contrastar con el panel */
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   text-align: center;
 
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1) !important;
+    border-color: rgba(52, 152, 219, 0.3);
   }
 
   mat-card-content {
-    padding: 24px 16px 8px;
+    padding: 32px 16px 16px;
   }
 
   h3 {
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin: 12px 0 8px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 16px 0 8px;
     color: #2c3e50;
   }
 
   p {
     color: #7f8c8d;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     margin: 0;
+    line-height: 1.4;
   }
 
   mat-card-actions {
     justify-content: center;
-    padding: 8px 16px 20px;
+    padding: 8px 16px 24px;
   }
 }
 
+/* Iconos de las tarjetas */
 .card-icon {
-  font-size: 3rem;
-  width: 3rem;
-  height: 3rem;
+  font-size: 3.5rem;
+  width: 3.5rem;
+  height: 3.5rem;
 }
 
 .pedidos-icon { color: #3498db; }
 .productos-icon { color: #9b59b6; }
-.chat-icon { color: #27ae60; }
 .stats-icon { color: #e67e22; }
 
+/* Alerta de pedidos pendientes */
 .pending-alert {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #fff3cd;
-  border: 1px solid #ffc107;
-  border-radius: 10px;
-  padding: 14px 18px;
-  margin-bottom: 24px;
+  background: linear-gradient(to right, #fff3cd, #fff8e1);
+  border-left: 5px solid #ffc107;
+  border-radius: 8px;
+  padding: 16px 24px;
+  margin-bottom: 32px;
   cursor: pointer;
-  transition: background 0.15s;
+  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.15);
+  transition: transform 0.15s, box-shadow 0.15s;
 
   &:hover {
-    background: #ffe9a0;
+    transform: translateX(4px);
+    box-shadow: 0 6px 16px rgba(255, 193, 7, 0.25);
   }
 
   .pending-alert-left {
     display: flex;
-    align-items: flex-start;
-    gap: 12px;
+    align-items: center;
+    gap: 16px;
   }
 
   .alert-icon {
     color: #f39c12;
-    font-size: 1.6rem;
-    width: 1.6rem;
-    height: 1.6rem;
-    margin-top: 2px;
+    font-size: 2rem;
+    width: 2rem;
+    height: 2rem;
   }
 
   strong {
-    font-size: 0.95rem;
+    font-size: 1.05rem;
     color: #856404;
     display: block;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
   }
 }
 
 .pending-numbers {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px;
 }
 
 .pending-chip {
-  font-size: 0.75rem !important;
-  height: 24px !important;
+  font-size: 0.8rem !important;
+  font-weight: 600;
+  height: 26px !important;
   background: #ffc107 !important;
   color: #5c4200 !important;
 }
@@ -140,76 +188,71 @@
 .icon-wrapper {
   position: relative;
   display: inline-flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .icon-badge {
   position: absolute;
-  top: -6px;
-  right: -10px;
+  top: -8px;
+  right: -12px;
   background: #e74c3c;
   color: white;
   border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  font-size: 0.7rem;
+  width: 24px;
+  height: 24px;
+  font-size: 0.8rem;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 2px 6px rgba(231, 76, 60, 0.4);
 }
 
-.productos-gallery {
-  padding: 8px 16px 24px;
-
-  .gallery-title {
-    font-size: 1.3rem;
-    font-weight: 600;
-    color: #2c3e50;
-    margin: 0 0 16px;
-  }
-}
-
-.productos-grid {
-  display: grid;
-  grid-template-columns: repeat(6, minmax(200px, 1fr));
-  gap: 16px;
-  padding: 16px;
-  @media (max-width: 768px) {
-    grid-template-columns: repeat(1, minmax(200px, 1fr));
-  }
-}
+/* ==========================================================================
+   Vista Repartidor: Layout Mapa y Tabla
+   ========================================================================== */
 .repartidor-layout {
   display: flex;
   gap: 24px;
-  margin-top: 20px;
-  min-height: 500px;
-  align-items: flex-start;
+  margin-top: 24px;
+  min-height: 550px;
+  align-items: stretch;
+
+  @media (max-width: 900px) {
+    flex-direction: column;
+  }
 
   .repartidor-panel-izq {
     flex: 1;
     display: flex;
     flex-direction: column;
     gap: 16px;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.05);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.02);
 
     .sucursal-title {
-      margin: 0;
-      color: #333;
+      margin: 0 0 8px;
+      color: #2c3e50;
+      font-weight: 700;
+      font-size: 1.2rem;
     }
   }
 
   .repartidor-panel-der {
-    flex: 1;
-    height: 500px;
+    flex: 1.2;
+    min-height: 500px;
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    border: 4px solid #ffffff; /* Marco blanco tipo fotografía para el mapa */
   }
 
   .mapa-repartidor {
     width: 100%;
     height: 100%;
+    background-color: #e5e5e5; /* Color temporal mientras carga */
   }
 
   .empty-state {
@@ -217,18 +260,25 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 40px 20px;
-    background: #f5f5f5;
-    border-radius: 8px;
-    color: #666;
+    padding: 60px 20px;
+    height: 100%;
+    color: #7f8c8d;
     text-align: center;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 2px dashed #e2e8f0;
 
     mat-icon {
-      font-size: 48px;
-      width: 48px;
-      height: 48px;
-      margin-bottom: 16px;
-      color: #999;
+      font-size: 56px;
+      width: 56px;
+      height: 56px;
+      margin-bottom: 20px;
+      color: #cbd5e1;
+    }
+    
+    p {
+      font-size: 1.1rem;
+      margin: 0;
     }
   }
 }
@@ -237,4 +287,45 @@
 ::ng-deep .mapa-pin {
   background: transparent;
   border: none;
+}
+
+/* ==========================================================================
+   Vista Comprador: Productos
+   ========================================================================== */
+.productos-gallery {
+  padding: 16px 0;
+
+  .gallery-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 0 0 24px;
+    border-bottom: 2px solid rgba(0,0,0,0.05);
+    padding-bottom: 12px;
+  }
+}
+
+.productos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 24px;
+}
+
+.carrito-fab {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  border-radius: 30px;
+  padding: 0 24px;
+  height: 56px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  
+  .fab-badge {
+    background: #fff;
+    color: #1976d2;
+    border-radius: 50%;
+    padding: 2px 8px;
+    margin-left: 8px;
+    font-weight: bold;
+  }
 }

@@ -1,18 +1,55 @@
+/* ==========================================================================
+   Fondo Global de la Pantalla
+   ========================================================================== */
+:host {
+  display: block;
+  min-height: 100vh;
+  position: relative;
+  padding-bottom: 40px;
+
+  &::before {
+    content: '';
+    position: fixed;
+    top: -5%;
+    left: -5%;
+    width: 110%;
+    height: 110%;
+    background-image: url('https://images.unsplash.com/photo-1526367790999-0150786686a2?q=80&w=2071&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+    filter: blur(8px) brightness(0.5);
+    z-index: -1;
+  }
+}
+
+/* ==========================================================================
+   Panel Translúcido (Glassmorphism)
+   ========================================================================== */
 .estadisticas-container {
-  padding: 24px;
+  padding: 32px;
   max-width: 1200px;
-  margin: 0 auto;
+  width: 90%;
+  margin: 40px auto;
+  box-sizing: border-box;
+
+  /* Efecto Glass */
+  background: rgba(255, 255, 255, 0.93);
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
 }
 
 .page-header {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
   margin-bottom: 28px;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+  padding-bottom: 16px;
 
   h1 {
     font-size: 1.8rem;
-    font-weight: 600;
+    font-weight: 700;
     color: #2c3e50;
     margin: 0 0 4px;
   }
@@ -20,7 +57,7 @@
   .subtitulo {
     color: #7f8c8d;
     margin: 0;
-    font-size: 0.95rem;
+    font-size: 1rem;
   }
 }
 
@@ -36,13 +73,20 @@
 /* KPIs */
 .kpi-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 16px;
-  margin-bottom: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+  margin-bottom: 32px;
 }
 
 .kpi-card {
   border-radius: 12px !important;
+  background-color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+  }
 
   mat-card-content {
     display: flex;
@@ -52,44 +96,42 @@
     text-align: center;
 
     mat-icon {
-      font-size: 2rem;
-      width: 2rem;
-      height: 2rem;
-      margin-bottom: 10px;
+      font-size: 2.2rem;
+      width: 2.2rem;
+      height: 2.2rem;
+      margin-bottom: 12px;
     }
   }
 }
 
 .kpi-value {
-  font-size: 1.8rem;
+  font-size: 2rem;
   font-weight: 700;
   line-height: 1;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
+  color: #2c3e50;
 }
 
 .kpi-label {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   color: #7f8c8d;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
+/* Colores específicos de los iconos KPI */
 .kpi-total mat-icon { color: #3498db; }
-.kpi-total .kpi-value { color: #3498db; }
-
 .kpi-ingresos mat-icon { color: #2ecc71; }
-.kpi-ingresos .kpi-value { color: #2ecc71; }
-
 .kpi-pendientes mat-icon { color: #f39c12; }
-.kpi-pendientes .kpi-value { color: #f39c12; }
-
 .kpi-entregados mat-icon { color: #27ae60; }
-.kpi-entregados .kpi-value { color: #27ae60; }
 
 /* Charts */
 .charts-row {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(480px, 1fr));
-  gap: 20px;
-  margin-bottom: 20px;
+  gap: 24px;
+  margin-bottom: 24px;
 
   @media (max-width: 600px) {
     grid-template-columns: 1fr;
@@ -98,13 +140,21 @@
 
 .chart-card {
   border-radius: 12px !important;
+  background-color: #ffffff !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
 
   mat-card-header {
-    padding: 16px 16px 0;
+    padding: 20px 20px 0;
+    
+    mat-card-title {
+      font-size: 1.1rem;
+      color: #2c3e50;
+      font-weight: 600;
+    }
   }
 
   mat-card-content {
-    padding: 8px 8px 16px !important;
+    padding: 16px !important;
   }
 }
 
@@ -117,17 +167,20 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
-  padding: 60px;
+  gap: 16px;
+  padding: 80px 20px;
   color: #bdc3c7;
+  text-align: center;
 
   mat-icon {
-    font-size: 3rem;
-    width: 3rem;
-    height: 3rem;
+    font-size: 4rem;
+    width: 4rem;
+    height: 4rem;
   }
 
   p {
-    font-size: 1rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin: 0;
   }
 }

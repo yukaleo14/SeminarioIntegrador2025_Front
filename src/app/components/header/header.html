@@ -1,4 +1,4 @@
-<mat-toolbar class="theme-primary">
+<mat-toolbar class="glass-header">
 
   <a routerLink="/" class="logo-link">
     <img ngSrc="/logo_PedYa.png" alt="PedYa" width="120" height="36" priority class="logo" />
@@ -6,20 +6,20 @@
 
   <span class="example-spacer"></span>
 
-  <!-- CARRITO (nuevo) -->
   @if (isLoggedIn() && esComprador()) {
     <button mat-icon-button 
             [matBadge]="totalItems()"
+            matBadgeColor="warn"
             aria-label="Ver carrito"
             (click)="irAlCarrito()"
-            class="cart-button">
+            class="cart-button action-btn">
       <mat-icon class="material-symbols-outlined">shopping_cart</mat-icon>
     </button>
   }
 
-  <!-- Ícono de Usuario -->
   @if (this.isLoggedIn()) {
     <button mat-icon-button 
+            class="action-btn"
             aria-label="Menú de usuario" 
             [matMenuTriggerFor]="userMenu">
       <mat-icon class="material-symbols-outlined">
@@ -28,6 +28,7 @@
     </button>
   } @else {
     <a mat-icon-button 
+       class="action-btn"
        [routerLink]="'/login'" 
        aria-label="Iniciar sesión / registrarse">
       <mat-icon class="material-symbols-outlined">
@@ -38,9 +39,9 @@
 
 </mat-toolbar>
 
-<mat-menu #userMenu="matMenu">
+<mat-menu #userMenu="matMenu" class="glass-menu">
   <button mat-menu-item (click)="logout()">
-    <mat-icon class="material-symbols-outlined">logout</mat-icon>
+    <mat-icon class="material-symbols-outlined text-danger">logout</mat-icon>
     <span>Cerrar sesión</span>
   </button>
 </mat-menu>
