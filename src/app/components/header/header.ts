@@ -10,6 +10,8 @@ import { ConfirmarPedidoLauncher } from '../../services/confirmar-pedido-launche
 import { AuthService, User } from '../../services/auth-service';
 import { CarroService } from '../../services/carro-service';
 import { MatBadge } from '@angular/material/badge';
+import { Rol } from '../../models/Rol';
+
 
 @Component({
   selector: 'app-header',
@@ -25,16 +27,22 @@ export class Header {
   totalItems = computed(() => this.carroService.getTotalItems());
 
   isLoggedIn = signal(false);
+  esComprador = signal(false);
+
   constructor() {
     this._usersService.getCurrentUserProfile().pipe(
       takeUntilDestroyed()
     ).subscribe({
       next: (user: User) => {
+        if (user.rol === Rol.COMPRADOR) {
+          this.esComprador.set(true);
+        }
+       
         this.isLoggedIn.set(user != null);
       }
     });
   }
-
+  
   logout() {
     this._usersService.logout();
     this.isLoggedIn.set(false);

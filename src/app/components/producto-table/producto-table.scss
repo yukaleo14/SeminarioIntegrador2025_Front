@@ -4,6 +4,7 @@
   margin: 0 auto;
 }
 
+
 .table-card {
   border-radius: 16px !important;
   overflow: hidden;
@@ -30,8 +31,24 @@
 }
 
 /* Header row */
-.mat-mdc-header-row {
-  background: var(--mat-sys-surface-container);
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+
+  h1 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0 0 4px;
+  }
+
+  .subtitulo {
+    color: #7f8c8d;
+    margin: 0;
+    font-size: 0.95rem;
+  }
 }
 
 .mat-mdc-header-cell {

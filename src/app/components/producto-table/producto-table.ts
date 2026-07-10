@@ -64,6 +64,10 @@ export class ProductoTableComponent implements OnInit, AfterViewInit {
     });
   }
 
+  goToHome() {
+    this.router.navigate(['/home']);
+  }
+
   openDialog(producto?: Producto): void {
     const dialogRef = this.dialog.open(ProductoDialogComponent, {
       width: '500px',

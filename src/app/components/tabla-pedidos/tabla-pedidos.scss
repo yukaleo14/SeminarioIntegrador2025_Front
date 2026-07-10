@@ -4,13 +4,24 @@
   margin: 0 auto;
 }
 
-.header {
+.page-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 25px;
-  flex-wrap: wrap;
-  gap: 15px;
+  gap: 12px;
+  margin-bottom: 28px;
+
+  h1 {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0 0 4px;
+  }
+
+  .subtitulo {
+    color: #7f8c8d;
+    margin: 0;
+    font-size: 0.95rem;
+  }
 }
 
 h2 {

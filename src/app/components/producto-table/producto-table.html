@@ -1,11 +1,17 @@
 <app-header></app-header>
 
-<div class="page-container">
-  <mat-card class="table-card">
-    <mat-card-header>
-      <mat-card-title>Mis Productos</mat-card-title>
-    </mat-card-header>
 
+<div class="page-container">
+
+  <div class="page-header">
+    <button mat-icon-button (click)="goToHome()" class="back-btn">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div>
+      <h1>Mis Productos</h1>
+    </div>
+  </div>
+  <mat-card class="table-card">    
     <mat-card-content>
       <table mat-table [dataSource]="dataSource" class="full-width">
 

@@ -7,7 +7,7 @@
   <span class="example-spacer"></span>
 
   <!-- CARRITO (nuevo) -->
-  @if (isLoggedIn()) {
+  @if (isLoggedIn() && esComprador()) {
     <button mat-icon-button 
             [matBadge]="totalItems()"
             aria-label="Ver carrito"

@@ -1,13 +1,17 @@
+<app-header></app-header>
 <div class="pedidos-container">
 
   <!-- Header con título y botón -->
-  <div class="header">
-    <h2>📋 Pedidos en Curso</h2>
-    <button class="btn btn-outline-primary btn-home" (click)="goToHome()">
-      <i class="bi bi-house-door"></i>
-      Volver al Inicio
+  <div class="page-header">
+    <button mat-icon-button (click)="goToHome()" class="back-btn">
+      <mat-icon>arrow_back</mat-icon>
     </button>
+    <div>
+      <h1>📋 Pedidos en Curso</h1>
+    </div>
   </div>
+  
+  
 
   <div class="table-responsive">
     <table class="table table-hover pedidos-table align-middle">
