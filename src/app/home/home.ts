@@ -67,6 +67,12 @@ export class Home implements OnInit, OnDestroy {
 
   private map?: L.Map;
 
+  // Nuevas variables para el repartidor
+  private repartidorUbicacion: [number, number] | null = null;
+  private repartidorMarker?: L.Marker;
+  private rutaPolilinea?: L.Polyline;
+  private clienteMarker?: L.Marker;
+
   // Usamos un setter para el ViewChild porque el elemento está dentro de un @if
   @ViewChild('mapEl') set mapElement(el: ElementRef<HTMLDivElement>) {
     if (el && !this.map && this.isRepartidor) {
@@ -130,6 +136,16 @@ export class Home implements OnInit, OnDestroy {
       attribution: '© OpenStreetMap',
     }).addTo(this.map);
 
+    this.repartidorUbicacion = [
+      VILLAMARIA[0] + (Math.random() - 0.5) * 0.04,
+      VILLAMARIA[1] + (Math.random() - 0.5) * 0.04
+    ];
+
+    this.repartidorMarker = L.marker(this.repartidorUbicacion, {
+      icon: this.pinIcon('#3498db') // Azul para diferenciarlo de las sucursales rojas
+    }).addTo(this.map);
+    this.repartidorMarker.bindTooltip('📍 Mi Ubicación', { direction: 'top' });
+
     // Obtenemos todas las sucursales para pintarlas
     this.sucursalService.findAll().subscribe({
       next: (sucursales) => {
@@ -186,16 +202,49 @@ export class Home implements OnInit, OnDestroy {
   }
 
 
-  cambiarEstado(pedido: Pedido, nuevoEstado: string) {
-      if (!nuevoEstado || pedido.estado?.nombre === nuevoEstado) return;
+  cambiarEstado(pedido: Pedido, nuevoEstado: string) {if (!nuevoEstado || pedido.estado?.nombre === nuevoEstado) return;
 
       this.pedidoService.actualizarEstado(pedido.id, nuevoEstado).subscribe({
         next: (pedidoActualizado) => {
           console.log(`Pedido ${pedido.numero} actualizado a estado ${nuevoEstado}`);
           
           this.pedidosPublicados.update(pedidosActuales => 
-            pedidosActuales.filter(p => p.id !== pedido.id)
+            pedidosActuales.map(p => 
+              p.id === pedido.id ? { ...p, estado: { ...p.estado, nombre: nuevoEstado, id: p.estado?.id ?? 0 } } : p
+            )
           );
+
+          // Lógica del mapa según el nuevo estado
+          if (nuevoEstado === 'ASIGNADO') {
+            this.trazarRutaASucursal();
+          } 
+          else if (nuevoEstado === 'ENRUTA') {
+            // VERIFICACIÓN: Si el pedido devuelto no trae la ruta anidada, buscamos el pedido completo
+            if (pedidoActualizado.ruta && pedidoActualizado.ruta.destino) {
+              this.mostrarUbicacionEntrega(pedidoActualizado);
+            } else {
+              console.log('El pedido actualizado no incluye los detalles de la ruta. Obteniendo pedido completo...');
+              
+              // Llamamos al endpoint que sabemos que sí trae toda la información (igual que en seguimiento)
+              this.pedidoService.findOne(pedido.id).subscribe({
+                next: (pedidoCompleto) => {
+                  this.mostrarUbicacionEntrega(pedidoCompleto);
+                },
+                error: (err) => {
+                  console.error('Error al obtener el pedido completo:', err);
+                  alert('No se pudo trazar la ruta porque no se encontraron los detalles del destino.');
+                }
+              });
+            }
+          } 
+          else if (nuevoEstado === 'ENTREGADO') {
+            // Limpieza al entregar
+            this.pedidosPublicados.update(pedidosActuales => 
+              pedidosActuales.filter(p => p.id !== pedido.id)
+            );
+            if (this.rutaPolilinea) this.map?.removeLayer(this.rutaPolilinea);
+            if (this.clienteMarker) this.map?.removeLayer(this.clienteMarker);
+          }
         },
         error: (err) => {
           console.error('Error al actualizar estado del pedido:', err);
@@ -203,5 +252,98 @@ export class Home implements OnInit, OnDestroy {
         }
       });
   }
+
+  private trazarRutaASucursal() {const sucursal = this.sucursalSeleccionada();
+    if (!sucursal || !this.repartidorUbicacion || !this.map) return;
+
+    const sucLat = sucursal.ubicacion?.posicion?.coordenadaX ?? sucursal.ubicacion?.coordenadaX;
+    const sucLng = sucursal.ubicacion?.posicion?.coordenadaY ?? sucursal.ubicacion?.coordenadaY;
+
+    if (sucLat != null && sucLng != null) {
+      // Trazar ruta azul (Repartidor -> Sucursal)
+      this.obtenerRutaYMostrar(
+        this.repartidorUbicacion, 
+        [sucLat, sucLng], 
+        '#3498db'
+      );
+    }
+  }
+
+  private obtenerRutaYMostrar(start: L.LatLngTuple, end: L.LatLngTuple, colorRuta: string): void {
+    const url = `https://router.project-osrm.org/route/v1/driving/${start[1]},${start[0]};${end[1]},${end[0]}?overview=full&geometries=geojson`;
+
+    fetch(url)
+      .then(response => {
+        if (!response.ok) throw new Error('Error en la respuesta de OSRM');
+        return response.json();
+      })
+      .then((data: any) => {
+        if (!this.map) return;
+
+        // Limpiar ruta anterior
+        if (this.rutaPolilinea) {
+          this.map.removeLayer(this.rutaPolilinea);
+        }
+
+        // Mapear coordenadas al formato Leaflet
+        const routeCoords = data.routes[0].geometry.coordinates.map(
+          (c: any): L.LatLngTuple => [c[1], c[0]]
+        );
+
+        // Dibujar la línea sólida sobre las calles
+        this.rutaPolilinea = L.polyline(routeCoords, { 
+          color: colorRuta, 
+          weight: 5 
+        }).addTo(this.map);
+
+        // Ajustar el zoom para ver la ruta completa
+        const bounds = L.latLngBounds(routeCoords);
+        this.map.fitBounds(bounds, { padding: [50, 50] });
+      })
+      .catch(err => console.error('Error obteniendo ruta OSRM:', err));
+  }
+
+  private mostrarUbicacionEntrega(pedido: Pedido) {if (!this.map) return;
+// Validación estricta: idéntica a la de cargarDatosPedido en seguimiento-pedido.ts
+    
+    if (!pedido?.ruta?.origen?.posicion || !pedido?.ruta?.destino?.posicion) {
+      console.error('El pedido no tiene ruta completa:', pedido);
+      alert('No se pudo cargar la ruta: Faltan las coordenadas de origen o destino.');
+      return;
+    }
+
+    // Extraemos las coordenadas tal cual lo hace seguimiento-pedido.ts
+    const coordsOrigen = pedido.ruta.origen.posicion;
+    const coordsDestino = pedido.ruta.destino.posicion;
+
+    const latOrigen = coordsOrigen.coordenadaX;
+    const lngOrigen = coordsOrigen.coordenadaY;
+    
+    const latDestino = coordsDestino.coordenadaX;
+    const lngDestino = coordsDestino.coordenadaY;
+
+    // Limpiar marcador del cliente anterior si existe
+    if (this.clienteMarker) {
+      this.map.removeLayer(this.clienteMarker);
+    }
+    
+    // Crear el Pin Verde del cliente (Destino)
+    this.clienteMarker = L.marker([latDestino, lngDestino], {
+      icon: this.pinIcon('#27ae60') 
+    }).addTo(this.map);
+    
+    // Mostramos la calle del destino o el nombre del comprador como respaldo
+    const textoDestino = pedido.ruta.destino.calle ?? pedido.comprador?.nombre ?? 'Cliente';
+    this.clienteMarker.bindTooltip(`🏠 Destino: ${textoDestino}`, { direction: 'top' });
+
+    // Trazar la ruta verde (Sucursal/Origen -> Cliente/Destino) usando las coordenadas de la base de datos
+    this.obtenerRutaYMostrar(
+      [latOrigen, lngOrigen], 
+      [latDestino, lngDestino], 
+      '#27ae60'
+    );
+  }
+
+  
   
 }
