@@ -1,5 +1,5 @@
 export enum Rol {
-    COMPRADOR= 'CLIENTE' ,
+    COMPRADOR= 'COMPRADOR', 
     EMPRESA= 'EMPRESA',
     REPARTIDOR= 'REPARTIDOR',
 }
