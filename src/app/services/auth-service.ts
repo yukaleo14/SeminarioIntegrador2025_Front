@@ -223,4 +223,10 @@ export class AuthService {
   isEmpresa(): boolean {
     return this.hasRole(Rol.EMPRESA);
   }
+
+  isComprador(): boolean {
+    return this.hasRole(Rol.COMPRADOR);
+  }
+
+
 }
