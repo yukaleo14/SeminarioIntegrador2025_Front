@@ -61,7 +61,7 @@ export class Home implements OnInit, OnDestroy {
   
   // Nuevas señales para la vista del Repartidor
   sucursalSeleccionada = signal<Sucursal | null>(null);
-  pedidosPreparacion = signal<Pedido[]>([]);
+  pedidosPublicados = signal<Pedido[]>([]);
 
   totalItemsCarrito = computed(() => this.carroService.getTotalItems());
 
@@ -164,10 +164,10 @@ export class Home implements OnInit, OnDestroy {
     // Aquí filtramos asumiendo que un método te devuelve los pedidos a repartir:
     this.pedidoService.findBySucursal(sucursal.empresa?.id ?? 0).subscribe({
       next: (pedidos) => {
-        const enPreparacion = pedidos.filter(p => 
-          p.estado?.nombre === 'ENPREPARACION'
+        const publicado = pedidos.filter(p => 
+          p.estado?.nombre === 'PUBLICADO'
         );
-        this.pedidosPreparacion.set(enPreparacion);
+        this.pedidosPublicados.set(publicado);
       },
       error: console.error
     });
@@ -193,7 +193,7 @@ export class Home implements OnInit, OnDestroy {
         next: (pedidoActualizado) => {
           console.log(`Pedido ${pedido.numero} actualizado a estado ${nuevoEstado}`);
           
-          this.pedidosPreparacion.update(pedidosActuales => 
+          this.pedidosPublicados.update(pedidosActuales => 
             pedidosActuales.filter(p => p.id !== pedido.id)
           );
         },

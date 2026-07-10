@@ -82,8 +82,8 @@
         @if (sucursalSeleccionada(); as sucursal) {
           <h3 class="sucursal-title">Sucursal: {{ sucursal.nombre }}</h3>
           
-          @if (pedidosPreparacion().length > 0) {
-            <table mat-table [dataSource]="pedidosPreparacion()" class="mat-elevation-z2 w-100">
+          @if (pedidosPublicados().length > 0) {
+            <table mat-table [dataSource]="pedidosPublicados()" class="mat-elevation-z2 w-100">
               
               <ng-container matColumnDef="numero">
                 <th mat-header-cell *matHeaderCellDef> Pedido </th>
