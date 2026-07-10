@@ -12,6 +12,10 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectChange } from '@angular/material/select';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { DetallePedidoDialogComponent } from '../detalle-pedido-dialog/detalle-pedido-dialog';
+import { Header } from '../header/header';
+
 
 const ESTADOS_PEDIDO = [
   'CREADO',
@@ -46,6 +50,8 @@ const TRANSICIONES_PERMITIDAS: Record<string, string[]> = {
     MatChipsModule,
     MatIconModule,
     MatButtonModule,
+    MatDialogModule,
+    Header
   ],
   templateUrl: './tabla-pedidos.html',
   styleUrl: './tabla-pedidos.scss'
@@ -63,7 +69,8 @@ export class TablaPedidos implements OnInit, OnDestroy {
     private socketService: SocketService,
     private authService: AuthService,
     private pedidoService: PedidoService,
-    private router: Router
+    private router: Router,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -184,9 +191,14 @@ export class TablaPedidos implements OnInit, OnDestroy {
   }
 
   verDetalle(pedido: Pedido) {
-    console.log('Ver detalle del pedido:', pedido);
-  // Aquí puedes abrir un modal o navegar a otra página
-  // this.router.navigate(['/pedidos', pedido.id]);
+    console.log('Abriendo detalle del pedido:', pedido);
+    
+    this.dialog.open(DetallePedidoDialogComponent, {
+      width: '450px', // Puedes ajustar el ancho de la ventanita
+      data: pedido,   // Le pasamos la información del pedido al modal
+      autoFocus: false
+    });
+    
   }
 
 
