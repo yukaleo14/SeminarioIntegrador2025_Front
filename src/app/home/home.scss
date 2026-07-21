@@ -2,6 +2,28 @@
    Fondo Global de la Pantalla
    Usamos :host para aplicarlo a todo el componente Home
    ========================================================================== */
+
+   .header-repartidor {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap; /* Para que se adapte bien en pantallas de celulares */
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.header-text {
+  flex: 1; /* Permite que el texto tome el espacio disponible */
+}
+
+.btn-rendimiento {
+  padding: 0 24px;
+  height: 48px;
+  border-radius: 8px; /* Le da un estilo de tarjeta más moderno */
+  font-size: 16px;
+  font-weight: 500;
+}
+
 :host {
   display: block;
   min-height: 100vh;

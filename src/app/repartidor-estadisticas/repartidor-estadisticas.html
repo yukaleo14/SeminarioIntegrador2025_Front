@@ -1,0 +1,123 @@
+<app-header></app-header>
+
+<div class="estadisticas-container">
+  <!-- Encabezado -->
+  <div class="page-header">
+    <button mat-icon-button routerLink="/home" class="back-btn">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div class="header-text">
+      <h1>Mi Rendimiento</h1>
+      <p class="subtitulo">Resumen de tu actividad como repartidor</p>
+    </div>
+  </div>
+
+  @if (cargando()) {
+    <div class="loading-center">
+      <mat-spinner diameter="48"></mat-spinner>
+      <p>Cargando tus estadísticas...</p>
+    </div>
+  } @else {
+    <!-- KPIs del Repartidor -->
+    <div class="kpi-grid">
+      <mat-card class="kpi-card kpi-total">
+        <mat-card-content>
+          <div class="kpi-icon-wrapper"><mat-icon>sports_motorsports</mat-icon></div>
+          <div class="kpi-info">
+            <div class="kpi-value">{{ totalPedidos() }}</div>
+            <div class="kpi-label">Total Histórico</div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="kpi-card kpi-entregados">
+        <mat-card-content>
+          <div class="kpi-icon-wrapper success"><mat-icon>check_circle</mat-icon></div>
+          <div class="kpi-info">
+            <div class="kpi-value">{{ pedidosEntregados() }}</div>
+            <div class="kpi-label">Pedidos Entregados</div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="kpi-card kpi-pendientes">
+        <mat-card-content>
+          <div class="kpi-icon-wrapper warning"><mat-icon>navigation</mat-icon></div>
+          <div class="kpi-info">
+            <div class="kpi-value">{{ pedidosEnCurso() }}</div>
+            <div class="kpi-label">En Curso</div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    @if (pedidos().length === 0) {
+      <div class="empty-state">
+        <mat-icon class="empty-icon">inbox</mat-icon>
+        <h3>Sin actividad</h3>
+        <p>Aún no has tomado ningún pedido. ¡Empieza a repartir para ver tus estadísticas!</p>
+      </div>
+    } @else {
+      <!-- Gráficos -->
+      <div class="charts-row">
+        <mat-card class="chart-card">
+          <mat-card-header>
+            <mat-card-title>Distribución de Estados</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div #chartEstados class="chart-container"></div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="chart-card">
+          <mat-card-header>
+            <mat-card-title>Entregas por Día (Últimos 14 días)</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div #chartDiario class="chart-container"></div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Historial Detallado -->
+      <mat-card class="historial-card">
+        <mat-card-header>
+          <mat-card-title>Historial de Pedidos</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="table-responsive">
+            <table mat-table [dataSource]="historialPedidos()" class="w-100">
+              
+              <ng-container matColumnDef="numero">
+                <th mat-header-cell *matHeaderCellDef> Pedido </th>
+                <td mat-cell *matCellDef="let p" class="fw-bold"> #{{ p.numero }} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="fecha">
+                <th mat-header-cell *matHeaderCellDef> Fecha </th>
+                <td mat-cell *matCellDef="let p" class="text-muted"> {{ p.fechaHora | date:'dd/MM/yyyy HH:mm' }} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="monto">
+                <th mat-header-cell *matHeaderCellDef> Total </th>
+                <td mat-cell *matCellDef="let p" class="monto-text"> {{ p.montoTotal | currency:'$':'symbol':'1.0-0' }} </td>
+              </ng-container>
+
+              <ng-container matColumnDef="estado">
+                <th mat-header-cell *matHeaderCellDef> Estado </th>
+                <td mat-cell *matCellDef="let p">
+                  <span class="estado-badge" [class]="obtenerClaseEstado(p.estado?.nombre)">
+                    {{ p.estado?.nombre }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="['numero', 'fecha', 'monto', 'estado']"></tr>
+              <tr mat-row *matRowDef="let row; columns: ['numero', 'fecha', 'monto', 'estado'];" class="hover-row"></tr>
+            </table>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    }
+  }
+</div>

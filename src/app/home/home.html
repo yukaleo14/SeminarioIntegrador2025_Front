@@ -71,9 +71,19 @@
 <!-- Vista REPARTIDOR -->
 @if (isRepartidor) {
   <div class="empresa-home">
-    <div class="empresa-header">
-      <h2>Bienvenido, {{ nombreUsuario }}</h2>
-      <p class="subtitulo">Seleccioná una sucursal en el mapa para ver los pedidos listos para retirar.</p>
+    
+    <!-- Encabezado modificado para contener el botón -->
+    <div class="empresa-header header-repartidor">
+      <div class="header-text">
+        <h2>Bienvenido, {{ nombreUsuario }}</h2>
+        <p class="subtitulo">Seleccioná una sucursal en el mapa para ver los pedidos listos para retirar.</p>
+      </div>
+      
+      <!-- Botón integrado a la derecha -->
+      <button mat-flat-button color="primary" class="btn-rendimiento" routerLink="/estadisticasRepartidor">
+        <mat-icon>bar_chart</mat-icon>
+        Ver mi rendimiento
+      </button>
     </div>
     
     <div class="repartidor-layout">

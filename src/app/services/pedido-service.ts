@@ -111,6 +111,10 @@ export class PedidoService {
     return this.http.get<Pedido[]>(`${this.apiUrl}/disponibles`);
   }
 
+  findByRepartidor(repartidorId: number): Observable<Pedido[]> {
+    return this.http.get<Pedido[]>(`${this.apiUrl}/repartidor/${repartidorId}`);
+  }
+
   findMisPedidos(): Observable<Pedido[]> {
     return this.http.get<Pedido[]>(`${this.apiUrl}/repartidor/me`);
   }

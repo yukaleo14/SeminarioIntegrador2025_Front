@@ -13,6 +13,7 @@ import { ProductoTableComponent } from './components/producto-table/producto-tab
 import {Chat} from './components/chat/chat';
 import { RepartidorComponent } from './repartidor/repartidor';
 import { EmpresaEstadisticas } from './empresa-estadisticas/empresa-estadisticas';
+import { RepartidorEstadisticas } from './repartidor-estadisticas/repartidor-estadisticas' ;
 
 export const routes: Routes = [
     {path:'home' ,component: Home},
@@ -25,6 +26,7 @@ export const routes: Routes = [
     {path:'seleccion-ubicacion' , component: SeleccionUbicaciones},
     {path: 'tabla-pedidos', component: TablaPedidos},
     {path: 'categoria/:idCategoria/productos', component: ProductosPorCategoria},
+    {path: 'estadisticasRepartidor', component: RepartidorEstadisticas},
 
     {path:'producto',component: ProductoTableComponent},
     {path:'chat',component: Chat},

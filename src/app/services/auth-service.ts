@@ -8,6 +8,7 @@ import {Empresa} from '../models/Empresa';
 import {Comprador} from '../models/Comprador';
 import {Repartidor} from '../models/Repartidor';
 import { CompradorService } from './comprador-service';
+import { RepartidorService } from './repartidor-service';
 
 export interface LoginDto {
   mail: string;
@@ -73,6 +74,8 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<User | null>(this.getUserFromToken());
   public currentUser$ = this.currentUserSubject.asObservable();
   private compradorService = inject(CompradorService);
+  private repartidorService = inject(RepartidorService);
+
 
   constructor(
     private http: HttpClient,
@@ -169,7 +172,20 @@ export class AuthService {
     map((comprador) => comprador?.id ?? null),
     catchError(() => of(null))
   );
-}
+  }
+
+  getCurrentRepartidorId(): Observable<number | null> {
+    const userId = this.getCurrentUserId();
+  
+  if (!userId) {
+    return of(null);
+  }
+
+  return this.repartidorService.getRepartidorIdByUserId(userId).pipe(
+    map((repartidor) => repartidor?.id ?? null),
+    catchError(() => of(null))
+  );
+  }
 
   hasRole(role: Rol): boolean {
     const user = this.getCurrentUser();

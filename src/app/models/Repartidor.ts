@@ -1,5 +1,6 @@
 
 export interface Repartidor {
+  id: number;
   nombre: string;
   apellido: string;
   cuitCuil: string;
