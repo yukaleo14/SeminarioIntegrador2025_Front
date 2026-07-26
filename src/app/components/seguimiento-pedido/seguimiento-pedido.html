@@ -85,3 +85,8 @@
     </div>
   </div>
 }
+
+<!-- Chat flotante -->
+@if (chatDisponible) {
+  <app-chat [pedidoId]="pedidoId"></app-chat>
+}

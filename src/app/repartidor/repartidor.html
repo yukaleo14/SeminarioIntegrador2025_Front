@@ -185,14 +185,19 @@
 
               <mat-card-actions>
                 @if (pedido.estado?.nombre === 'ASIGNADO') {
-                  <button mat-flat-button color="accent" class="full-btn"
+                  <button mat-stroked-button color="primary" class="half-btn"
+                          (click)="toggleChat(pedido.id)">
+                    <mat-icon>chat_bubble_outline</mat-icon>
+                    Chat
+                  </button>
+                  <button mat-flat-button color="accent" class="half-btn"
                           (click)="iniciarEntrega(pedido)">
                     <mat-icon>navigation</mat-icon>
                     Iniciar entrega
                   </button>
                 } @else if (pedido.estado?.nombre === 'ENRUTA') {
                   <button mat-stroked-button color="primary" class="half-btn"
-                          (click)="irAChat(pedido.id)">
+                          (click)="toggleChat(pedido.id)">
                     <mat-icon>chat_bubble_outline</mat-icon>
                     Chat
                   </button>
@@ -215,4 +220,9 @@
     </mat-tab>
 
   </mat-tab-group>
+
+  <!-- Chat flotante -->
+  @if (chatPedidoId(); as pid) {
+    <app-chat [pedidoId]="pid"></app-chat>
+  }
 </div>

@@ -13,6 +13,7 @@ import { CarruselCategorias } from '../components/carrusel-categorias/carrusel-c
 import { Header } from '../components/header/header';
 import { ListadoSucursales } from '../components/listado-sucursales/listado-sucursales';
 import { ProductoCard } from '../components/producto-card/producto-card';
+import { Chat } from '../components/chat/chat';
 import { Producto } from '../models/Producto';
 import { Rol } from '../models/Rol';
 import { Sucursal } from '../models/Sucursal';
@@ -21,8 +22,8 @@ import { CarroService } from '../services/carro-service';
 import { ConfirmarPedidoLauncher } from '../services/confirmar-pedido-launcher';
 import { Pedido, PedidoService } from '../services/pedido-service';
 import { ProductoService } from '../services/producto-service';
-import { SucursalService } from '../services/sucursal-service'; // <-- Agregado
-import { CurrencyPipe } from '@angular/common'; // <-- Agregado para formatear montos
+import { SucursalService } from '../services/sucursal-service';
+import { CurrencyPipe } from '@angular/common';
 
 const VILLAMARIA: [number, number] = [-32.41378, -63.25237];
 
@@ -41,8 +42,9 @@ const VILLAMARIA: [number, number] = [-32.41378, -63.25237];
     MatIconModule,
     MatBadgeModule,
     MatChipsModule,
-    MatTableModule, // <-- Registramos el módulo de tabla
-    CurrencyPipe
+    MatTableModule,
+    CurrencyPipe,
+    Chat,
   ],
   templateUrl: './home.html',
   styleUrl: './home.scss',
@@ -59,9 +61,10 @@ export class Home implements OnInit, OnDestroy {
   productos = signal<Producto[]>([]);
   pedidosPendientes = signal<Pedido[]>([]);
   
-  // Nuevas señales para la vista del Repartidor
   sucursalSeleccionada = signal<Sucursal | null>(null);
   pedidosPublicados = signal<Pedido[]>([]);
+  pedidoTomado = signal<Pedido | null>(null);
+  chatPedidoId = signal<number | null>(null);
 
   totalItemsCarrito = computed(() => this.carroService.getTotalItems());
 
@@ -96,6 +99,10 @@ export class Home implements OnInit, OnDestroy {
         },
         error: console.error,
       });
+    }
+
+    if (this.isRepartidor) {
+      this.cargarPedidoTomado();
     }
   }
 
@@ -214,18 +221,19 @@ export class Home implements OnInit, OnDestroy {
             )
           );
 
-          // Lógica del mapa según el nuevo estado
           if (nuevoEstado === 'ASIGNADO') {
+            const pedidoGuardado = { ...pedido, estado: { ...pedido.estado, nombre: 'ASIGNADO', id: pedido.estado?.id ?? 0 } } as Pedido;
+            this.guardarPedidoTomado(pedidoGuardado);
             this.trazarRutaASucursal();
           } 
           else if (nuevoEstado === 'ENRUTA') {
-            // VERIFICACIÓN: Si el pedido devuelto no trae la ruta anidada, buscamos el pedido completo
+            const pedidoActualizadoLocal = { ...pedido, estado: { ...pedido.estado, nombre: 'ENRUTA', id: pedido.estado?.id ?? 0 } } as Pedido;
+            this.guardarPedidoTomado(pedidoActualizadoLocal);
             if (pedidoActualizado.ruta && pedidoActualizado.ruta.destino) {
               this.mostrarUbicacionEntrega(pedidoActualizado);
             } else {
               console.log('El pedido actualizado no incluye los detalles de la ruta. Obteniendo pedido completo...');
               
-              // Llamamos al endpoint que sabemos que sí trae toda la información (igual que en seguimiento)
               this.pedidoService.findOne(pedido.id).subscribe({
                 next: (pedidoCompleto) => {
                   this.mostrarUbicacionEntrega(pedidoCompleto);
@@ -238,7 +246,7 @@ export class Home implements OnInit, OnDestroy {
             }
           } 
           else if (nuevoEstado === 'ENTREGADO') {
-            // Limpieza al entregar
+            this.limpiarPedidoTomado();
             this.pedidosPublicados.update(pedidosActuales => 
               pedidosActuales.filter(p => p.id !== pedido.id)
             );
@@ -251,6 +259,43 @@ export class Home implements OnInit, OnDestroy {
           alert('Error al actualizar el estado del pedido. Por favor, intenta nuevamente.');
         }
       });
+  }
+
+  // Abre o cierra el chat flotante para el pedido indicado.
+  toggleChat(pedidoId: number) {
+    if (this.chatPedidoId() === pedidoId) {
+      this.chatPedidoId.set(null);
+    } else {
+      this.chatPedidoId.set(pedidoId);
+    }
+  }
+
+  private static readonly STORAGE_KEY_PEDIDO_TOMADO = 'repartidor-pedido-tomado';
+
+  private cargarPedidoTomado(): void {
+    try {
+      const raw = localStorage.getItem(Home.STORAGE_KEY_PEDIDO_TOMADO);
+      if (raw) {
+        const pedido: Pedido = JSON.parse(raw);
+        if (pedido?.id && pedido.estado?.nombre !== 'ENTREGADO' && pedido.estado?.nombre !== 'CANCELADO') {
+          this.pedidoTomado.set(pedido);
+        } else {
+          localStorage.removeItem(Home.STORAGE_KEY_PEDIDO_TOMADO);
+        }
+      }
+    } catch {
+      localStorage.removeItem(Home.STORAGE_KEY_PEDIDO_TOMADO);
+    }
+  }
+
+  private guardarPedidoTomado(pedido: Pedido): void {
+    this.pedidoTomado.set(pedido);
+    localStorage.setItem(Home.STORAGE_KEY_PEDIDO_TOMADO, JSON.stringify(pedido));
+  }
+
+  private limpiarPedidoTomado(): void {
+    this.pedidoTomado.set(null);
+    localStorage.removeItem(Home.STORAGE_KEY_PEDIDO_TOMADO);
   }
 
   private trazarRutaASucursal() {const sucursal = this.sucursalSeleccionada();

@@ -110,11 +110,19 @@
                 <td mat-cell *matCellDef="let p">
                   @if (p.estado?.nombre === 'PUBLICADO') {
                     <button mat-flat-button color="primary" (click)="cambiarEstado(p, 'ASIGNADO')">Tomar</button>
-                  } 
+                  }
                   @else if (p.estado?.nombre === 'ASIGNADO') {
+                    <button mat-stroked-button color="primary" (click)="toggleChat(p.id)">
+                      <mat-icon>chat_bubble_outline</mat-icon>
+                      Chat
+                    </button>
                     <button mat-flat-button color="accent" (click)="cambiarEstado(p, 'ENRUTA')">En Ruta</button>
-                  } 
+                  }
                   @else if (p.estado?.nombre === 'ENRUTA' || p.estado?.nombre === 'EN RUTA') {
+                    <button mat-stroked-button color="primary" (click)="toggleChat(p.id)">
+                      <mat-icon>chat_bubble_outline</mat-icon>
+                      Chat
+                    </button>
                     <button mat-flat-button color="warn" (click)="cambiarEstado(p, 'ENTREGADO')">Entregado</button>
                   }
                 </td>
@@ -127,6 +135,37 @@
             <div class="empty-state">
               <mat-icon>check_circle_outline</mat-icon>
               <p>No hay pedidos en preparación para esta sucursal.</p>
+            </div>
+          }
+
+          @if (pedidoTomado(); as pedido) {
+            <div class="pedido-tomado-card">
+              <div class="pedido-tomado-header">
+                <mat-icon [class]="pedido.estado?.nombre === 'ENRUTA' ? 'status-enruta' : 'status-asignado'">
+                  {{ pedido.estado?.nombre === 'ENRUTA' ? 'local_shipping' : 'assignment' }}
+                </mat-icon>
+                <div>
+                  <h4>Pedido #{{ pedido.numero }} — {{ pedido.estado?.nombre === 'ENRUTA' ? 'En ruta' : 'Tomado' }}</h4>
+                  <p class="pedido-tomado-info">{{ pedido.comprador?.nombre || 'Cliente' }} · ${{ (pedido.montoTotal / 100).toFixed(2) }}</p>
+                </div>
+              </div>
+              <div class="pedido-tomado-actions">
+                <button mat-stroked-button color="primary" (click)="toggleChat(pedido.id)">
+                  <mat-icon>chat_bubble_outline</mat-icon>
+                  Chat
+                </button>
+                @if (pedido.estado?.nombre === 'ASIGNADO') {
+                  <button mat-flat-button color="accent" (click)="cambiarEstado(pedido, 'ENRUTA')">
+                    <mat-icon>navigation</mat-icon>
+                    Iniciar entrega
+                  </button>
+                } @else if (pedido.estado?.nombre === 'ENRUTA') {
+                  <button mat-flat-button color="primary" (click)="cambiarEstado(pedido, 'ENTREGADO')">
+                    <mat-icon>check_circle</mat-icon>
+                    Entregar
+                  </button>
+                }
+              </div>
             </div>
           }
         } @else {
@@ -174,4 +213,9 @@
       <span class="fab-badge">{{ totalItemsCarrito() }}</span>
     </button>
   }
+}
+
+<!-- Chat flotante repartidor -->
+@if (chatPedidoId(); as pid) {
+  <app-chat [pedidoId]="pid"></app-chat>
 }

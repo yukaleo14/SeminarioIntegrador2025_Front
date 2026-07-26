@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, switchMap, of, catchError } from 'rxjs';
 import * as L from 'leaflet';
 
 import { MatTabsModule } from '@angular/material/tabs';
@@ -22,6 +22,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { AuthService } from '../services/auth-service';
 import { PedidoService, Pedido } from '../services/pedido-service';
 import { SocketService } from '../services/socket.service';
+import { Chat } from '../components/chat/chat';
 import { Rol } from '../models/Rol';
 
 interface PosicionGps {
@@ -58,6 +59,7 @@ interface PedidoConRuta extends Pedido {
     MatProgressSpinnerModule,
     MatChipsModule,
     MatDividerModule,
+    Chat,
   ],
   templateUrl: './repartidor.html',
   styleUrl: './repartidor.scss',
@@ -69,11 +71,14 @@ export class RepartidorComponent implements OnInit, OnDestroy {
   isLoadingMisPedidos = signal(true);
   activeDeliveryId = signal<number | null>(null);
   gpsActivo = signal(false);
+  chatPedidoId = signal<number | null>(null);
 
   private map: L.Map | null = null;
   private repartidorMarker: L.Marker | null = null;
   private gpsWatchId: number | null = null;
   private destroy$ = new Subject<void>();
+  private repartidorId: number | null = null;
+  private static readonly STORAGE_KEY = 'repartidor-mis-pedidos';
 
   constructor(
     private authService: AuthService,
@@ -91,8 +96,44 @@ export class RepartidorComponent implements OnInit, OnDestroy {
     }
 
     this.cargarDisponibles();
-    this.cargarMisPedidos();
     this.conectarSocket();
+
+    this.authService.getCurrentRepartidorId().pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (id) => {
+        this.repartidorId = id;
+        this.cargarMisPedidos();
+      },
+      error: () => {
+        this.cargarMisPedidos();
+      }
+    });
+  }
+
+  private obtenerPedidosLocales(): PedidoConRuta[] {
+    try {
+      const raw = localStorage.getItem(RepartidorComponent.STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  private guardarPedidoLocal(pedido: PedidoConRuta): void {
+    const pedidos = this.obtenerPedidosLocales();
+    const idx = pedidos.findIndex(p => p.id === pedido.id);
+    if (idx >= 0) {
+      pedidos[idx] = pedido;
+    } else {
+      pedidos.unshift(pedido);
+    }
+    localStorage.setItem(RepartidorComponent.STORAGE_KEY, JSON.stringify(pedidos));
+  }
+
+  private eliminarPedidoLocal(pedidoId: number): void {
+    const pedidos = this.obtenerPedidosLocales().filter(p => p.id !== pedidoId);
+    localStorage.setItem(RepartidorComponent.STORAGE_KEY, JSON.stringify(pedidos));
   }
 
   cargarDisponibles(): void {
@@ -111,28 +152,54 @@ export class RepartidorComponent implements OnInit, OnDestroy {
 
   private cargarMisPedidos(): void {
     this.isLoadingMisPedidos.set(true);
-    this.pedidoService.findMisPedidos().subscribe({
+
+    const pedidosLocales = this.obtenerPedidosLocales();
+
+    const request$ = this.repartidorId
+      ? this.pedidoService.findByRepartidor(this.repartidorId)
+      : this.pedidoService.findMisPedidos();
+
+    request$.pipe(
+      catchError(() => {
+        return this.repartidorId
+          ? this.pedidoService.findMisPedidos()
+          : of([]);
+      })
+    ).subscribe({
       next: (pedidos) => {
-        const misP = pedidos as PedidoConRuta[];
-        this.misPedidos.set(misP);
+        const pedidosBackend = pedidos as PedidoConRuta[];
+        const idsBackend = new Set(pedidosBackend.map(p => p.id));
+        const soloLocal = pedidosLocales.filter(p => !idsBackend.has(p.id));
+        const todos = [...pedidosBackend, ...soloLocal];
+
+        todos.forEach(p => this.guardarPedidoLocal(p));
+        this.misPedidos.set(todos);
         this.isLoadingMisPedidos.set(false);
 
-        const enRuta = misP.find((p) => p.estado?.nombre === 'ENRUTA');
-        if (enRuta) {
-          this.activeDeliveryId.set(enRuta.id);
-          this.socketService.connect();
-          this.socketService.joinPedidoRoom(enRuta.id);
-          setTimeout(() => {
-            this.initMap(enRuta);
-            this.iniciarGps(enRuta.id);
-          }, 300);
-        }
+        this.onMisPedidosCargados(todos);
       },
       error: () => {
+        if (pedidosLocales.length > 0) {
+          this.misPedidos.set(pedidosLocales);
+          this.onMisPedidosCargados(pedidosLocales);
+        }
         this.isLoadingMisPedidos.set(false);
         this.snackBar.open('Error al cargar tus pedidos', 'Cerrar', { duration: 3000 });
       },
     });
+  }
+
+  private onMisPedidosCargados(pedidos: PedidoConRuta[]): void {
+    const enRuta = pedidos.find((p) => p.estado?.nombre === 'ENRUTA');
+    if (enRuta) {
+      this.activeDeliveryId.set(enRuta.id);
+      this.socketService.connect();
+      this.socketService.joinPedidoRoom(enRuta.id);
+      setTimeout(() => {
+        this.initMap(enRuta);
+        this.iniciarGps(enRuta.id);
+      }, 300);
+    }
   }
 
   private conectarSocket(): void {
@@ -141,19 +208,42 @@ export class RepartidorComponent implements OnInit, OnDestroy {
       .onPedidoActualizado()
       .pipe(takeUntil(this.destroy$))
       .subscribe((actualizado: Pedido) => {
-        this.misPedidos.update((pedidos) =>
-          pedidos.map((p) =>
-            p.id === actualizado.id ? { ...p, estado: actualizado.estado } : p,
-          ),
-        );
+        const existente = this.misPedidos().find(p => p.id === actualizado.id);
+        if (existente) {
+          this.misPedidos.update((pedidos) =>
+            pedidos.map((p) =>
+              p.id === actualizado.id ? { ...p, estado: actualizado.estado } : p,
+            ),
+          );
+        } else if (actualizado.repartidor?.id) {
+          this.misPedidos.update((pedidos) => [actualizado as PedidoConRuta, ...pedidos]);
+        }
+
+        if (actualizado.repartidor?.id && !this.repartidorId) {
+          this.repartidorId = actualizado.repartidor.id;
+        }
       });
+
+    this.socketService.onPedidoCreado().pipe(
+      takeUntil(this.destroy$)
+    ).subscribe((nuevo: Pedido) => {
+      if (nuevo.repartidor?.id) {
+        const yaExiste = this.misPedidos().find(p => p.id === nuevo.id);
+        if (!yaExiste) {
+          this.misPedidos.update((pedidos) => [nuevo as PedidoConRuta, ...pedidos]);
+        }
+      }
+    });
   }
 
   tomarPedido(pedido: PedidoConRuta): void {
     this.pedidoService.tomarPedido(pedido.id).subscribe({
       next: (tomado) => {
+        const tomadoRuta = tomado as PedidoConRuta;
         this.disponibles.update((p) => p.filter((x) => x.id !== pedido.id));
-        this.misPedidos.update((p) => [tomado as PedidoConRuta, ...p]);
+        this.misPedidos.update((p) => [tomadoRuta, ...p]);
+        this.guardarPedidoLocal(tomadoRuta);
+        this.chatPedidoId.set(pedido.id);
         this.snackBar.open(`Pedido #${pedido.numero} tomado`, 'OK', { duration: 3000 });
       },
       error: (err) => {
@@ -166,11 +256,13 @@ export class RepartidorComponent implements OnInit, OnDestroy {
   iniciarEntrega(pedido: PedidoConRuta): void {
     this.pedidoService.actualizarEstado(pedido.id, 'ENRUTA').subscribe({
       next: (actualizado) => {
+        const actualizadoRuta = { ...pedido, estado: actualizado.estado } as PedidoConRuta;
         this.misPedidos.update((pedidos) =>
           pedidos.map((p) =>
-            p.id === actualizado.id ? { ...p, estado: actualizado.estado } : p,
+            p.id === actualizado.id ? actualizadoRuta : p,
           ),
         );
+        this.guardarPedidoLocal(actualizadoRuta);
         this.activeDeliveryId.set(pedido.id);
         this.socketService.joinPedidoRoom(pedido.id);
         setTimeout(() => {
@@ -189,10 +281,9 @@ export class RepartidorComponent implements OnInit, OnDestroy {
     this.pedidoService.actualizarEstado(pedido.id, 'ENTREGADO').subscribe({
       next: (actualizado) => {
         this.misPedidos.update((pedidos) =>
-          pedidos.map((p) =>
-            p.id === actualizado.id ? { ...p, estado: actualizado.estado } : p,
-          ),
+          pedidos.filter((p) => p.id !== actualizado.id),
         );
+        this.eliminarPedidoLocal(pedido.id);
         this.activeDeliveryId.set(null);
         this.detenerGps();
         this.destroyMap();
@@ -204,8 +295,12 @@ export class RepartidorComponent implements OnInit, OnDestroy {
     });
   }
 
-  irAChat(pedidoId: number): void {
-    this.router.navigate(['/chat'], { queryParams: { pedidoId } });
+  toggleChat(pedidoId: number) {
+    if (this.chatPedidoId() === pedidoId) {
+      this.chatPedidoId.set(null);
+    } else {
+      this.chatPedidoId.set(pedidoId);
+    }
   }
 
   isActiveDelivery(pedidoId: number): boolean {

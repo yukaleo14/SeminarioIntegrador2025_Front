@@ -1,16 +1,19 @@
-import { AfterViewInit, Component, OnDestroy, OnInit, ChangeDetectorRef } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit, ChangeDetectorRef, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import * as L from 'leaflet';
 import { Subject, takeUntil } from 'rxjs';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SocketService } from '../../services/socket.service';
 import { PedidoService } from '../../services/pedido-service';
 import { CommonModule } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { Chat } from '../chat/chat';
 
 @Component({
   selector: 'app-seguimiento-pedido',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MatButtonModule, MatIconModule, Chat],
   templateUrl: './seguimiento-pedido.html',
   styleUrl: './seguimiento-pedido.scss'
 })
@@ -28,6 +31,7 @@ export class SeguimientoPedido implements OnInit, AfterViewInit, OnDestroy {
   tiempoRestante = 0;
   datosPedido: any = null;
   estadoActual: string = '';
+  chatAbierto = signal(false);
 
   private readonly ESTADO_ORDER = [
     'CREADO', 'ENPREPARACION', 'ASIGNADO', 'ENRUTA', 'ENTREGADO',
@@ -46,15 +50,24 @@ export class SeguimientoPedido implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private destroy$ = new Subject<void>();
-  private pedidoId!: number;
+  pedidoId!: number;
 
   constructor(
     private http: HttpClient,
     private socketService: SocketService,
     private route: ActivatedRoute,
     private pedidoService: PedidoService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router: Router
   ) {}
+
+  get chatDisponible(): boolean {
+    return this.estadoActual === 'ASIGNADO' || this.estadoActual === 'ENRUTA';
+  }
+
+  toggleChat() {
+    this.chatAbierto.update(v => !v);
+  }
 
   ngOnInit(): void {
     this.pedidoId = Number(this.route.snapshot.paramMap.get('pedidoId'));

@@ -351,3 +351,51 @@
     font-weight: bold;
   }
 }
+
+/* Pedido tomado por el repartidor */
+.pedido-tomado-card {
+  margin-top: 24px;
+  border: 2px solid #1976d2;
+  border-radius: 12px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #e3f2fd 0%, #ffffff 100%);
+}
+
+.pedido-tomado-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+
+  mat-icon.status-asignado {
+    color: #ff9800;
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+  }
+
+  mat-icon.status-enruta {
+    color: #1976d2;
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+  }
+
+  h4 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #212121;
+  }
+
+  .pedido-tomado-info {
+    margin: 2px 0 0;
+    font-size: 0.85rem;
+    color: #757575;
+  }
+}
+
+.pedido-tomado-actions {
+  display: flex;
+  gap: 8px;
+}

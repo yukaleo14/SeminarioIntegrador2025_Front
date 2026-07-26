@@ -17,6 +17,16 @@
   margin-bottom: 12px;
 }
 
+// ── Botón de chat ───────────────────────────────────────────────────────────
+
+.seg-chat-btn {
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 20px;
+}
+
 // ── Estado badge ──────────────────────────────────────────────────────────────
 
 .seg-estado {
