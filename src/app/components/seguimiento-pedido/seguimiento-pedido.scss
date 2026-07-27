@@ -9,6 +9,7 @@
 
 .seg-header {
   padding: 20px 20px 0;
+  position: relative;
 }
 
 .seg-order-number {
@@ -208,4 +209,14 @@
   height: 1px;
   background: var(--mat-sys-outline-variant);
   margin: 4px 0 4px 48px;
+}
+
+.volver-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  border-radius: 20px;
+  z-index: 1000;
+  background: var(--mat-sys-surface);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }

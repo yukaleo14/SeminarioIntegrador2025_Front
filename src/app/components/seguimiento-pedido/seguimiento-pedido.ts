@@ -8,12 +8,13 @@ import { PedidoService } from '../../services/pedido-service';
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { RouterLink } from '@angular/router';
 import { Chat } from '../chat/chat';
 
 @Component({
   selector: 'app-seguimiento-pedido',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatIconModule, Chat],
+  imports: [CommonModule, MatButtonModule, MatIconModule, RouterLink, Chat],
   templateUrl: './seguimiento-pedido.html',
   styleUrl: './seguimiento-pedido.scss'
 })

@@ -146,7 +146,7 @@
                 </mat-icon>
                 <div>
                   <h4>Pedido #{{ pedido.numero }} — {{ pedido.estado?.nombre === 'ENRUTA' ? 'En ruta' : 'Tomado' }}</h4>
-                  <p class="pedido-tomado-info">{{ pedido.comprador?.nombre || 'Cliente' }} · ${{ (pedido.montoTotal / 100).toFixed(2) }}</p>
+                  <p class="pedido-tomado-info">{{ pedido.comprador?.nombre || 'Cliente' }} · ${{ pedido.montoTotal }}</p>
                 </div>
               </div>
               <div class="pedido-tomado-actions">
@@ -211,6 +211,13 @@
       <mat-icon>shopping_cart</mat-icon>
       Ver pedido
       <span class="fab-badge">{{ totalItemsCarrito() }}</span>
+    </button>
+  }
+
+  @if (pedidoActivoComprador(); as pedido) {
+    <button mat-flat-button color="accent" class="pedido-activo-fab" routerLink="/seguimiento/{{ pedido.id }}">
+      <mat-icon>local_shipping</mat-icon>
+      Seguir mi pedido #{{ pedido.numero }}
     </button>
   }
 }

@@ -119,6 +119,14 @@ export class PedidoService {
     return this.http.get<Pedido[]>(`${this.apiUrl}/repartidor/me`);
   }
 
+  findPedidoActivo(): Observable<Pedido | null> {
+    return this.http.get<Pedido | null>(`${this.apiUrl}/repartidor/activo`);
+  }
+
+  findPedidoActivoComprador(): Observable<Pedido | null> {
+    return this.http.get<Pedido | null>(`${this.apiUrl}/comprador/activo`);
+  }
+
   tomarPedido(pedidoId: number): Observable<Pedido> {
     return this.http.patch<Pedido>(`${this.apiUrl}/${pedidoId}/tomar`, {});
   }

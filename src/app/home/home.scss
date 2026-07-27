@@ -352,6 +352,16 @@
   }
 }
 
+.pedido-activo-fab {
+  position: fixed;
+  bottom: 100px;
+  right: 30px;
+  border-radius: 30px;
+  padding: 0 24px;
+  height: 56px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
 /* Pedido tomado por el repartidor */
 .pedido-tomado-card {
   margin-top: 24px;

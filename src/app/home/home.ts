@@ -6,7 +6,8 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table'; // <-- Agregado para la tabla
 import { Router, RouterLink } from '@angular/router';
-import * as L from 'leaflet'; // <-- Importación de Leaflet
+import * as L from 'leaflet';
+import { Subject, takeUntil } from 'rxjs';
 
 import { Buscador } from '../components/buscador/buscador';
 import { CarruselCategorias } from '../components/carrusel-categorias/carrusel-categorias';
@@ -22,6 +23,7 @@ import { CarroService } from '../services/carro-service';
 import { ConfirmarPedidoLauncher } from '../services/confirmar-pedido-launcher';
 import { Pedido, PedidoService } from '../services/pedido-service';
 import { ProductoService } from '../services/producto-service';
+import { SocketService } from '../services/socket.service';
 import { SucursalService } from '../services/sucursal-service';
 import { CurrencyPipe } from '@angular/common';
 
@@ -56,7 +58,9 @@ export class Home implements OnInit, OnDestroy {
   private pedidoLauncher = inject(ConfirmarPedidoLauncher);
   private pedidoService = inject(PedidoService);
   private sucursalService = inject(SucursalService);
+  private socketService = inject(SocketService);
   private router = inject(Router);
+  private destroy$ = new Subject<void>();
 
   productos = signal<Producto[]>([]);
   pedidosPendientes = signal<Pedido[]>([]);
@@ -64,6 +68,7 @@ export class Home implements OnInit, OnDestroy {
   sucursalSeleccionada = signal<Sucursal | null>(null);
   pedidosPublicados = signal<Pedido[]>([]);
   pedidoTomado = signal<Pedido | null>(null);
+  pedidoActivoComprador = signal<Pedido | null>(null);
   chatPedidoId = signal<number | null>(null);
 
   totalItemsCarrito = computed(() => this.carroService.getTotalItems());
@@ -99,14 +104,43 @@ export class Home implements OnInit, OnDestroy {
         },
         error: console.error,
       });
+
+      this.socketService.connect();
+      setTimeout(() => {
+        this.socketService.joinCompanyRoom(this.authService.getEmpresaId()!);
+      }, 600);
+
+      this.socketService.onNuevoPedido().pipe(takeUntil(this.destroy$)).subscribe((nuevo: Pedido) => {
+        if (nuevo.estado?.nombre === 'CREADO' || nuevo.estado?.nombre === 'PENDIENTE') {
+          this.pedidosPendientes.update(current => [nuevo, ...current]);
+        }
+      });
+
+      this.socketService.onPedidoActualizado().pipe(takeUntil(this.destroy$)).subscribe((actualizado: Pedido) => {
+        const nombre = actualizado.estado?.nombre;
+        if (nombre === 'CREADO' || nombre === 'PENDIENTE') {
+          const existe = this.pedidosPendientes().find(p => p.id === actualizado.id);
+          if (!existe) {
+            this.pedidosPendientes.update(current => [actualizado, ...current]);
+          }
+        } else {
+          this.pedidosPendientes.update(current => current.filter(p => p.id !== actualizado.id));
+        }
+      });
     }
 
     if (this.isRepartidor) {
       this.cargarPedidoTomado();
     }
+
+    if (this.isComprador) {
+      this.cargarPedidoActivoComprador();
+    }
   }
 
   ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
     this.map?.remove();
   }
 
@@ -273,29 +307,37 @@ export class Home implements OnInit, OnDestroy {
   private static readonly STORAGE_KEY_PEDIDO_TOMADO = 'repartidor-pedido-tomado';
 
   private cargarPedidoTomado(): void {
-    try {
-      const raw = localStorage.getItem(Home.STORAGE_KEY_PEDIDO_TOMADO);
-      if (raw) {
-        const pedido: Pedido = JSON.parse(raw);
-        if (pedido?.id && pedido.estado?.nombre !== 'ENTREGADO' && pedido.estado?.nombre !== 'CANCELADO') {
+    this.pedidoService.findPedidoActivo().subscribe({
+      next: (pedido) => {
+        if (pedido && pedido.estado?.nombre !== 'ENTREGADO' && pedido.estado?.nombre !== 'CANCELADO') {
           this.pedidoTomado.set(pedido);
         } else {
-          localStorage.removeItem(Home.STORAGE_KEY_PEDIDO_TOMADO);
+          this.pedidoTomado.set(null);
         }
+      },
+      error: () => {
+        this.pedidoTomado.set(null);
       }
-    } catch {
-      localStorage.removeItem(Home.STORAGE_KEY_PEDIDO_TOMADO);
-    }
+    });
+  }
+
+  private cargarPedidoActivoComprador(): void {
+    this.pedidoService.findPedidoActivoComprador().subscribe({
+      next: (pedido) => {
+        this.pedidoActivoComprador.set(pedido);
+      },
+      error: () => {
+        this.pedidoActivoComprador.set(null);
+      }
+    });
   }
 
   private guardarPedidoTomado(pedido: Pedido): void {
     this.pedidoTomado.set(pedido);
-    localStorage.setItem(Home.STORAGE_KEY_PEDIDO_TOMADO, JSON.stringify(pedido));
   }
 
   private limpiarPedidoTomado(): void {
     this.pedidoTomado.set(null);
-    localStorage.removeItem(Home.STORAGE_KEY_PEDIDO_TOMADO);
   }
 
   private trazarRutaASucursal() {const sucursal = this.sucursalSeleccionada();

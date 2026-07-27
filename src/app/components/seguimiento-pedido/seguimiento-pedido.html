@@ -1,5 +1,9 @@
 @if (datosPedido) {
   <div class="seg-header">
+    <button mat-stroked-button color="primary" class="volver-btn" routerLink="/home">
+      <mat-icon>arrow_back</mat-icon>
+      Volver a productos
+    </button>
     <div class="seg-order-number">Pedido #{{ datosPedido.numero }}</div>
 
     <div class="seg-estado" [ngClass]="'seg-estado--' + estadoActual.toLowerCase()">
